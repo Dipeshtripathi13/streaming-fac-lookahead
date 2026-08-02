@@ -1,0 +1,56 @@
+{
+  "fast": "m4",
+  "slow": "arm64",
+  "n_conditions": 63,
+  "scalar_fit": {
+    "alpha_through_origin": 0.9282455523875353,
+    "r2_through_origin": 0.9647534793597675,
+    "max_rel_err_through_origin": 0.4925012634142915,
+    "alpha_affine": 0.8824431999574056,
+    "beta_affine_ms": 1.7162137154127912,
+    "r2_affine": 0.9715002651100136,
+    "max_rel_err_affine": 0.8826644544859436
+  },
+  "per_preset_alpha": {
+    "base": 0.9245093031275353,
+    "small": 1.58617315273638,
+    "tiny": 1.6837620859008935
+  },
+  "per_preset_spread": 1.8212494781879116,
+  "single_scalar_adequate": false,
+  "slowdown_axis": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    8,
+    10,
+    13
+  ],
+  "rtf_threshold": 0.8,
+  "robust_conclusions": {
+    "infeasible_at_all": [
+      "base@20ms",
+      "base@40ms",
+      "base@80ms"
+    ],
+    "feasible_at_all": [
+      "small@80ms",
+      "tiny@20ms",
+      "tiny@40ms",
+      "tiny@80ms"
+    ],
+    "boundary": [
+      "small@20ms",
+      "small@40ms"
+    ]
+  },
+  "pi5_spec": {
+    "soc": "Broadcom BCM2712, 4x Cortex-A76 @ 2.4 GHz",
+    "neon_fp32_peak_gflops": 76.8,
+    "memory": "LPDDR4X-4267, 32-bit -> ~17 GB/s peak",
+    "note": "Peak figures. Achieved sgemm on A76-class cores is typically 40-60% of peak, and this study already shows achieved throughput is what matters (RESULTS_M4.md F2). Treat the derived slowdown as a range, never a point."
+  },
+  "status": "PROJECTION -- NOT MEASURED"
+}

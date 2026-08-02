@@ -426,6 +426,71 @@ the real test. The 1−CKA curve agrees in shape. And "two-segment preferred at
 will detect any curvature, and a 0.994 log-linear fit is not a cliff.
 
 
+## Finding 9 — a single scalar does not describe two machines
+
+Before projecting anything onto hardware we do not have, the projection needs a
+model. The simplest one is `t_B = alpha * t_A`. Across **63 matched conditions**
+on M4 and Neoverse-N1:
+
+| fit | alpha | R² | max relative error |
+|---|---:|---:|---:|
+| through origin | 0.928 | 0.965 | **49.3%** |
+| with intercept | 0.882 (+1.72 ms) | 0.972 | 88.3% |
+
+Per preset:
+
+| preset | alpha (Neoverse / M4) |
+|---|---:|
+| base | **0.925** ← Neoverse is *faster* |
+| small | 1.586 |
+| tiny | 1.684 |
+
+**1.82× spread, and the ranking reverses by model size.** On the 768-dim base
+encoder the Neoverse box beats the M4; on the small and tiny encoders the M4 is
+~1.6× faster. So "machine X is *N*× slower than machine Y" is not a well-defined
+statement for this workload, and any embedded projection has to be per
+configuration.
+
+This also sharpens Finding 2. Peak FLOPS does not merely mispredict the
+*magnitude* of streaming performance — it does not reliably predict the
+**ordering** of two machines.
+
+## Finding 10 — H4: quantisability is an operator-mix property, not a size one
+
+Every benchmark before this passed `--skip-fp32`, so the quantisation half of H4
+had never been tested. int8 vs fp32, same inputs, ARM64, 1 thread:
+
+| stage | params | fp32 → int8 size | fp32 → int8 time | speedup |
+|---|---:|---|---|---:|
+| ASR encoder | 69.14 M | 353.7 → 187.8 MB (1.88×) | 15.39 → 9.53 ms | **1.61×** |
+| ASR joiner | 0.26 M | 1.0 → 0.3 MB (3.96×) | 0.019 → 0.009 ms | **2.09×** |
+| ASR decoder | 0.52 M | 2.1 → 0.5 MB (3.88×) | 0.030 → 0.019 ms | **1.55×** |
+
+Across stages spanning **265× in parameter count**, int8 speedup stays in a
+narrow 1.55–2.09× band and correlates *negatively* with size
+(ρ = −0.51 against log params). The 69 M-parameter encoder quantises **worse**
+than the 0.26 M joiner — 1.88× size reduction against the joiner's near-ideal
+3.96×.
+
+The operator histogram says why. The encoder's graph is dominated by
+**Constant ×1785, Unsqueeze ×676, Add ×436, Gather ×365, Concat ×319** — shape
+and indexing glue, not arithmetic. Those ops do not quantise. They are the
+streaming-state plumbing: this encoder takes **36 inputs**, most of them ring-KV
+cache tensors, and every one needs indexing and concatenation each step.
+
+**This supports H4's direction while sharpening its content.** H4 predicted
+"non-causal operations that resist quantisation". The measurement says something
+more specific and more useful: **streaming *state-management* ops resist
+quantisation, and they scale with the number of cached tensors rather than with
+parameter count.** The actionable form: shrinking a streaming encoder buys less
+than its parameter count suggests, because a growing share of its cost is cache
+plumbing.
+
+**Untested clause.** The vocoder half of H4 needs an ONNX model shipping both
+precisions; Kokoro ships int8 only. Until that is measured the vocoder claim
+stands unsupported, and the paper says so.
+
+
 ---
 
 ## Scope

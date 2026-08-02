@@ -1,0 +1,4 @@
+stage,threads,n_params_M,fp32_MB,int8_MB,size_ratio,fp32_p50_ms,int8_p50_ms,int8_speedup,top_ops
+asr_encoder,1,69.14,353.7,187.8,1.88,15.3893,9.531,1.615,Constantx1785;Unsqueezex676;Addx436;Gatherx365;Concatx319;Mulx302
+asr_joiner,1,0.26,1.0,0.3,3.96,0.0188,0.009,2.088,Addx1;Tanhx1;Gemmx1
+asr_decoder,1,0.52,2.1,0.5,3.88,0.0299,0.0192,1.552,Constantx4;Castx2;Gatherx2;Transposex2;Clipx1;GreaterOrEqualx1

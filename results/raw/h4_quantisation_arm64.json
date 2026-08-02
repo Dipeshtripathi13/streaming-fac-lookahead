@@ -1,0 +1,42 @@
+{
+  "rows": [
+    {
+      "stage": "asr_encoder",
+      "threads": 1,
+      "n_params_M": 69.14,
+      "fp32_MB": 353.7,
+      "int8_MB": 187.8,
+      "size_ratio": 1.88,
+      "fp32_p50_ms": 15.3893,
+      "int8_p50_ms": 9.531,
+      "int8_speedup": 1.615,
+      "top_ops": "Constantx1785;Unsqueezex676;Addx436;Gatherx365;Concatx319;Mulx302"
+    },
+    {
+      "stage": "asr_joiner",
+      "threads": 1,
+      "n_params_M": 0.26,
+      "fp32_MB": 1.0,
+      "int8_MB": 0.3,
+      "size_ratio": 3.96,
+      "fp32_p50_ms": 0.0188,
+      "int8_p50_ms": 0.009,
+      "int8_speedup": 2.088,
+      "top_ops": "Addx1;Tanhx1;Gemmx1"
+    },
+    {
+      "stage": "asr_decoder",
+      "threads": 1,
+      "n_params_M": 0.52,
+      "fp32_MB": 2.1,
+      "int8_MB": 0.5,
+      "size_ratio": 3.88,
+      "fp32_p50_ms": 0.0299,
+      "int8_p50_ms": 0.0192,
+      "int8_speedup": 1.552,
+      "top_ops": "Constantx4;Castx2;Gatherx2;Transposex2;Clipx1;GreaterOrEqualx1"
+    }
+  ],
+  "threads": 1,
+  "reps": 20
+}
