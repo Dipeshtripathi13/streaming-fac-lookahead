@@ -101,13 +101,34 @@ not test. Both positive and negative results are publishable — see §11.
 > Pre-register the knee-location estimate before running. Bootstrap CI on a
 > knee from 7 points is wide; say so.
 >
-> **PROVISIONAL ANSWER (§7 F7, real L2-ARCTIC, encoder-level): the third
-> branch.** Representation drift is **log-linear in lookahead** — R² = 0.9955
-> against log₂(L) vs 0.7746 against L, constant −0.081 per doubling from 20 to
-> 640 ms, no inflection. Nothing special happens at 40 ms. If this survives the
-> trained sweep, the paper's job becomes *publishing the exchange rate* rather
-> than recommending an operating point. Caveat: this is drift from the
-> bidirectional representation, not conversion quality.
+> **PROVISIONAL ANSWER (§7 F8, 198 L2-ARCTIC utterances on a T4,
+> encoder-level): no cliff, but a broad optimum in the exchange rate.**
+> R² = 0.9942 against log₂(L) vs 0.7267 against L — overwhelmingly log-linear —
+> yet BIC also prefers a two-segment fit (ΔBIC = −22.9). Both are true: strong
+> log-linearity *plus* small real curvature. The model-free reading settles it:
+>
+> | doubling | Δ divergence |
+> |---|---:|
+> | 20 → 40 ms | +0.050 |
+> | 80 → 160 ms | +0.079 |
+> | **100 → 200 ms** | **+0.081** ← peak |
+> | 320 → 640 ms | +0.053 |
+>
+> **Nothing distinguishes 40 ms — it sits on the least productive doubling
+> measured.** Best marginal return is **100–200 ms**, 2.5–5× PHONOS's budget.
+> So "current budgets are under-provisioned" is defensible as
+> *diminishing-returns geometry*, not as a knee. Report the exchange rate
+> (~0.08 per doubling, peaking at 100–200 ms), not an operating point.
+> Caveat: representation drift, not conversion quality — the trained sweep is
+> the real test.
+
+*Two methodological notes that belong in the paper, both from getting this
+wrong first (§7 F8):* **(a)** lookahead is quantised to `ceil(L/frame_ms)`
+frames, so a knee narrower than the 20 ms frame rate is not merely unmeasured
+but *unrepresentable* — and sampling finer than that silently creates duplicate
+conditions that reweight the fit. **(b)** A 7-point geometric grid is
+**underpowered** for knee detection: a synthetic planted cliff returns
+ΔBIC = −0.2 on n = 7. Any "no knee" claim needs ≥ ~16 distinct conditions.
 
 **RQ2.** Is degradation uniform across phoneme classes?
 

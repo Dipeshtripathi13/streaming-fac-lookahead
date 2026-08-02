@@ -31,6 +31,7 @@ reference (weakest, but dependency-free).
 """
 from __future__ import annotations
 
+import math
 import os
 import sys
 from collections import defaultdict
@@ -311,64 +312,126 @@ def _lin_r2(x: np.ndarray, y: np.ndarray) -> float:
     return 1.0 - float((resid ** 2).sum()) / ss if ss > 0 else float("nan")
 
 
+def _fit_ss(x: np.ndarray, y: np.ndarray) -> float:
+    A = np.vstack([x, np.ones_like(x)]).T
+    m, c = np.linalg.lstsq(A, y, rcond=None)[0]
+    return float(((y - (m * x + c)) ** 2).sum())
+
+
+def _bic(ss: float, n: int, k: int) -> float:
+    return n * math.log(max(ss, 1e-300) / n) + k * math.log(n)
+
+
 def find_knee(Ls: Sequence[float], ys: Sequence[float],
-              loglinear_r2_threshold: float = 0.99) -> Dict[str, float]:
-    """H1: is there a knee in the quality-vs-lookahead curve, and where?
+              frame_ms: float = 20.0) -> Dict[str, object]:
+    """Is there a knee in the quality-vs-lookahead curve, and where?
 
-    **Test for a knee before locating one.** The maximum-distance-to-chord
-    method (Kneedle without smoothing) *always* returns a point. Applied to a
-    curve that is smoothly log-linear it returns the middle of the sampled
-    range and looks like a finding. We hit exactly that: the real pilot data
-    is log-linear at R2 = 0.996, and the chord method confidently reported a
-    "knee at 160 ms" with a tight bootstrap CI, because every bootstrap
-    resample of a log-linear curve is also log-linear.
+    Three lessons are baked in here, each learned by getting it wrong first.
 
-    So: fit `y ~ log2(L + step)` first. If that fits well, there is no knee —
-    every doubling of lookahead buys the same increment, there is no natural
-    operating point, and the honest report is a slope per doubling. Only if
-    the log-linear fit is poor does a knee location mean anything.
+    **1. Test for a knee before locating one.** Maximum-distance-to-chord
+    (Kneedle) *always* returns a point; on a curve that is smooth in log space
+    it returns the middle of the sampled range and looks like a finding. Our
+    first run reported "knee at 160 ms, bootstrap CI [160, 160]" on a curve
+    that was log-linear at R2 = 0.9955 — the CI was tight *because* there was
+    no effect, since every resample of a log-linear curve is log-linear.
 
-    Lookahead is sampled geometrically (0, 20, 40, ... 640), so log2 is the
-    natural axis; `+step` handles L = 0. Linear-in-L is also fitted so the
-    reader can see which geometry the curve prefers.
+    **2. Do not decide on an R2 threshold.** The second run, on a denser grid,
+    gave R2 = 0.9887 and flipped `has_knee` purely by crossing an arbitrary
+    0.99 cutoff. A scientific conclusion must not hinge on a magic number, so
+    model choice is now BIC between a one-segment and a two-segment fit on the
+    log2 axis.
+
+    **3. Check for duplicate conditions.** Lookahead is quantised to
+    ceil(L / frame_ms) frames. Sampling finer than the frame rate produces
+    byte-identical duplicates that silently reweight the fit. We warn, and the
+    caller should deduplicate.
+
+    Because these curves are means over hundreds of utterances, residuals are
+    real curvature rather than sampling noise, and BIC will happily prefer the
+    two-segment model for a *gentle* bend. So the honest headline is neither
+    "knee" nor "no knee" but the **gain-per-doubling profile**, which is
+    model-free and is what a practitioner actually needs. It is always returned.
     """
-    x = np.asarray(Ls, float)
+    x_ms = np.asarray(Ls, float)
     y = np.asarray(ys, float)
-    if len(x) < 3:
-        return {"knee_ms": float("nan"), "has_knee": None}
+    if len(x_ms) < 4:
+        return {"knee_ms": float("nan"), "has_knee": None,
+                "note": "need >= 4 points"}
 
-    step = float(np.min(np.diff(np.unique(x)))) if len(np.unique(x)) > 1 else 1.0
-    r2_log = _lin_r2(np.log2(x + step), y)
-    r2_lin = _lin_r2(x, y)
+    frames = np.ceil(x_ms / frame_ms - 1e-9).astype(int)
+    n_dup = len(frames) - len(set(frames.tolist()))
 
-    xn = (x - x.min()) / (np.ptp(x) or 1)
+    step = float(np.min(np.diff(np.unique(x_ms)))) if len(np.unique(x_ms)) > 1 else 1.0
+    X = np.log2(x_ms + max(step, frame_ms))
+    n = len(y)
+
+    ss_log = _fit_ss(X, y)
+    bic_log = _bic(ss_log, n, 3)
+    best_bic, best_bp = float("inf"), float("nan")
+    for i in range(2, n - 2):
+        s2 = _fit_ss(X[:i + 1], y[:i + 1]) + _fit_ss(X[i:], y[i:])
+        b = _bic(s2, n, 6)
+        if b < best_bic:
+            best_bic, best_bp = b, float(x_ms[i])
+    d_bic = best_bic - bic_log
+    has_knee = bool(d_bic < -6)      # "strong" evidence on the Kass-Raftery scale
+    # BIC pays k*log(n) for the 3 extra parameters. Below ~10 points that
+    # penalty swamps a real bend: a planted knee on a 7-point grid comes back
+    # dBIC = -0.2, i.e. undetectable. So a "no knee" verdict from a sparse grid
+    # means "underpowered", not "absent" -- say so rather than let the reader
+    # assume evidence of absence.
+    underpowered = n < 10
+
+    # gain per doubling of lookahead -- the model-free headline
+    # Pair each sampled L with its double wherever the grid contains one --
+    # not just adjacent points, which on a linear grid are rarely doublings.
+    profile = []
+    for i, a in enumerate(x_ms):
+        if a <= 0:
+            continue
+        j = int(np.argmin(abs(x_ms - 2 * a)))
+        if abs(x_ms[j] - 2 * a) > 1e-6 or j == i:
+            continue
+        profile.append({"from_ms": float(a), "to_ms": float(x_ms[j]),
+                        "delta": round(float(y[i] - y[j]), 5)})
+    A = np.vstack([X, np.ones_like(X)]).T
+    slope = float(np.linalg.lstsq(A, y, rcond=None)[0][0])
+
+    xn = (x_ms - x_ms.min()) / (np.ptp(x_ms) or 1)
     yn = (y - y.min()) / (np.ptp(y) or 1)
     d = np.abs((yn[-1] - yn[0]) * xn - (xn[-1] - xn[0]) * yn
                + xn[-1] * yn[0] - yn[-1] * xn[0]) / \
         np.hypot(yn[-1] - yn[0], xn[-1] - xn[0])
-    k = int(np.argmax(d))
-
-    has_knee = bool(r2_log < loglinear_r2_threshold)
-    # slope per doubling, the number to report when there is no knee
-    A = np.vstack([np.log2(x + step), np.ones_like(x)]).T
-    slope_per_doubling = float(np.linalg.lstsq(A, y, rcond=None)[0][0])
 
     return {
-        "knee_ms": float(x[k]) if has_knee else float("nan"),
-        "knee_index": k if has_knee else -1,
-        "knee_strength": float(d[k]),
+        "knee_ms": best_bp if has_knee else float("nan"),
         "has_knee": has_knee,
-        "r2_loglinear": round(r2_log, 4),
-        "r2_linear": round(r2_lin, 4),
-        "slope_per_doubling": round(slope_per_doubling, 5),
-        "chord_argmax_ms": float(x[k]),   # what the naive estimator would say
+        "delta_bic_piecewise_minus_loglinear": round(d_bic, 2),
+        "breakpoint_if_piecewise_ms": best_bp,
+        "r2_loglinear": round(1 - ss_log / float(((y - y.mean()) ** 2).sum()), 5),
+        "r2_linear": round(_lin_r2(x_ms, y), 5),
+        "slope_per_doubling": round(slope, 5),
+        "gain_per_doubling_profile": profile,
+        "n_duplicate_conditions": n_dup,
+        "n_points": n,
+        "underpowered_for_bic": underpowered,
+        "chord_argmax_ms": float(x_ms[int(np.argmax(d))]),
         "monotone": bool(np.all(np.diff(y) <= 1e-9) or np.all(np.diff(y) >= -1e-9)),
         "interpretation": (
-            f"No knee: y is log-linear in lookahead (R2={r2_log:.4f}). Every "
-            f"doubling of L buys a constant {abs(slope_per_doubling):.4f}. There "
-            f"is no natural operating point; the budget is a product decision."
-            if not has_knee else
-            f"Knee at {x[k]:.0f} ms (log-linear fit is poor, R2={r2_log:.4f})."),
+            (f"WARNING: {n_dup} duplicate conditions at the {frame_ms:g} ms frame "
+             f"rate -- deduplicate before trusting this. " if n_dup else "")
+            + (f"UNDERPOWERED: only {n} points; BIC cannot detect a knee below "
+               f"~10 points, so a 'no knee' verdict here is absence of evidence, "
+               f"not evidence of absence. " if underpowered else "")
+            + (f"Two-segment fit preferred (dBIC={d_bic:.1f}), bend near "
+               f"{best_bp:.0f} ms. But R2 of the single log-linear fit is "
+               f"{1 - ss_log / float(((y - y.mean()) ** 2).sum()):.4f}, so this is a "
+               f"gentle curvature, not a cliff -- report the gain-per-doubling "
+               f"profile, not a knee location."
+               if has_knee else
+               f"No knee: log-linear in lookahead (dBIC={d_bic:+.1f} favours one "
+               f"segment). Every doubling buys ~{abs(slope):.4f}. No natural "
+               f"operating point; the budget is a product decision.")),
     }
 
 
@@ -377,8 +440,21 @@ if __name__ == "__main__":
     Ls = [0, 20, 40, 80, 160, 320, 640]
     q = [1.0, 0.95, 0.80, 0.40, 0.32, 0.30, 0.29]      # big drop up to 80 ms
     k = find_knee(Ls, q)
-    assert k["has_knee"] and k["knee_ms"] == 80, k
-    print("ok  knee detection recovers planted knee at 80 ms")
+    assert k["underpowered_for_bic"] and k["has_knee"] is False, k
+    print(f"ok  7-point grid reported as UNDERPOWERED, not as 'no knee' "
+          f"(dBIC={k['delta_bic_piecewise_minus_loglinear']:+.1f} on n=7)")
+
+    # Same shape, grid dense enough for BIC to have power.
+    import numpy as _np
+    Ld = [0,20,40,60,80,100,120,140,160,200,240,280,320,400,480,640]
+    qd = [1.0 if L == 0 else (1.0 - 0.0075 * L if L <= 80 else 0.42 - 0.00018 * (L - 80))
+          for L in Ld]
+    kd = find_knee(Ld, qd)
+    assert kd["has_knee"], kd
+    assert 60 <= kd["breakpoint_if_piecewise_ms"] <= 120, kd["breakpoint_if_piecewise_ms"]
+    print(f"ok  planted knee recovered on a 16-point grid: bend at "
+          f"{kd['breakpoint_if_piecewise_ms']:.0f} ms "
+          f"(dBIC={kd['delta_bic_piecewise_minus_loglinear']:.1f})")
 
     # The case that actually bit us: a smoothly log-linear curve has NO knee,
     # but the chord estimator will happily name one in the middle of the grid.
@@ -391,6 +467,29 @@ if __name__ == "__main__":
     assert k2["chord_argmax_ms"] > 0        # the naive answer, kept for contrast
     print(f"ok  log-linear curve correctly reported as NO knee "
           f"(chord estimator would have said {k2['chord_argmax_ms']:.0f} ms)")
+
+    # The duplicate-condition trap: sampling finer than the frame rate makes
+    # byte-identical conditions that silently reweight the fit. Must be flagged.
+    dense_L = list(range(0, 201, 10))
+    dense_y = [1.0 - 0.08 * _np.log2(20 * _np.ceil(L / 20 - 1e-9) + 20) for L in dense_L]
+    k3 = find_knee(dense_L, dense_y)
+    assert k3["n_duplicate_conditions"] == 10, k3["n_duplicate_conditions"]
+    assert "duplicate conditions" in k3["interpretation"]
+    print(f"ok  duplicate conditions flagged "
+          f"({k3['n_duplicate_conditions']} of {len(dense_L)} at the 20 ms frame rate)")
+
+    # And the real GPU curve, deduplicated: gentle curvature, not a cliff
+    real_L = [0,20,40,60,80,100,120,140,160,180,200,240,280,320,480,640]
+    real_y = [0.49716,0.42209,0.37166,0.33439,0.30919,0.28621,0.26562,0.24664,
+              0.23045,0.21639,0.20509,0.18769,0.17298,0.16078,0.12768,0.10737]
+    k4 = find_knee(real_L, real_y)
+    assert k4["n_duplicate_conditions"] == 0
+    assert k4["r2_loglinear"] > 0.99
+    print(f"ok  real GPU curve: R2_loglin={k4['r2_loglinear']} "
+          f"dBIC={k4['delta_bic_piecewise_minus_loglinear']} "
+          f"has_knee={k4['has_knee']}")
+    print(f"    gain per doubling: "
+          f"{[p['delta'] for p in k4['gain_per_doubling_profile']]}")
 
     per_L = {}
     for L in Ls:

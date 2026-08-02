@@ -144,8 +144,21 @@ model you trained.
    400 ms the cascade is ~853 ms and **still ~93% algorithmic**. The conclusion
    survives its own best-case repair.
 
-Compute-side and correctness only. No accent-conversion model is trained yet —
-finding 0 was the prerequisite for the lookahead labels meaning anything.
+7. **RQ1, first real answer (198 utts, Tesla T4).** No cliff, but a broad
+   optimum in the *exchange rate*. R² log-linear **0.9942** vs linear 0.7267;
+   gain per doubling peaks at **+0.081 for 100→200 ms** and is lowest
+   (+0.050) at 20→40 ms. **Nothing distinguishes PHONOS's 40 ms — it sits on
+   the least productive doubling measured.** Report the exchange rate, not an
+   operating point.
+
+Compute-side, correctness, and encoder-level results only. No accent-conversion
+model is trained yet — finding 0 was the prerequisite for the lookahead labels
+meaning anything.
+
+**Two errors worth reading about** (`docs/RESULTS_M4.md` F8): a 10 ms sampling
+grid was invalid because lookahead is quantised to the 20 ms frame rate (half
+the points were duplicates), and the knee test was deciding on an arbitrary R²
+threshold. Both are fixed; both are documented rather than quietly corrected.
 
 ---
 

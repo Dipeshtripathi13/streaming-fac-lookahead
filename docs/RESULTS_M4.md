@@ -233,7 +233,12 @@ over L2-ARCTIC with `--wavs`: accented speech should revise *more*, and if it
 does, the cascade argument gets stronger.
 
 
-## Finding 7 — RQ1 on real speech: **there is no knee**
+## Finding 7 — RQ1 on real speech, first pass *(superseded by Finding 8)*
+
+> **Read Finding 8 first.** This section's headline — "there is no knee" — was
+> based on a 7-point grid that BIC later showed is underpowered to detect one.
+> The measurement is sound; the conclusion was over-confident. Kept because the
+> estimator failure it documents is the point.
 
 The first result with actual accented speech in it. 48 L2-ARCTIC utterances,
 8 per L1 across all six L1s, WavLM-base-plus layer 9, both causality patches
@@ -313,6 +318,112 @@ benefit more from right context — and it excludes zero, but a 1.3-point
 difference on a crude voicing × spectral-flux proxy is not evidence for a
 phoneme-class story. The real test needs forced alignment against L2-ARCTIC's
 phone annotations; this only shows the effect is worth looking for.
+
+
+## Finding 8 — RQ1 on GPU, 198 utterances: the answer, and two of my own errors
+
+Tesla T4, torch 2.11.0+cu128, 198 L2-ARCTIC utterances (33 per L1 × 6 L1s),
+165 s. This supersedes Finding 7's conclusion.
+
+### First: the causality proof replicates exactly, and improves
+
+| configuration | M4 (torch 2.13) | T4 (torch 2.11) |
+|---|---:|---:|
+| attention mask only | 1.1438e-2 | **1.1438e-2** |
+| + causal positional conv | 5.9956e-3 | **5.9956e-3** |
+| + cumulative GroupNorm | 2.5983e-2 | **2.5983e-2** |
+| **both patches** | 6.14e-6 | **0.0 exactly** |
+
+Bit-identical across two architectures and two torch versions, and on the T4
+the patched encoder is causal to *machine zero* — `max_abs_delta = 0.0`.
+Finding 0 is solid.
+
+### Then: my "dense" grid was invalid
+
+I asked for L every 10 ms. **Lookahead is quantised to `ceil(L / frame_ms)`
+frames, and the frame rate is 20 ms**, so half the grid was byte-identical
+duplicates:
+
+```
+L(ms)  frames  divergence
+  10     1     0.42209
+  20     1     0.42209   <- same condition
+  30     2     0.37166
+  40     2     0.37166   <- same condition
+```
+
+26 nominal points → **16 distinct conditions**. The 10 duplicates all sat in
+0–200 ms, double-weighting that region and dragging R² from 0.994 to 0.989.
+
+**A knee narrower than 20 ms is not unmeasured — it is unrepresentable.** The
+encoder cannot express it. That is a real constraint on the whole question and
+it should have been obvious from `StreamGeometry.lookahead_frames`, which I
+wrote. `--dense` now steps by `frame_ms`, and the pilot deduplicates and warns.
+
+### And my knee test was deciding on an arbitrary number
+
+Those duplicates pushed R² across the 0.99 threshold I had chosen, flipping
+`has_knee` from False to True and printing *"Knee at 170 ms"*. A scientific
+conclusion turned on a magic constant. Replaced with BIC comparison between a
+one- and two-segment fit on the log₂ axis.
+
+That change immediately exposed a second problem: **on the original 7-point
+grid, BIC cannot detect a knee at all.** A synthetic curve with a planted cliff
+at 80 ms returns ΔBIC = −0.2 on 7 points — the `k·log n` penalty swamps it. So
+Finding 7's "no knee" was never evidence of absence; it was an underpowered
+grid. `find_knee` now returns `underpowered_for_bic` and says so.
+
+### The actual result
+
+16 distinct conditions, 198 utterances:
+
+| | |
+|---|---|
+| R² log-linear | **0.9942** |
+| R² linear | 0.7267 |
+| ΔBIC (piecewise − log-linear) | **−22.9** → two-segment preferred |
+| best breakpoint | 280 ms |
+| mean slope | −0.081 per doubling |
+
+These pull in opposite directions, and the honest reading is that **both are
+true**: the curve is *overwhelmingly* log-linear (0.994 vs 0.727), and it also
+has a small, real, systematic curvature that BIC detects because the residuals
+are genuine structure rather than sampling noise (each point is a mean over 198
+utterances, so noise is tiny).
+
+The model-free view settles it — gain per doubling of lookahead:
+
+| doubling | Δ divergence |
+|---|---:|
+| 20 → 40 ms | +0.0504 |
+| 40 → 80 ms | +0.0625 |
+| 80 → 160 ms | +0.0787 |
+| **100 → 200 ms** | **+0.0811** ← peak |
+| 160 → 320 ms | +0.0697 |
+| 320 → 640 ms | +0.0534 |
+
+**There is no cliff. There is a broad, shallow maximum in the exchange rate
+around 100–200 ms.** Every doubling buys something, and doublings in the
+100–200 ms band buy about 60% more than doublings at 20–40 ms. The curve is
+closer to "no natural operating point" than to "a knee", but the flat statement
+*"no knee"* from Finding 7 was over-confident and is withdrawn.
+
+### What this means for the paper
+
+- **Nothing distinguishes 40 ms.** PHONOS's budget is on the cheap part of the
+  curve: the 20→40 ms doubling is the *least* productive one measured.
+- **The best marginal return is 100–200 ms**, i.e. 2.5–5× PHONOS's budget. If
+  the trained sweep reproduces this, "current budgets are under-provisioned"
+  becomes defensible — but as *diminishing-returns geometry*, not a knee.
+- **Report the exchange rate, not an operating point.** ~0.08 divergence per
+  doubling, peaking around 100–200 ms.
+
+### Caveats
+
+Still representation drift, not conversion quality — the trained sweep remains
+the real test. The 1−CKA curve agrees in shape. And "two-segment preferred at
+280 ms" should not be quoted as a knee: with n = 16 and near-zero noise, BIC
+will detect any curvature, and a 0.994 log-linear fit is not a cliff.
 
 
 ---

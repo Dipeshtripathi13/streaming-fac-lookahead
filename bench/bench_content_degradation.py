@@ -646,15 +646,17 @@ def main() -> None:
     ap.add_argument("--lookaheads", type=float, nargs="+", default=None,
                     help="explicit L grid in ms; overrides the default sweep")
     ap.add_argument("--dense", action="store_true",
-                    help="dense grid 0..200 ms in 10 ms steps, plus 320/640. "
-                         "Tests whether a knee narrower than one octave is "
-                         "hiding between the geometric sample points -- the "
-                         "one caveat that could overturn the no-knee finding.")
+                    help="finest MEANINGFUL grid: every frame (20 ms) from 0 to "
+                         "200 ms, then 240/280/320/480/640. Sampling below the "
+                         "frame rate is pointless -- lookahead is quantised to "
+                         "ceil(L/frame_ms) frames, so a 10 ms step just "
+                         "duplicates conditions (we made that mistake once).")
     a = ap.parse_args()
 
     global SWEEP_L
     if a.dense:
-        SWEEP_L = tuple(list(range(0, 201, 10)) + [240, 280, 320, 480, 640])
+        step = int(FRAME_MS)   # 20 ms: one encoder frame. Finer is not a thing.
+        SWEEP_L = tuple(list(range(0, 201, step)) + [240, 280, 320, 480, 640])
     elif a.lookaheads:
         SWEEP_L = tuple(a.lookaheads)
 
@@ -742,9 +744,29 @@ def main() -> None:
     # ---------------- summarise ----------------
     Ls = list(SWEEP_L)
     mean_div = [float(np.mean(by_L[L])) for L in Ls]
+
+    # Lookahead is quantised to ceil(L / frame_ms) frames. Two nominal L values
+    # that round to the same frame count are the SAME condition and produce
+    # byte-identical output. Leaving them in silently double-weights whichever
+    # region was oversampled, which is exactly how a 10 ms grid manufactured a
+    # spurious knee here. Collapse to distinct conditions before fitting.
+    import math as _m
+    _seen, _keep = set(), []
+    for _i, _L in enumerate(Ls):
+        _f = _m.ceil(_L / FRAME_MS - 1e-9)
+        if _f not in _seen:
+            _seen.add(_f)
+            _keep.append(_i)
+    n_dup = len(Ls) - len(_keep)
+    if n_dup:
+        print(f"\nNOTE: {len(Ls)} nominal lookaheads collapse to {len(_keep)} "
+              f"distinct conditions ({n_dup} duplicates at the {FRAME_MS:g} ms "
+              f"frame rate). Fitting on distinct conditions only.")
+    Ls_fit = [Ls[i] for i in _keep]
+    div_fit = [mean_div[i] for i in _keep]
     mean_cka = [float(np.mean(by_L_cka[L])) for L in Ls]
-    knee_div = find_knee(Ls, mean_div)
-    knee_cka = find_knee(Ls, [1 - c for c in mean_cka])
+    knee_div = find_knee(Ls_fit, div_fit)
+    knee_cka = find_knee(Ls_fit, [1 - float(np.mean(by_L_cka[L])) for L in Ls_fit])
 
     # bootstrap CI on the knee -- 7 points gives a wide interval and the paper
     # must say so rather than quoting a point estimate
@@ -780,6 +802,8 @@ def main() -> None:
         "encoder_causality": encinfo,
         "causality_selftest": st,
         "lookaheads_ms": Ls,
+        "lookaheads_distinct_ms": Ls_fit,
+        "n_duplicate_conditions": n_dup,
         "divergence_from_bidirectional": dict(zip(map(str, Ls), mean_div)),
         "cka_to_bidirectional": dict(zip(map(str, Ls), mean_cka)),
         "knee_divergence": knee_div,
