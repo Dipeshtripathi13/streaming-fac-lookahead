@@ -1,0 +1,8 @@
+# Training + the `gpu` hardware class.
+# Install torch FIRST from the CUDA index, then this file:
+#   pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
+-r cpu.txt
+torchaudio>=2.2
+speechbrain>=1.0
+accelerate>=0.30
+tensorboard>=2.15

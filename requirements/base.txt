@@ -1,0 +1,5 @@
+# Core -- needed by every platform, no heavy deps.
+numpy>=1.24
+scipy>=1.10
+soundfile>=0.12
+pyyaml>=6.0

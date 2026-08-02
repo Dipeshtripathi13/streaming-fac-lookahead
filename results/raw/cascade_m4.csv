@@ -1,0 +1,13 @@
+component,quantised,threads,load_ms,feed_block_ms,compute_p50_ms,compute_p95_ms,compute_p99_ms,rtf_p50,rtf_p95,active_step_p50_ms,active_step_p95_ms,encoder_duty_cycle,rtf_amortised,model_decode_chunk_ms,model_right_context_ms,n_blocks,transcript,hw_class,utt_synth_p50_ms,utt_synth_p95_ms,single_word_synth_p50_ms,n
+asr_streaming_zipformer,True,1,705.8,100.0,0.095,13.91,17.618,0.0009,0.1391,12.362,16.505,0.313,0.0414,320.0,70.0,299,SEVERALS FROM ROSES FROM ROSES FROM THOUSANDS FROM THE CITIES FROM THE RIVERSALS SEVERALS FOR MOVEMENTS FORTH AND SEA FO,cpu-apple-silicon,,,,
+tts_kokoro,,1,602.2,,,,,0.6963,0.7375,,,,,,,,,cpu-apple-silicon,2145.08,2231.99,828.5,12
+tts_vits,,1,613.2,,,,,0.1201,0.1273,,,,,,,,,cpu-apple-silicon,341.69,368.15,16.63,12
+asr_streaming_zipformer,True,2,515.6,100.0,0.113,12.724,13.675,0.0011,0.1272,11.562,13.648,0.313,0.0374,320.0,70.0,299,SEVERALS FROM ROSES FROM ROSES FROM THOUSAND FROM THE ROSES SEVERALS FOR MOVEMENTS FORTH AND SEVERAL SEASONABLE,cpu-apple-silicon,,,,
+tts_kokoro,,2,477.4,,,,,0.6855,0.7157,,,,,,,,,cpu-apple-silicon,2075.01,2208.35,809.28,12
+tts_vits,,2,739.1,,,,,0.1273,0.1346,,,,,,,,,cpu-apple-silicon,359.04,384.81,20.09,12
+asr_streaming_zipformer,True,4,599.8,100.0,0.163,14.73,15.022,0.0016,0.1473,13.999,14.925,0.313,0.0445,320.0,70.0,299,SAR,cpu-apple-silicon,,,,
+tts_kokoro,,4,568.2,,,,,0.8303,0.8823,,,,,,,,,cpu-apple-silicon,2558.22,2653.43,1048.26,12
+tts_vits,,4,1049.6,,,,,0.1734,0.1832,,,,,,,,,cpu-apple-silicon,487.65,547.12,22.19,12
+asr_streaming_zipformer,True,8,773.8,100.0,0.195,51.233,80.077,0.0019,0.5123,37.884,71.818,0.357,0.1383,320.0,70.0,299,SAR,cpu-apple-silicon,,,,
+tts_kokoro,,8,686.2,,,,,1.0607,1.1847,,,,,,,,,cpu-apple-silicon,3293.8,3505.64,1394.92,12
+tts_vits,,8,1021.7,,,,,0.2254,0.2459,,,,,,,,,cpu-apple-silicon,625.57,713.07,34.3,12

@@ -1,0 +1,8 @@
+# Raspberry Pi 5 / ARM64. Inference and timing ONLY.
+# Deliberately excludes torch, transformers, datasets, whisper, speechbrain and
+# matplotlib: the Pi runs the ONNX benchmarks and writes CSVs; scoring, the
+# causal-WavLM pilot and plotting happen on the Mac. Installing torch on a Pi is
+# a multi-hour detour that buys nothing here.
+-r base.txt
+onnxruntime>=1.17
+sherpa-onnx>=1.10

@@ -1,0 +1,297 @@
+
+============================================================
+  0. ENVIRONMENT
+============================================================
+repo   : /Users/dipeshtripathi/Desktop/accent_con/research
+log    : results/raw/run_m4_20260802_135459.log
+ProductName:		macOS ProductVersion:		26.5 BuildVersion:		25F71 
+Apple M4
+P-cores: 4  E-cores: 6
+Now drawing from 'AC Power'
+
+NOTE: benchmarks should run on AC power. Battery = downclocked = wrong p95.
+python : python3.11 (Python 3.11.15)
+installing dependencies (first run downloads ~2 GB, later runs are instant) ...
+  [OK]   dependencies
+QoS clamp: taskpolicy -c utility
+
+============================================================
+  1. UNIT TESTS AND INVARIANT GUARDS
+============================================================
+  [OK]   tests/test_causal.py
+  [OK]   tests/test_pipeline_invariants.py
+  [OK]   eval/metrics.py
+  [OK]   eval/phoneme_analysis.py
+
+============================================================
+  2. HARDWARE PROBE
+============================================================
+
+wrote results/raw/hw_m4.json
+  "mac_perf_cores": "4",
+  "mac_eff_cores": "6",
+  "mac_model": "Mac16,1",
+  "calibration": {
+    "sgemm_512": {
+      "n": 512,
+      "median_ms": 0.1535,
+      "gflops": 1748.3
+    },
+    "sgemm_1024": {
+      "n": 1024,
+      "median_ms": 1.2143,
+      "gflops": 1768.51
+    },
+    "memcpy_64mb": {
+      "mb": 64,
+      "median_ms": 2.019,
+      "gb_per_s": 30.95
+    },
+    "single_core": {
+      "loop_2m_ms": 46.13
+    }
+  },
+  "hw_class": "cpu-apple-silicon"
+}
+  [OK]   hardware probe
+
+============================================================
+  3. ENCODER SCALING SWEEP  (compute vs lookahead x chunk x model size)
+============================================================
+
+=== preset base: d=768 h=12 ffn=3072 layers=12 ===
+!! C= 20ms L=  0ms  t_algo=  20.0  t_cmp_p50=  31.99  p95=  39.26  RTF= 1.599    93.9 GF/s
+!! C= 20ms L= 20ms  t_algo=  40.0  t_cmp_p50=  30.48  p95=  34.20  RTF= 1.524    99.5 GF/s
+!! C= 20ms L= 40ms  t_algo=  60.0  t_cmp_p50=  30.86  p95=  53.36  RTF= 1.543    99.2 GF/s
+!! C= 20ms L= 80ms  t_algo= 100.0  t_cmp_p50=  29.77  p95=  30.97  RTF= 1.489   104.7 GF/s
+!! C= 20ms L=160ms  t_algo= 180.0  t_cmp_p50=  30.88  p95=  33.61  RTF= 1.544   104.7 GF/s
+!! C= 20ms L=320ms  t_algo= 340.0  t_cmp_p50=  30.32  p95=  37.72  RTF= 1.516   114.1 GF/s
+!! C= 20ms L=640ms  t_algo= 660.0  t_cmp_p50=  31.50  p95=  32.14  RTF= 1.575   124.2 GF/s
+!! C= 40ms L=  0ms  t_algo=  40.0  t_cmp_p50=  42.98  p95=  44.16  RTF= 1.075    74.0 GF/s
+!! C= 40ms L= 20ms  t_algo=  60.0  t_cmp_p50=  43.41  p95=  44.16  RTF= 1.085    73.9 GF/s
+!! C= 40ms L= 40ms  t_algo=  80.0  t_cmp_p50=  46.64  p95=  60.24  RTF= 1.166    69.4 GF/s
+!! C= 40ms L= 80ms  t_algo= 120.0  t_cmp_p50=  43.99  p95=  49.68  RTF= 1.100    74.9 GF/s
+!! C= 40ms L=160ms  t_algo= 200.0  t_cmp_p50=  43.73  p95=  47.29  RTF= 1.093    77.9 GF/s
+!! C= 40ms L=320ms  t_algo= 360.0  t_cmp_p50=  44.19  p95=  45.63  RTF= 1.105    82.2 GF/s
+!! C= 40ms L=640ms  t_algo= 680.0  t_cmp_p50=  43.53  p95=  46.57  RTF= 1.088    93.9 GF/s
+OK C= 80ms L=  0ms  t_algo=  80.0  t_cmp_p50=  42.79  p95=  43.58  RTF= 0.535    82.5 GF/s
+OK C= 80ms L= 20ms  t_algo= 100.0  t_cmp_p50=  43.06  p95=  44.37  RTF= 0.538    82.6 GF/s
+OK C= 80ms L= 40ms  t_algo= 120.0  t_cmp_p50=  47.80  p95=  56.58  RTF= 0.598    75.0 GF/s
+OK C= 80ms L= 80ms  t_algo= 160.0  t_cmp_p50=  44.12  p95=  51.22  RTF= 0.551    82.6 GF/s
+OK C= 80ms L=160ms  t_algo= 240.0  t_cmp_p50=  45.77  p95=  54.88  RTF= 0.572    82.1 GF/s
+OK C= 80ms L=320ms  t_algo= 400.0  t_cmp_p50=  44.72  p95=  60.91  RTF= 0.559    89.1 GF/s
+OK C= 80ms L=640ms  t_algo= 720.0  t_cmp_p50=  45.69  p95=  46.84  RTF= 0.571    97.2 GF/s
+
+=== preset small: d=384 h=6 ffn=1536 layers=6 ===
+OK C= 20ms L=  0ms  t_algo=  20.0  t_cmp_p50=   2.30  p95=   3.28  RTF= 0.115   163.5 GF/s
+OK C= 20ms L= 20ms  t_algo=  40.0  t_cmp_p50=   2.36  p95=   3.21  RTF= 0.118   160.8 GF/s
+OK C= 20ms L= 40ms  t_algo=  60.0  t_cmp_p50=   2.45  p95=   2.96  RTF= 0.122   156.5 GF/s
+OK C= 20ms L= 80ms  t_algo= 100.0  t_cmp_p50=   2.40  p95=   3.05  RTF= 0.120   162.9 GF/s
+OK C= 20ms L=160ms  t_algo= 180.0  t_cmp_p50=   2.43  p95=   3.07  RTF= 0.121   166.5 GF/s
+OK C= 20ms L=320ms  t_algo= 340.0  t_cmp_p50=   2.46  p95=   3.35  RTF= 0.123   176.0 GF/s
+OK C= 20ms L=640ms  t_algo= 660.0  t_cmp_p50=   2.62  p95=   3.35  RTF= 0.131   187.2 GF/s
+OK C= 40ms L=  0ms  t_algo=  40.0  t_cmp_p50=   2.91  p95=   4.03  RTF= 0.073   137.1 GF/s
+OK C= 40ms L= 20ms  t_algo=  60.0  t_cmp_p50=   3.01  p95=   4.03  RTF= 0.075   133.5 GF/s
+OK C= 40ms L= 40ms  t_algo=  80.0  t_cmp_p50=   3.11  p95=   3.70  RTF= 0.078   130.5 GF/s
+OK C= 40ms L= 80ms  t_algo= 120.0  t_cmp_p50=   2.94  p95=   3.95  RTF= 0.073   140.4 GF/s
+OK C= 40ms L=160ms  t_algo= 200.0  t_cmp_p50=   3.03  p95=   3.79  RTF= 0.076   141.1 GF/s
+OK C= 40ms L=320ms  t_algo= 360.0  t_cmp_p50=   3.06  p95=   3.78  RTF= 0.076   148.9 GF/s
+OK C= 40ms L=640ms  t_algo= 680.0  t_cmp_p50=   3.28  p95=   5.98  RTF= 0.082   156.2 GF/s
+OK C= 80ms L=  0ms  t_algo=  80.0  t_cmp_p50=   3.21  p95=   3.85  RTF= 0.040   138.1 GF/s
+OK C= 80ms L= 20ms  t_algo= 100.0  t_cmp_p50=   3.16  p95=   4.11  RTF= 0.040   141.3 GF/s
+OK C= 80ms L= 40ms  t_algo= 120.0  t_cmp_p50=   3.00  p95=   4.06  RTF= 0.037   150.1 GF/s
+OK C= 80ms L= 80ms  t_algo= 160.0  t_cmp_p50=   3.45  p95=   4.20  RTF= 0.043   132.6 GF/s
+OK C= 80ms L=160ms  t_algo= 240.0  t_cmp_p50=   3.38  p95=   4.69  RTF= 0.042   139.8 GF/s
+OK C= 80ms L=320ms  t_algo= 400.0  t_cmp_p50=   3.43  p95=   3.97  RTF= 0.043   145.8 GF/s
+OK C= 80ms L=640ms  t_algo= 720.0  t_cmp_p50=   3.48  p95=   4.41  RTF= 0.043   160.4 GF/s
+
+=== preset tiny: d=256 h=4 ffn=1024 layers=4 ===
+OK C= 20ms L=  0ms  t_algo=  20.0  t_cmp_p50=   0.99  p95=   1.14  RTF= 0.049   113.0 GF/s
+OK C= 20ms L= 20ms  t_algo=  40.0  t_cmp_p50=   0.99  p95=   1.48  RTF= 0.050   113.4 GF/s
+OK C= 20ms L= 40ms  t_algo=  60.0  t_cmp_p50=   0.97  p95=   1.54  RTF= 0.049   117.3 GF/s
+OK C= 20ms L= 80ms  t_algo= 100.0  t_cmp_p50=   0.97  p95=   1.27  RTF= 0.048   119.7 GF/s
+OK C= 20ms L=160ms  t_algo= 180.0  t_cmp_p50=   0.96  p95=   1.39  RTF= 0.048   125.2 GF/s
+OK C= 20ms L=320ms  t_algo= 340.0  t_cmp_p50=   0.95  p95=   1.14  RTF= 0.047   135.8 GF/s
+OK C= 20ms L=640ms  t_algo= 660.0  t_cmp_p50=   0.98  p95=   1.45  RTF= 0.049   147.8 GF/s
+OK C= 40ms L=  0ms  t_algo=  40.0  t_cmp_p50=   1.05  p95=   1.51  RTF= 0.026   113.1 GF/s
+OK C= 40ms L= 20ms  t_algo=  60.0  t_cmp_p50=   1.04  p95=   1.38  RTF= 0.026   114.7 GF/s
+OK C= 40ms L= 40ms  t_algo=  80.0  t_cmp_p50=   1.00  p95=   1.19  RTF= 0.025   120.7 GF/s
+OK C= 40ms L= 80ms  t_algo= 120.0  t_cmp_p50=   0.99  p95=   1.18  RTF= 0.025   124.1 GF/s
+OK C= 40ms L=160ms  t_algo= 200.0  t_cmp_p50=   0.98  p95=   1.13  RTF= 0.025   129.6 GF/s
+OK C= 40ms L=320ms  t_algo= 360.0  t_cmp_p50=   1.00  p95=   1.39  RTF= 0.025   135.8 GF/s
+OK C= 40ms L=640ms  t_algo= 680.0  t_cmp_p50=   1.04  p95=   1.37  RTF= 0.026   146.6 GF/s
+OK C= 80ms L=  0ms  t_algo=  80.0  t_cmp_p50=   1.09  p95=   1.44  RTF= 0.014   120.7 GF/s
+OK C= 80ms L= 20ms  t_algo= 100.0  t_cmp_p50=   1.07  p95=   1.70  RTF= 0.013   124.0 GF/s
+OK C= 80ms L= 40ms  t_algo= 120.0  t_cmp_p50=   1.03  p95=   1.33  RTF= 0.013   129.6 GF/s
+OK C= 80ms L= 80ms  t_algo= 160.0  t_cmp_p50=   1.06  p95=   1.52  RTF= 0.013   129.1 GF/s
+OK C= 80ms L=160ms  t_algo= 240.0  t_cmp_p50=   1.07  p95=   1.39  RTF= 0.013   131.9 GF/s
+OK C= 80ms L=320ms  t_algo= 400.0  t_cmp_p50=   1.08  p95=   1.86  RTF= 0.013   138.5 GF/s
+OK C= 80ms L=640ms  t_algo= 720.0  t_cmp_p50=   1.17  p95=   1.47  RTF= 0.015   142.0 GF/s
+{
+  "n_rows": 63,
+  "csv": "results/raw/encoder_scaling_m4.csv"
+}
+  [OK]   encoder scaling
+
+============================================================
+  4. CASCADE BENCHMARK (S1)
+============================================================
+host: cpu-apple-silicon  arm64  10 cores  16.0 GB
+ASR   th=1 int8=True  p50=   0.09ms/100ms  RTF=0.001  p95RTF=0.124
+TTS   th=1 kokoro  utt_p50=  2429.0ms  RTF=0.780  1word=973ms
+TTS   th=1 vits    utt_p50=   381.3ms  RTF=0.137  1word=21ms
+ASR   th=2 int8=True  p50=   0.12ms/100ms  RTF=0.001  p95RTF=0.135
+TTS   th=2 kokoro  utt_p50=  2631.0ms  RTF=0.848  1word=976ms
+TTS   th=2 vits    utt_p50=   417.4ms  RTF=0.147  1word=23ms
+ASR   th=4 int8=True  p50=   0.19ms/100ms  RTF=0.002  p95RTF=0.251
+TTS   th=4 kokoro  utt_p50=  2813.1ms  RTF=0.918  1word=1135ms
+TTS   th=4 vits    utt_p50=   495.2ms  RTF=0.175  1word=26ms
+ASR   th=8 int8=True  p50=   0.18ms/100ms  RTF=0.002  p95RTF=0.458
+TTS   th=8 kokoro  utt_p50=  3273.1ms  RTF=1.098  1word=1548ms
+TTS   th=8 vits    utt_p50=   613.7ms  RTF=0.217  1word=33ms
+{
+  "n_rows": 12,
+  "csv": "results/raw/cascade_m4.csv"
+}
+  [OK]   cascade
+
+============================================================
+  5. CAUSALITY SELF-TEST
+============================================================
+Does masking attention alone make WavLM causal? (spoiler: no -- pos_conv)
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+====================================================================
+CAUSALITY SELF-TEST  (does attention masking alone make WavLM causal?)
+====================================================================
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 42146.98it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 44855.00it/s]
+{
+  "with_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_future_frames_leaked": 64,
+    "pos_conv_leak_ms": 1280.0,
+    "max_abs_delta": 0.005359768867492676,
+    "relative_l2_delta": 0.005995647516101599,
+    "causal": false
+  },
+  "without_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_future_frames_leaked": 0,
+    "pos_conv_leak_ms": 0.0,
+    "max_abs_delta": 0.051471710205078125,
+    "relative_l2_delta": 0.011429516598582268,
+    "causal": false
+  },
+  "verdict": "CHECK MANUALLY: unexpected result, see numbers above."
+}
+  [OK]   causality self-test
+
+============================================================
+  6. CONTENT-DEGRADATION PILOT ON REAL L2-ARCTIC  (the RQ1 evidence)
+============================================================
+  !! No Hugging Face token found.
+  !! KoelLabs/L2Arctic is gated. Accept terms at
+  !!   https://huggingface.co/datasets/KoelLabs/L2Arctic
+  !! then run:  source .venv/bin/activate && huggingface-cli login
+  !! Falling back to synthetic audio so the pipeline is still exercised.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+====================================================================
+CAUSALITY SELF-TEST  (does attention masking alone make WavLM causal?)
+====================================================================
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 35956.56it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 39234.59it/s]
+{
+  "with_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_future_frames_leaked": 64,
+    "pos_conv_leak_ms": 1280.0,
+    "max_abs_delta": 0.005359768867492676,
+    "relative_l2_delta": 0.005995647516101599,
+    "causal": false
+  },
+  "without_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_future_frames_leaked": 0,
+    "pos_conv_leak_ms": 0.0,
+    "max_abs_delta": 0.051471710205078125,
+    "relative_l2_delta": 0.011429516598582268,
+    "causal": false
+  },
+  "verdict": "CHECK MANUALLY: unexpected result, see numbers above."
+}
+
+12 utterances (corpus split size 12); per L1: {'SYNTHETIC': 12}
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 71407.11it/s]
+encoder microsoft/wavlm-base-plus on cpu; pos_conv leak fixed (64 frames = 1280 ms)
+  8/12 utts  (4s, 0.5s/utt)
+  12/12 utts  (6s, 0.5s/utt)
+
+====================================================================
+CONTENT DEGRADATION vs LOOKAHEAD  (WavLM-base-plus layer 9)
+====================================================================
+  L (ms)   t_algo   divergence      CKA   sonorant  obstruent
+       0       40       0.2638   0.8652     0.2606     0.2851
+      20       60       0.2312   0.8876     0.2242     0.2296
+      40       80       0.1915   0.9056     0.1888     0.1901
+      80      120       0.1969   0.9021     0.1902     0.1999
+     160      200       0.1878   0.9251     0.1855     0.1867
+     320      360       0.0902   0.9701     0.0906     0.0894
+     640      680       0.0555   0.9823     0.0546     0.0566
+
+knee (divergence): 320 ms   bootstrap 95% CI [40, 320] ms, modal 320 ms
+knee (1-CKA):      320 ms
+relative gain 0->640ms:  sonorant 0.791  obstruent 0.801  ->  H2-proxy NOT supported
+
+wrote results/raw/content_degradation_m4_synthetic.csv
+  [OK]   pilot (synthetic)
+
+============================================================
+  7. TRANSLATOR SMOKE TEST
+============================================================
+Proves the training pipeline runs end-to-end (60 steps, 3 lookaheads).
+The full 14-condition sweep belongs on a GPU -- see notebooks/.
+ok  translator self-test (tokenizer, PER, vocab, sweep invariants)
+  [OK]   translator self-test
+  skipped: no Hugging Face token (see stage 6)
+
+============================================================
+  8. FIGURES
+============================================================
+wrote fig1_compute_vs_lookahead
+wrote fig2_algo_vs_compute
+wrote fig3_rtf_feasibility
+no quality CSVs yet -- fig4 waits for the November sweep
+
+figures in /Users/dipeshtripathi/Desktop/accent_con/research/results/figures
+  [OK]   figures
+
+============================================================
+  DONE
+============================================================
+All stages completed.
+
+Results:
+total 360
+drwxr-xr-x   4 dipeshtripathi  staff    128 Aug  2 01:16 _superseded
+drwxr-xr-x  21 dipeshtripathi  staff    672 Aug  2 13:58 .
+drwxr-xr-x   4 dipeshtripathi  staff    128 Aug  2 00:52 ..
+-rw-r--r--   1 dipeshtripathi  staff   1260 Aug  2 01:07 cascade_asr_arm64_host.json
+-rw-r--r--   1 dipeshtripathi  staff    808 Aug  2 01:07 cascade_asr_arm64.csv
+-rw-r--r--   1 dipeshtripathi  staff   1565 Aug  2 01:07 cascade_asr_arm64.jsonl
+-rw-r--r--@  1 dipeshtripathi  staff   1294 Aug  2 13:58 cascade_m4_host.json
+-rw-r--r--@  1 dipeshtripathi  staff   2017 Aug  2 13:58 cascade_m4.csv
+-rw-r--r--@  1 dipeshtripathi  staff   4179 Aug  2 13:58 cascade_m4.jsonl
+-rw-r--r--@  1 dipeshtripathi  staff    575 Aug  2 13:58 causality_selftest_m4_synthetic.json
+-rw-r--r--@  1 dipeshtripathi  staff    575 Aug  2 13:58 causality_selftest_m4.json
+-rw-r--r--@  1 dipeshtripathi  staff   4333 Aug  2 13:58 content_degradation_m4_synthetic_summary.json
+-rw-r--r--@  1 dipeshtripathi  staff  13068 Aug  2 13:58 content_degradation_m4_synthetic.csv
+-rw-r--r--   1 dipeshtripathi  staff   7377 Aug  2 01:16 encoder_scaling_arm64.csv
+-rw-r--r--   1 dipeshtripathi  staff  28916 Aug  2 01:16 encoder_scaling_arm64.jsonl
+-rw-r--r--@  1 dipeshtripathi  staff   7432 Aug  2 13:55 encoder_scaling_m4.csv
+-rw-r--r--@  1 dipeshtripathi  staff  28971 Aug  2 13:55 encoder_scaling_m4.jsonl
+-rw-r--r--@  1 dipeshtripathi  staff   1652 Aug  2 13:55 hw_m4.json
+-rw-r--r--   1 dipeshtripathi  staff   1617 Aug  2 00:56 hw_sandbox_aarch64.json
+-rw-r--r--@  1 dipeshtripathi  staff  16310 Aug  2 13:53 run_m4_20260802_135116.log
+-rw-r--r--@  1 dipeshtripathi  staff  14230 Aug  2 13:59 run_m4_20260802_135459.log
+
+This window can be closed.

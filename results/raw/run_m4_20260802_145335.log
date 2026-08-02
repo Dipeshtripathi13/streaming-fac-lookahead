@@ -1,0 +1,559 @@
+
+============================================================
+  0. ENVIRONMENT
+============================================================
+repo   : /Users/dipeshtripathi/Desktop/accent_con/research
+log    : results/raw/run_m4_20260802_145335.log
+ProductName:		macOS ProductVersion:		26.5 BuildVersion:		25F71 
+Apple M4
+P-cores: 4  E-cores: 6
+Now drawing from 'AC Power'
+
+NOTE: benchmarks should run on AC power. Battery = downclocked = wrong p95.
+python : python3.11 (Python 3.11.15)
+installing dependencies (first run downloads ~2 GB, later runs are instant) ...
+  [OK]   dependencies
+QoS clamp: taskpolicy -c utility
+
+============================================================
+  1. UNIT TESTS AND INVARIANT GUARDS
+============================================================
+  [OK]   tests/test_causal.py
+  [OK]   tests/test_pipeline_invariants.py
+  [OK]   eval/metrics.py
+  [OK]   eval/phoneme_analysis.py
+
+============================================================
+  2. HARDWARE PROBE
+============================================================
+
+wrote results/raw/hw_m4.json
+  "mac_perf_cores": "4",
+  "mac_eff_cores": "6",
+  "mac_model": "Mac16,1",
+  "calibration": {
+    "sgemm_512": {
+      "n": 512,
+      "median_ms": 0.1533,
+      "gflops": 1750.66
+    },
+    "sgemm_1024": {
+      "n": 1024,
+      "median_ms": 1.2512,
+      "gflops": 1716.38
+    },
+    "memcpy_64mb": {
+      "mb": 64,
+      "median_ms": 2.005,
+      "gb_per_s": 31.17
+    },
+    "single_core": {
+      "loop_2m_ms": 41.06
+    }
+  },
+  "hw_class": "cpu-apple-silicon"
+}
+  [OK]   hardware probe
+
+============================================================
+  3. ENCODER SCALING SWEEP  (compute vs lookahead x chunk x model size)
+============================================================
+
+=== preset base: d=768 h=12 ffn=3072 layers=12 ===
+!! C= 20ms L=  0ms  t_algo=  20.0  t_cmp_p50=  31.93  p95=  41.57  RTF= 1.597    94.1 GF/s
+!! C= 20ms L= 20ms  t_algo=  40.0  t_cmp_p50=  31.40  p95=  34.57  RTF= 1.570    96.6 GF/s
+!! C= 20ms L= 40ms  t_algo=  60.0  t_cmp_p50=  31.15  p95=  32.29  RTF= 1.558    98.3 GF/s
+!! C= 20ms L= 80ms  t_algo= 100.0  t_cmp_p50=  29.84  p95=  31.85  RTF= 1.492   104.5 GF/s
+!! C= 20ms L=160ms  t_algo= 180.0  t_cmp_p50=  30.48  p95=  31.37  RTF= 1.524   106.1 GF/s
+!! C= 20ms L=320ms  t_algo= 340.0  t_cmp_p50=  30.02  p95=  30.38  RTF= 1.501   115.2 GF/s
+!! C= 20ms L=640ms  t_algo= 660.0  t_cmp_p50=  31.49  p95=  36.07  RTF= 1.574   124.3 GF/s
+!! C= 40ms L=  0ms  t_algo=  40.0  t_cmp_p50=  43.23  p95=  44.68  RTF= 1.081    73.5 GF/s
+!! C= 40ms L= 20ms  t_algo=  60.0  t_cmp_p50=  43.90  p95=  46.25  RTF= 1.097    73.1 GF/s
+!! C= 40ms L= 40ms  t_algo=  80.0  t_cmp_p50=  43.87  p95=  50.86  RTF= 1.097    73.8 GF/s
+!! C= 40ms L= 80ms  t_algo= 120.0  t_cmp_p50=  43.11  p95=  50.19  RTF= 1.078    76.4 GF/s
+!! C= 40ms L=160ms  t_algo= 200.0  t_cmp_p50=  44.06  p95=  46.06  RTF= 1.102    77.3 GF/s
+!! C= 40ms L=320ms  t_algo= 360.0  t_cmp_p50=  43.81  p95=  45.32  RTF= 1.095    82.9 GF/s
+!! C= 40ms L=640ms  t_algo= 680.0  t_cmp_p50=  43.82  p95=  45.17  RTF= 1.095    93.3 GF/s
+OK C= 80ms L=  0ms  t_algo=  80.0  t_cmp_p50=  44.22  p95=  45.93  RTF= 0.553    79.8 GF/s
+OK C= 80ms L= 20ms  t_algo= 100.0  t_cmp_p50=  44.43  p95=  46.13  RTF= 0.555    80.0 GF/s
+OK C= 80ms L= 40ms  t_algo= 120.0  t_cmp_p50=  45.30  p95=  55.90  RTF= 0.566    79.1 GF/s
+OK C= 80ms L= 80ms  t_algo= 160.0  t_cmp_p50=  44.67  p95=  47.99  RTF= 0.558    81.5 GF/s
+OK C= 80ms L=160ms  t_algo= 240.0  t_cmp_p50=  45.76  p95=  63.32  RTF= 0.572    82.1 GF/s
+OK C= 80ms L=320ms  t_algo= 400.0  t_cmp_p50=  45.27  p95=  57.70  RTF= 0.566    88.0 GF/s
+OK C= 80ms L=640ms  t_algo= 720.0  t_cmp_p50=  44.20  p95=  44.99  RTF= 0.552   100.4 GF/s
+
+=== preset small: d=384 h=6 ffn=1536 layers=6 ===
+OK C= 20ms L=  0ms  t_algo=  20.0  t_cmp_p50=   2.40  p95=   2.84  RTF= 0.120   157.0 GF/s
+OK C= 20ms L= 20ms  t_algo=  40.0  t_cmp_p50=   2.38  p95=   3.18  RTF= 0.119   159.3 GF/s
+OK C= 20ms L= 40ms  t_algo=  60.0  t_cmp_p50=   2.44  p95=   3.09  RTF= 0.122   157.3 GF/s
+OK C= 20ms L= 80ms  t_algo= 100.0  t_cmp_p50=   2.45  p95=   2.95  RTF= 0.123   159.1 GF/s
+OK C= 20ms L=160ms  t_algo= 180.0  t_cmp_p50=   2.34  p95=   3.14  RTF= 0.117   173.2 GF/s
+OK C= 20ms L=320ms  t_algo= 340.0  t_cmp_p50=   2.48  p95=   2.78  RTF= 0.124   174.7 GF/s
+OK C= 20ms L=640ms  t_algo= 660.0  t_cmp_p50=   2.45  p95=   3.21  RTF= 0.122   200.2 GF/s
+OK C= 40ms L=  0ms  t_algo=  40.0  t_cmp_p50=   2.90  p95=   3.60  RTF= 0.073   137.3 GF/s
+OK C= 40ms L= 20ms  t_algo=  60.0  t_cmp_p50=   2.82  p95=   3.40  RTF= 0.071   142.4 GF/s
+OK C= 40ms L= 40ms  t_algo=  80.0  t_cmp_p50=   2.85  p95=   3.37  RTF= 0.071   142.5 GF/s
+OK C= 40ms L= 80ms  t_algo= 120.0  t_cmp_p50=   2.94  p95=   3.53  RTF= 0.073   140.5 GF/s
+OK C= 40ms L=160ms  t_algo= 200.0  t_cmp_p50=   2.92  p95=   3.43  RTF= 0.073   146.1 GF/s
+OK C= 40ms L=320ms  t_algo= 360.0  t_cmp_p50=   3.16  p95=   3.84  RTF= 0.079   144.0 GF/s
+OK C= 40ms L=640ms  t_algo= 680.0  t_cmp_p50=   3.04  p95=   3.80  RTF= 0.076   168.5 GF/s
+OK C= 80ms L=  0ms  t_algo=  80.0  t_cmp_p50=   3.28  p95=   3.65  RTF= 0.041   135.3 GF/s
+OK C= 80ms L= 20ms  t_algo= 100.0  t_cmp_p50=   3.03  p95=   3.76  RTF= 0.038   147.5 GF/s
+OK C= 80ms L= 40ms  t_algo= 120.0  t_cmp_p50=   2.97  p95=   3.74  RTF= 0.037   151.7 GF/s
+OK C= 80ms L= 80ms  t_algo= 160.0  t_cmp_p50=   3.01  p95=   3.77  RTF= 0.038   152.2 GF/s
+OK C= 80ms L=160ms  t_algo= 240.0  t_cmp_p50=   3.13  p95=   3.64  RTF= 0.039   150.8 GF/s
+OK C= 80ms L=320ms  t_algo= 400.0  t_cmp_p50=   3.21  p95=   3.91  RTF= 0.040   156.0 GF/s
+OK C= 80ms L=640ms  t_algo= 720.0  t_cmp_p50=   3.40  p95=   3.96  RTF= 0.043   164.2 GF/s
+
+=== preset tiny: d=256 h=4 ffn=1024 layers=4 ===
+OK C= 20ms L=  0ms  t_algo=  20.0  t_cmp_p50=   0.85  p95=   1.15  RTF= 0.043   131.1 GF/s
+OK C= 20ms L= 20ms  t_algo=  40.0  t_cmp_p50=   0.84  p95=   1.05  RTF= 0.042   133.9 GF/s
+OK C= 20ms L= 40ms  t_algo=  60.0  t_cmp_p50=   0.85  p95=   1.05  RTF= 0.042   134.3 GF/s
+OK C= 20ms L= 80ms  t_algo= 100.0  t_cmp_p50=   0.85  p95=   1.08  RTF= 0.042   136.5 GF/s
+OK C= 20ms L=160ms  t_algo= 180.0  t_cmp_p50=   0.87  p95=   1.09  RTF= 0.044   137.5 GF/s
+OK C= 20ms L=320ms  t_algo= 340.0  t_cmp_p50=   0.88  p95=   1.07  RTF= 0.044   146.3 GF/s
+OK C= 20ms L=640ms  t_algo= 660.0  t_cmp_p50=   0.93  p95=   1.20  RTF= 0.046   156.9 GF/s
+OK C= 40ms L=  0ms  t_algo=  40.0  t_cmp_p50=   0.97  p95=   1.16  RTF= 0.024   122.5 GF/s
+OK C= 40ms L= 20ms  t_algo=  60.0  t_cmp_p50=   0.97  p95=   1.15  RTF= 0.024   123.5 GF/s
+OK C= 40ms L= 40ms  t_algo=  80.0  t_cmp_p50=   0.97  p95=   1.12  RTF= 0.024   124.2 GF/s
+OK C= 40ms L= 80ms  t_algo= 120.0  t_cmp_p50=   0.98  p95=   1.20  RTF= 0.024   125.5 GF/s
+OK C= 40ms L=160ms  t_algo= 200.0  t_cmp_p50=   0.96  p95=   1.16  RTF= 0.024   131.9 GF/s
+OK C= 40ms L=320ms  t_algo= 360.0  t_cmp_p50=   1.00  p95=   1.25  RTF= 0.025   135.3 GF/s
+OK C= 40ms L=640ms  t_algo= 680.0  t_cmp_p50=   1.04  p95=   1.29  RTF= 0.026   146.2 GF/s
+OK C= 80ms L=  0ms  t_algo=  80.0  t_cmp_p50=   1.02  p95=   1.24  RTF= 0.013   129.9 GF/s
+OK C= 80ms L= 20ms  t_algo= 100.0  t_cmp_p50=   1.01  p95=   1.29  RTF= 0.013   131.3 GF/s
+OK C= 80ms L= 40ms  t_algo= 120.0  t_cmp_p50=   1.02  p95=   1.21  RTF= 0.013   130.9 GF/s
+OK C= 80ms L= 80ms  t_algo= 160.0  t_cmp_p50=   1.02  p95=   1.27  RTF= 0.013   133.7 GF/s
+OK C= 80ms L=160ms  t_algo= 240.0  t_cmp_p50=   1.02  p95=   1.21  RTF= 0.013   137.1 GF/s
+OK C= 80ms L=320ms  t_algo= 400.0  t_cmp_p50=   1.05  p95=   1.24  RTF= 0.013   142.0 GF/s
+OK C= 80ms L=640ms  t_algo= 720.0  t_cmp_p50=   1.08  p95=   1.28  RTF= 0.013   153.9 GF/s
+{
+  "n_rows": 63,
+  "csv": "results/raw/encoder_scaling_m4.csv"
+}
+  [OK]   encoder scaling
+
+============================================================
+  4. CASCADE BENCHMARK (S1)
+============================================================
+host: cpu-apple-silicon  arm64  10 cores  16.0 GB
+ASR   th=1 int8=True  p50=   0.10ms/100ms  RTF=0.001  p95RTF=0.139
+TTS   th=1 kokoro  utt_p50=  2145.1ms  RTF=0.696  1word=828ms
+TTS   th=1 vits    utt_p50=   341.7ms  RTF=0.120  1word=17ms
+ASR   th=2 int8=True  p50=   0.11ms/100ms  RTF=0.001  p95RTF=0.127
+TTS   th=2 kokoro  utt_p50=  2075.0ms  RTF=0.685  1word=809ms
+TTS   th=2 vits    utt_p50=   359.0ms  RTF=0.127  1word=20ms
+ASR   th=4 int8=True  p50=   0.16ms/100ms  RTF=0.002  p95RTF=0.147
+TTS   th=4 kokoro  utt_p50=  2558.2ms  RTF=0.830  1word=1048ms
+TTS   th=4 vits    utt_p50=   487.6ms  RTF=0.173  1word=22ms
+ASR   th=8 int8=True  p50=   0.20ms/100ms  RTF=0.002  p95RTF=0.512
+TTS   th=8 kokoro  utt_p50=  3293.8ms  RTF=1.061  1word=1395ms
+TTS   th=8 vits    utt_p50=   625.6ms  RTF=0.225  1word=34ms
+{
+  "n_rows": 12,
+  "csv": "results/raw/cascade_m4.csv"
+}
+  [OK]   cascade
+
+============================================================
+  5. CAUSALITY SELF-TEST
+============================================================
+Does masking attention alone make WavLM causal? (spoiler: no -- pos_conv)
+====================================================================
+CAUSALITY SELF-TEST  (does attention masking alone make WavLM causal?)
+====================================================================
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 47317.81it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 45454.79it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 55854.99it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 45596.26it/s]
+{
+  "encoder": "microsoft/wavlm-base-plus",
+  "tolerance": 0.0001,
+  "mask_only": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.051471710205078125,
+    "relative_l2_delta": 0.011429516598582268,
+    "causal": false
+  },
+  "mask_posconv": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.005359768867492676,
+    "relative_l2_delta": 0.005995647516101599,
+    "causal": false
+  },
+  "mask_groupnorm": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.32654643058776855,
+    "relative_l2_delta": 0.025983180850744247,
+    "causal": false
+  },
+  "mask_both": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 8.732080459594727e-06,
+    "relative_l2_delta": 6.137697255326202e-06,
+    "causal": true
+  },
+  "verdict": "PASS. Masking attention alone does NOT make microsoft/wavlm-base-plus causal. The positional convolution (kernel 128) and the feature-encoder GroupNorm each leak future context; with both patched the truncation proof passes and the lookahead labels are valid.",
+  "with_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 8.732080459594727e-06,
+    "relative_l2_delta": 6.137697255326202e-06,
+    "causal": true
+  },
+  "without_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.051471710205078125,
+    "relative_l2_delta": 0.011429516598582268,
+    "causal": false
+  }
+}
+  [OK]   causality self-test
+
+============================================================
+  6. CONTENT-DEGRADATION PILOT ON REAL L2-ARCTIC  (the RQ1 evidence)
+============================================================
+====================================================================
+CAUSALITY SELF-TEST  (does attention masking alone make WavLM causal?)
+====================================================================
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 32704.12it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 31551.43it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 70079.32it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 46054.52it/s]
+{
+  "encoder": "microsoft/wavlm-base-plus",
+  "tolerance": 0.0001,
+  "mask_only": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.051471710205078125,
+    "relative_l2_delta": 0.011429516598582268,
+    "causal": false
+  },
+  "mask_posconv": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.005359768867492676,
+    "relative_l2_delta": 0.005995647516101599,
+    "causal": false
+  },
+  "mask_groupnorm": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.32654643058776855,
+    "relative_l2_delta": 0.025983180850744247,
+    "causal": false
+  },
+  "mask_both": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 8.732080459594727e-06,
+    "relative_l2_delta": 6.137697255326202e-06,
+    "causal": true
+  },
+  "verdict": "PASS. Masking attention alone does NOT make microsoft/wavlm-base-plus causal. The positional convolution (kernel 128) and the feature-encoder GroupNorm each leak future context; with both patched the truncation proof passes and the lookahead labels are valid.",
+  "with_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 8.732080459594727e-06,
+    "relative_l2_delta": 6.137697255326202e-06,
+    "causal": true
+  },
+  "without_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.051471710205078125,
+    "relative_l2_delta": 0.011429516598582268,
+    "causal": false
+  }
+}
+Generating spontaneous split:   0%|          | 0/22 [00:00<?, ? examples/s]Generating spontaneous split: 100%|██████████| 22/22 [00:00<00:00, 488.30 examples/s]
+Generating scripted split:   0%|          | 0/3599 [00:00<?, ? examples/s]Generating scripted split:  24%|██▎       | 850/3599 [00:00<00:00, 4225.22 examples/s]Generating scripted split:  71%|███████   | 2550/3599 [00:00<00:00, 6946.78 examples/s]Generating scripted split: 100%|██████████| 3599/3599 [00:00<00:00, 8294.60 examples/s]
+  audio auto-decode unavailable (ImportError); falling back to raw bytes + soundfile
+
+48 utterances (corpus split size 3599); per L1: {'Arabic': 8, 'Chinese': 8, 'Spanish': 8, 'Hindi': 8, 'Korean': 8, 'Vietnamese': 8}
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 38444.30it/s]
+encoder microsoft/wavlm-base-plus on cpu
+  pos_conv kernel 128 -> would leak 1280 ms; patched to left-only padding
+  feature-encoder GroupNorm present=True -> replaced with cumulative norm on 512 channels
+  8/48 utts  (7s, 0.9s/utt)
+  16/48 utts  (13s, 0.8s/utt)
+  24/48 utts  (18s, 0.7s/utt)
+  32/48 utts  (25s, 0.8s/utt)
+  40/48 utts  (30s, 0.8s/utt)
+  48/48 utts  (37s, 0.8s/utt)
+
+====================================================================
+CONTENT DEGRADATION vs LOOKAHEAD  (WavLM-base-plus layer 9)
+====================================================================
+  L (ms)   t_algo   divergence      CKA   sonorant  obstruent
+       0       40       0.5008   0.7678     0.5010     0.4999
+      20       60       0.4294   0.8102     0.4275     0.4206
+      40       80       0.3744   0.8355     0.3705     0.3668
+      80      120       0.3091   0.8688     0.3052     0.3015
+     160      200       0.2306   0.9072     0.2201     0.2218
+     320      360       0.1639   0.9341     0.1477     0.1532
+     640      680       0.1073   0.9555     0.0900     0.0961
+
+knee (divergence): 160 ms   bootstrap 95% CI [160, 160] ms, modal 160 ms
+knee (1-CKA):      160 ms
+relative gain 0->640ms:  sonorant 0.820  obstruent 0.808  ->  H2-proxy SUPPORTED
+
+wrote results/raw/content_degradation_m4.csv
+  [OK]   content-degradation pilot
+
+============================================================
+  6b. COMMIT-DELAY MEASUREMENT (cascade's dominant term)
+============================================================
+How long until a streaming ASR stops revising a word? Needs no dataset.
+2 utterances, 20 ms feed step, 1 thread(s)
+
+0.wav: 0 word(s) in 6.62s — word-boundary detection failed. Inspect rec.tokens() and fix tokens_to_words().
+  [FAIL] commit delay
+
+============================================================
+  7. TRANSLATOR SMOKE TEST
+============================================================
+Proves the training pipeline runs end-to-end (60 steps, 3 lookaheads).
+The full 14-condition sweep belongs on a GPU -- see notebooks/.
+ok  translator self-test (tokenizer, PER, vocab, sweep invariants)
+  [OK]   translator self-test
+device: cpu
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 46978.02it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 45355.69it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 69097.08it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 50859.94it/s]
+{
+  "encoder": "microsoft/wavlm-base-plus",
+  "tolerance": 0.0001,
+  "mask_only": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.051471710205078125,
+    "relative_l2_delta": 0.011429516598582268,
+    "causal": false
+  },
+  "mask_posconv": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.005359768867492676,
+    "relative_l2_delta": 0.005995647516101599,
+    "causal": false
+  },
+  "mask_groupnorm": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.32654643058776855,
+    "relative_l2_delta": 0.025983180850744247,
+    "causal": false
+  },
+  "mask_both": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 8.732080459594727e-06,
+    "relative_l2_delta": 6.137697255326202e-06,
+    "causal": true
+  },
+  "verdict": "PASS. Masking attention alone does NOT make microsoft/wavlm-base-plus causal. The positional convolution (kernel 128) and the feature-encoder GroupNorm each leak future context; with both patched the truncation proof passes and the lookahead labels are valid.",
+  "with_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 8.732080459594727e-06,
+    "relative_l2_delta": 6.137697255326202e-06,
+    "causal": true
+  },
+  "without_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.051471710205078125,
+    "relative_l2_delta": 0.011429516598582268,
+    "causal": false
+  }
+}
+  audio auto-decode unavailable (ImportError); falling back to raw bytes + soundfile
+{
+  "n_items": 120,
+  "n_train": 56,
+  "n_val": 36,
+  "n_test": 28,
+  "val_speakers": [
+    "ASI",
+    "BWC",
+    "HKK",
+    "MBMPS",
+    "TLV",
+    "YBAA"
+  ],
+  "test_speakers": [
+    "ABA",
+    "EBVS",
+    "HJK",
+    "LXC",
+    "PNV",
+    "SVBI"
+  ],
+  "vocab_size": 37,
+  "per_l1": {
+    "Arabic": 16,
+    "Chinese": 18,
+    "Hindi": 18,
+    "Korean": 21,
+    "Spanish": 26,
+    "Vietnamese": 21
+  },
+  "mean_dur_s": 3.91,
+  "mean_per_g2p_vs_ipa": 0.1754
+}
+corpus loaded in 2s
+
+3 conditions x 60 steps
+
+[1/3] L0_native  chunk=40ms(2f) L=0ms(0f) lookback=100f t_algo=40ms (+5ms frontend)
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 41954.88it/s]
+/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/functional.py:6802: UserWarning: Support for mismatched key_padding_mask and attn_mask is deprecated. Use same type for both instead.
+  key_padding_mask = _canonical_mask(
+/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/activation.py:1336: UserWarning: Support for mismatched key_padding_mask and attn_mask is deprecated. Use same type for both instead.
+  key_padding_mask = F._canonical_mask(
+    L0_native step 60  val PER 1.0000  cross-PER 1.0000
+[2/3] L80_native  chunk=40ms(2f) L=80ms(4f) lookback=100f t_algo=120ms (+5ms frontend)
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 48841.97it/s]
+    L80_native step 60  val PER 1.0000  cross-PER 1.0000
+[3/3] L640_native  chunk=40ms(2f) L=640ms(32f) lookback=100f t_algo=680ms (+5ms frontend)
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 39308.72it/s]
+    L640_native step 60  val PER 1.0000  cross-PER 1.0000
+
+==================================================================
+target        L (ms)   t_algo   test PER  cross-PER
+native             0       40     1.0000     1.0000
+native            80      120     1.0000     1.0000
+native           640      680     1.0000     1.0000
+
+native: knee at 0 ms, relative gain 0->max 0.000
+
+wrote results/raw/translator_smoke_m4.csv and results/raw/translator_smoke_m4_summary.json
+  [OK]   translator smoke
+  (set RUN_CPU_SWEEP=1 to also run a reduced 10-condition CPU sweep)
+
+============================================================
+  8. FIGURES
+============================================================
+wrote fig1_compute_vs_lookahead
+wrote fig2_algo_vs_compute
+wrote fig3_rtf_feasibility
+wrote fig5_commit_delay
+no quality CSVs yet -- fig4 waits for the November sweep
+
+figures in /Users/dipeshtripathi/Desktop/accent_con/research/results/figures
+  [OK]   figures
+
+============================================================
+  DONE
+============================================================
+STAGES THAT FAILED: commit delay
+Full log: results/raw/run_m4_20260802_145335.log
+
+Results:
+-rw-r--r--   1 dipeshtripathi  staff   1565 Aug  2 01:07 cascade_asr_arm64.jsonl
+-rw-r--r--@  1 dipeshtripathi  staff   1294 Aug  2 14:57 cascade_m4_host.json
+-rw-r--r--@  1 dipeshtripathi  staff   1834 Aug  2 14:57 cascade_m4.csv
+-rw-r--r--@  1 dipeshtripathi  staff   3996 Aug  2 14:57 cascade_m4.jsonl
+-rw-r--r--@  1 dipeshtripathi  staff    575 Aug  2 13:58 causality_selftest_m4_synthetic.json
+-rw-r--r--@  1 dipeshtripathi  staff   2405 Aug  2 15:05 causality_selftest_m4.json
+-rw-r--r--   1 dipeshtripathi  staff   2822 Aug  2 15:03 commit_delay_zipformer_summary.json
+-rw-r--r--   1 dipeshtripathi  staff   3530 Aug  2 15:03 commit_delay_zipformer.csv
+-rw-r--r--@  1 dipeshtripathi  staff   8170 Aug  2 15:06 content_degradation_m4_summary.json
+-rw-r--r--@  1 dipeshtripathi  staff   4333 Aug  2 13:58 content_degradation_m4_synthetic_summary.json
+-rw-r--r--@  1 dipeshtripathi  staff  13068 Aug  2 13:58 content_degradation_m4_synthetic.csv
+-rw-r--r--@  1 dipeshtripathi  staff  50511 Aug  2 15:06 content_degradation_m4.csv
+-rw-r--r--   1 dipeshtripathi  staff   7377 Aug  2 01:16 encoder_scaling_arm64.csv
+-rw-r--r--   1 dipeshtripathi  staff  28916 Aug  2 01:16 encoder_scaling_arm64.jsonl
+-rw-r--r--@  1 dipeshtripathi  staff   7421 Aug  2 14:54 encoder_scaling_m4.csv
+-rw-r--r--@  1 dipeshtripathi  staff  28960 Aug  2 14:54 encoder_scaling_m4.jsonl
+-rw-r--r--@  1 dipeshtripathi  staff   1653 Aug  2 14:53 hw_m4.json
+-rw-r--r--   1 dipeshtripathi  staff   1617 Aug  2 00:56 hw_sandbox_aarch64.json
+-rw-r--r--@  1 dipeshtripathi  staff   5439 Aug  2 15:06 quick_20260802_150536.log
+-rw-r--r--@  1 dipeshtripathi  staff  16310 Aug  2 13:53 run_m4_20260802_135116.log
+-rw-r--r--@  1 dipeshtripathi  staff  15947 Aug  2 13:59 run_m4_20260802_135459.log
+-rw-r--r--@  1 dipeshtripathi  staff  24877 Aug  2 15:07 run_m4_20260802_145335.log
+-rw-r--r--@  1 dipeshtripathi  staff   3440 Aug  2 14:02 selftest_20260802_140215.log
+-rw-r--r--@  1 dipeshtripathi  staff   2414 Aug  2 15:07 translator_smoke_m4_summary.json
+-rw-r--r--@  1 dipeshtripathi  staff    328 Aug  2 15:07 translator_smoke_m4.csv
+
+This window can be closed.

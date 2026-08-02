@@ -1,0 +1,61 @@
+{
+  "timestamp_utc": "2026-08-02T04:56:00Z",
+  "hostname": "claude",
+  "system": "Linux",
+  "release": "6.8.0-124-generic",
+  "machine": "aarch64",
+  "python": "3.10.12",
+  "cpu_model": "0x000",
+  "cpu_count_logical": 4,
+  "mem_total_gb": 3.81,
+  "pi_model": null,
+  "thermal": {},
+  "libs": {
+    "numpy_build": {
+      "blas": {
+        "name": "scipy-openblas",
+        "found": true,
+        "version": "0.3.29",
+        "detection method": "pkgconfig",
+        "include directory": "/opt/_internal/cpython-3.10.17/lib/python3.10/site-packages/scipy_openblas64/include",
+        "lib directory": "/opt/_internal/cpython-3.10.17/lib/python3.10/site-packages/scipy_openblas64/lib",
+        "openblas configuration": "OpenBLAS 0.3.29  USE64BITINT DYNAMIC_ARCH NO_AFFINITY neoversen1 MAX_THREADS=64",
+        "pc file directory": "/project/.openblas"
+      }
+    },
+    "threading_env": {
+      "OMP_NUM_THREADS": null,
+      "OPENBLAS_NUM_THREADS": null,
+      "MKL_NUM_THREADS": null,
+      "VECLIB_MAXIMUM_THREADS": null,
+      "NUMEXPR_NUM_THREADS": null
+    },
+    "onnxruntime_version": "1.23.2",
+    "onnxruntime_providers": [
+      "AzureExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "torch_version": null
+  },
+  "calibration": {
+    "sgemm_512": {
+      "n": 512,
+      "median_ms": 0.7372,
+      "gflops": 364.15
+    },
+    "sgemm_1024": {
+      "n": 1024,
+      "median_ms": 5.3268,
+      "gflops": 403.15
+    },
+    "memcpy_64mb": {
+      "mb": 64,
+      "median_ms": 1.169,
+      "gb_per_s": 53.46
+    },
+    "single_core": {
+      "loop_2m_ms": 40.69
+    }
+  },
+  "hw_class": "cpu-arm64"
+}

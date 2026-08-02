@@ -1,0 +1,83 @@
+HF token present: NO
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+====================================================================
+CAUSALITY SELF-TEST  (does attention masking alone make WavLM causal?)
+====================================================================
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 36374.00it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 49342.41it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 63426.06it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 46197.70it/s]
+{
+  "encoder": "microsoft/wavlm-base-plus",
+  "tolerance": 0.0001,
+  "mask_only": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.051471710205078125,
+    "relative_l2_delta": 0.011429516598582268,
+    "causal": false
+  },
+  "mask_posconv": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.005359768867492676,
+    "relative_l2_delta": 0.005995647516101599,
+    "causal": false
+  },
+  "mask_groupnorm": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.32654643058776855,
+    "relative_l2_delta": 0.025983180850744247,
+    "causal": false
+  },
+  "mask_both": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 8.732080459594727e-06,
+    "relative_l2_delta": 6.137697255326202e-06,
+    "causal": true
+  },
+  "verdict": "PASS. Masking attention alone does NOT make microsoft/wavlm-base-plus causal. The positional convolution (kernel 128) and the feature-encoder GroupNorm each leak future context; with both patched the truncation proof passes and the lookahead labels are valid.",
+  "with_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 8.732080459594727e-06,
+    "relative_l2_delta": 6.137697255326202e-06,
+    "causal": true
+  },
+  "without_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.051471710205078125,
+    "relative_l2_delta": 0.011429516598582268,
+    "causal": false
+  }
+}
+
+log: results/raw/selftest_20260802_140215.log
+This window can be closed.

@@ -1,0 +1,22 @@
+# environments
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# data (large, and L2-ARCTIC is CC-BY-NC — never commit corpora)
+data/corpora/
+*.wav
+*.flac
+*.onnx
+
+# model checkpoints
+checkpoints/
+*.pt
+*.ckpt
+
+# superseded results
+results/raw/_superseded/
+
+# OS
+.DS_Store

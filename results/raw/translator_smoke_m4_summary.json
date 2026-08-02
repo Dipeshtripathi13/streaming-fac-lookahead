@@ -1,0 +1,128 @@
+{
+  "corpus": {
+    "n_items": 120,
+    "n_train": 56,
+    "n_val": 36,
+    "n_test": 28,
+    "val_speakers": [
+      "ASI",
+      "BWC",
+      "HKK",
+      "MBMPS",
+      "TLV",
+      "YBAA"
+    ],
+    "test_speakers": [
+      "ABA",
+      "EBVS",
+      "HJK",
+      "LXC",
+      "PNV",
+      "SVBI"
+    ],
+    "vocab_size": 37,
+    "per_l1": {
+      "Arabic": 16,
+      "Chinese": 18,
+      "Hindi": 18,
+      "Korean": 21,
+      "Spanish": 26,
+      "Vietnamese": 21
+    },
+    "mean_dur_s": 3.91,
+    "mean_per_g2p_vs_ipa": 0.1754
+  },
+  "device": "cpu",
+  "steps": 60,
+  "chunk_ms": 40.0,
+  "results": [
+    {
+      "tag": "L0_native",
+      "lookahead_ms": 0,
+      "target": "native",
+      "chunk_ms": 40.0,
+      "t_algorithmic_ms": 40.0,
+      "t_algorithmic_honest_ms": 45.0,
+      "test_per": 1.0,
+      "test_per_cross": 1.0,
+      "n_test": 28,
+      "params": 24552741,
+      "steps": 60,
+      "wall_s": 181.7,
+      "history": [
+        {
+          "step": 60,
+          "loss": 3.3806264400482178,
+          "per": 1.0,
+          "per_cross": 1.0,
+          "n": 36
+        }
+      ]
+    },
+    {
+      "tag": "L80_native",
+      "lookahead_ms": 80,
+      "target": "native",
+      "chunk_ms": 40.0,
+      "t_algorithmic_ms": 120.0,
+      "t_algorithmic_honest_ms": 125.0,
+      "test_per": 1.0,
+      "test_per_cross": 1.0,
+      "n_test": 28,
+      "params": 24552741,
+      "steps": 60,
+      "wall_s": 168.7,
+      "history": [
+        {
+          "step": 60,
+          "loss": 3.3437986373901367,
+          "per": 1.0,
+          "per_cross": 1.0,
+          "n": 36
+        }
+      ]
+    },
+    {
+      "tag": "L640_native",
+      "lookahead_ms": 640,
+      "target": "native",
+      "chunk_ms": 40.0,
+      "t_algorithmic_ms": 680.0,
+      "t_algorithmic_honest_ms": 685.0,
+      "test_per": 1.0,
+      "test_per_cross": 1.0,
+      "n_test": 28,
+      "params": 24552741,
+      "steps": 60,
+      "wall_s": 188.8,
+      "history": [
+        {
+          "step": 60,
+          "loss": 3.344322443008423,
+          "per": 1.0,
+          "per_cross": 1.0,
+          "n": 36
+        }
+      ]
+    }
+  ],
+  "curve_native": {
+    "lookaheads_ms": [
+      0,
+      80,
+      640
+    ],
+    "test_per": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "knee": {
+      "knee_ms": 0.0,
+      "knee_index": 0,
+      "knee_strength": 0.0,
+      "monotone": true
+    },
+    "relative_gain_0_to_max": 0.0
+  }
+}

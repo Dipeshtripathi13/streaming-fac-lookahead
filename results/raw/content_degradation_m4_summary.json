@@ -1,0 +1,312 @@
+{
+  "tag": "m4",
+  "device": "cpu",
+  "encoder": "microsoft/wavlm-base-plus",
+  "n_utts": 48,
+  "per_l1": {
+    "Arabic": 8,
+    "Chinese": 8,
+    "Spanish": 8,
+    "Hindi": 8,
+    "Korean": 8,
+    "Vietnamese": 8
+  },
+  "corpus_split_size": 3599,
+  "chunk_ms": 40.0,
+  "lookback_ms": 2000.0,
+  "layer": 9,
+  "encoder_causality": {
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_frames": 64,
+    "pos_conv_leak_ms": 1280.0,
+    "pos_conv_fixed": true,
+    "has_group_norm": true,
+    "group_norm_fixed": true,
+    "group_norm_channels": 512
+  },
+  "causality_selftest": {
+    "encoder": "microsoft/wavlm-base-plus",
+    "tolerance": 0.0001,
+    "mask_only": {
+      "mask_injection_strategy": "position_bias",
+      "pos_conv_causal": false,
+      "group_norm_causal": false,
+      "pos_conv_kernel": 128,
+      "pos_conv_leak_ms_if_unpatched": 1280.0,
+      "has_group_norm": true,
+      "max_abs_delta": 0.051471710205078125,
+      "relative_l2_delta": 0.011429516598582268,
+      "causal": false
+    },
+    "mask_posconv": {
+      "mask_injection_strategy": "position_bias",
+      "pos_conv_causal": true,
+      "group_norm_causal": false,
+      "pos_conv_kernel": 128,
+      "pos_conv_leak_ms_if_unpatched": 1280.0,
+      "has_group_norm": true,
+      "max_abs_delta": 0.005359768867492676,
+      "relative_l2_delta": 0.005995647516101599,
+      "causal": false
+    },
+    "mask_groupnorm": {
+      "mask_injection_strategy": "position_bias",
+      "pos_conv_causal": false,
+      "group_norm_causal": true,
+      "pos_conv_kernel": 128,
+      "pos_conv_leak_ms_if_unpatched": 1280.0,
+      "has_group_norm": true,
+      "max_abs_delta": 0.32654643058776855,
+      "relative_l2_delta": 0.025983180850744247,
+      "causal": false
+    },
+    "mask_both": {
+      "mask_injection_strategy": "position_bias",
+      "pos_conv_causal": true,
+      "group_norm_causal": true,
+      "pos_conv_kernel": 128,
+      "pos_conv_leak_ms_if_unpatched": 1280.0,
+      "has_group_norm": true,
+      "max_abs_delta": 8.732080459594727e-06,
+      "relative_l2_delta": 6.137697255326202e-06,
+      "causal": true
+    },
+    "verdict": "PASS. Masking attention alone does NOT make microsoft/wavlm-base-plus causal. The positional convolution (kernel 128) and the feature-encoder GroupNorm each leak future context; with both patched the truncation proof passes and the lookahead labels are valid.",
+    "with_fix": {
+      "mask_injection_strategy": "position_bias",
+      "pos_conv_causal": true,
+      "group_norm_causal": true,
+      "pos_conv_kernel": 128,
+      "pos_conv_leak_ms_if_unpatched": 1280.0,
+      "has_group_norm": true,
+      "max_abs_delta": 8.732080459594727e-06,
+      "relative_l2_delta": 6.137697255326202e-06,
+      "causal": true
+    },
+    "without_fix": {
+      "mask_injection_strategy": "position_bias",
+      "pos_conv_causal": false,
+      "group_norm_causal": false,
+      "pos_conv_kernel": 128,
+      "pos_conv_leak_ms_if_unpatched": 1280.0,
+      "has_group_norm": true,
+      "max_abs_delta": 0.051471710205078125,
+      "relative_l2_delta": 0.011429516598582268,
+      "causal": false
+    }
+  },
+  "lookaheads_ms": [
+    0,
+    20,
+    40,
+    80,
+    160,
+    320,
+    640
+  ],
+  "divergence_from_bidirectional": {
+    "0": 0.5008112366000811,
+    "20": 0.4293671989192565,
+    "40": 0.3743656948208809,
+    "80": 0.30910872171322507,
+    "160": 0.23058714779714742,
+    "320": 0.16388759296387434,
+    "640": 0.10730454449852307
+  },
+  "cka_to_bidirectional": {
+    "0": 0.7678246144541122,
+    "20": 0.8101554379473926,
+    "40": 0.8355009436516552,
+    "80": 0.8687695059031842,
+    "160": 0.9072363498353972,
+    "320": 0.9341058598256842,
+    "640": 0.9554572806441416
+  },
+  "knee_divergence": {
+    "knee_ms": NaN,
+    "knee_index": -1,
+    "knee_strength": 0.3087990000290123,
+    "has_knee": false,
+    "r2_loglinear": 0.9955,
+    "r2_linear": 0.7746,
+    "slope_per_doubling": -0.08074,
+    "chord_argmax_ms": 160.0,
+    "monotone": true,
+    "interpretation": "No knee: y is log-linear in lookahead (R2=0.9955). Every doubling of L buys a constant 0.0807. There is no natural operating point; the budget is a product decision."
+  },
+  "knee_cka": {
+    "knee_ms": 160.0,
+    "knee_index": 4,
+    "knee_strength": 0.3486061469705673,
+    "has_knee": true,
+    "r2_loglinear": 0.9869,
+    "r2_linear": 0.7245,
+    "slope_per_doubling": -0.03833,
+    "chord_argmax_ms": 160.0,
+    "monotone": true,
+    "interpretation": "Knee at 160 ms (log-linear fit is poor, R2=0.9869)."
+  },
+  "knee_bootstrap_ci95_ms": "superseded: see knee_divergence.has_knee",
+  "knee_bootstrap_modal_ms": 160,
+  "bucket_curves": {
+    "sonorant_steady": [
+      0.5009935852140188,
+      0.4274699830760558,
+      0.3704588860273361,
+      0.3051843245824178,
+      0.2201396624247233,
+      0.14767837462325892,
+      0.09001209307461977
+    ],
+    "obstruent_or_transient": [
+      0.49994624468187493,
+      0.4205746737619241,
+      0.36677113982538384,
+      0.30148272154231864,
+      0.2218055408447981,
+      0.15323245944455266,
+      0.0960919027371953
+    ]
+  },
+  "relative_gain_sonorant_steady": 0.8203328431118182,
+  "relative_gain_obstruent_transient": 0.8077955305008034,
+  "h2_proxy_direction_supported": true,
+  "per_l1_curves": {
+    "Arabic": [
+      0.5092467628419399,
+      0.4338424950838089,
+      0.3812367804348469,
+      0.3062936272472143,
+      0.23712692596018314,
+      0.16474585607647896,
+      0.10906427633017302
+    ],
+    "Chinese": [
+      0.4747525230050087,
+      0.4042162522673607,
+      0.35584161430597305,
+      0.29670221731066704,
+      0.21268562227487564,
+      0.15596156381070614,
+      0.11967383977025747
+    ],
+    "Hindi": [
+      0.5236615128815174,
+      0.472525417804718,
+      0.39393245056271553,
+      0.3394574597477913,
+      0.25952875800430775,
+      0.19208150915801525,
+      0.11305523384362459
+    ],
+    "Korean": [
+      0.523746233433485,
+      0.4551302641630173,
+      0.4030790440738201,
+      0.33410123735666275,
+      0.23802033253014088,
+      0.15555338468402624,
+      0.0915626110509038
+    ],
+    "Spanish": [
+      0.4802120290696621,
+      0.40212250128388405,
+      0.3520650677382946,
+      0.28361660055816174,
+      0.21851721592247486,
+      0.15953648649156094,
+      0.10323640797287226
+    ],
+    "Vietnamese": [
+      0.4932483583688736,
+      0.40836626291275024,
+      0.36003921180963516,
+      0.29448118805885315,
+      0.21764403209090233,
+      0.15544675756245852,
+      0.10723489802330732
+    ]
+  },
+  "forward_latency_ms": {
+    "fwd_L0": {
+      "n": 45.0,
+      "mean": 85.69662491111112,
+      "p50": 85.127,
+      "p90": 115.239,
+      "p95": 118.921583,
+      "p99": 134.129208,
+      "max": 134.129208,
+      "stdev": 22.51153311329784
+    },
+    "fwd_L20": {
+      "n": 45.0,
+      "mean": 85.66750366666666,
+      "p50": 85.269834,
+      "p90": 113.120875,
+      "p95": 119.703625,
+      "p99": 132.298375,
+      "max": 132.298375,
+      "stdev": 22.081900321089833
+    },
+    "fwd_L40": {
+      "n": 45.0,
+      "mean": 85.87032404444444,
+      "p50": 84.812916,
+      "p90": 113.484458,
+      "p95": 117.059917,
+      "p99": 132.91175,
+      "max": 132.91175,
+      "stdev": 22.26864757904735
+    },
+    "fwd_L80": {
+      "n": 45.0,
+      "mean": 85.9263176,
+      "p50": 86.056292,
+      "p90": 111.209917,
+      "p95": 117.176416,
+      "p99": 132.6425,
+      "max": 132.6425,
+      "stdev": 21.79584224513833
+    },
+    "fwd_L160": {
+      "n": 45.0,
+      "mean": 85.58962784444445,
+      "p50": 88.088959,
+      "p90": 111.867291,
+      "p95": 119.0535,
+      "p99": 133.019167,
+      "max": 133.019167,
+      "stdev": 21.898541653632318
+    },
+    "fwd_L320": {
+      "n": 45.0,
+      "mean": 85.15836386666666,
+      "p50": 86.577416,
+      "p90": 111.698375,
+      "p95": 117.38,
+      "p99": 131.923458,
+      "max": 131.923458,
+      "stdev": 22.167608734941552
+    },
+    "fwd_L640": {
+      "n": 45.0,
+      "mean": 86.85508337777777,
+      "p50": 87.782917,
+      "p90": 117.470875,
+      "p95": 121.120083,
+      "p99": 133.717667,
+      "max": 133.717667,
+      "stdev": 23.138702962103732
+    }
+  },
+  "wall_seconds": 34.9,
+  "h2_proxy_paired": {
+    "n": 48,
+    "mean_diff": 0.0129093493057139,
+    "ci95": [
+      0.0026227275395453464,
+      0.02300018295137415
+    ],
+    "significant": true
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "timestamp_utc": "2026-08-02T18:54:09Z",
+  "hostname": "Mac.lan",
+  "system": "Darwin",
+  "release": "25.5.0",
+  "machine": "arm64",
+  "python": "3.11.15",
+  "cpu_model": "Apple M4",
+  "cpu_count_logical": 10,
+  "mem_total_gb": 16.0,
+  "pi_model": null,
+  "thermal": {
+    "note": "macOS: no user-space throttle counter; run `pmset -g thermlog` alongside"
+  },
+  "libs": {
+    "numpy_build": {
+      "blas": {
+        "name": "accelerate",
+        "found": true,
+        "version": "unknown",
+        "detection method": "system",
+        "include directory": "unknown",
+        "lib directory": "unknown",
+        "openblas configuration": "unknown",
+        "pc file directory": "unknown"
+      }
+    },
+    "threading_env": {
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": null,
+      "MKL_NUM_THREADS": null,
+      "VECLIB_MAXIMUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": null
+    },
+    "onnxruntime_version": "1.28.0",
+    "onnxruntime_providers": [
+      "CoreMLExecutionProvider",
+      "AzureExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "torch_version": "2.13.0",
+    "torch_threads": 4,
+    "torch_cuda": false,
+    "torch_mps": true
+  },
+  "mac_perf_cores": "4",
+  "mac_eff_cores": "6",
+  "mac_model": "Mac16,1",
+  "hw_class": "cpu-apple-silicon"
+}

@@ -1,0 +1,270 @@
+
+============================================================
+  0. ENVIRONMENT
+============================================================
+repo   : /Users/dipeshtripathi/Desktop/accent_con/research
+log    : results/raw/run_m4_20260802_135116.log
+ProductName:		macOS ProductVersion:		26.5 BuildVersion:		25F71 
+Apple M4
+P-cores: 4  E-cores: 6
+Now drawing from 'Battery Power'
+
+NOTE: benchmarks should run on AC power. Battery = downclocked = wrong p95.
+python : python3.11 (Python 3.11.15)
+creating .venv ...
+installing dependencies (first run downloads ~2 GB, later runs are instant) ...
+  [OK]   dependencies
+
+============================================================
+  1. UNIT TESTS AND INVARIANT GUARDS
+============================================================
+  [OK]   tests/test_causal.py
+  [OK]   tests/test_pipeline_invariants.py
+  [OK]   eval/metrics.py
+  [OK]   eval/phoneme_analysis.py
+
+============================================================
+  2. HARDWARE PROBE
+============================================================
+
+wrote results/raw/hw_m4.json
+  "mac_perf_cores": "4",
+  "mac_eff_cores": "6",
+  "mac_model": "Mac16,1",
+  "calibration": {
+    "sgemm_512": {
+      "n": 512,
+      "median_ms": 0.1645,
+      "gflops": 1631.83
+    },
+    "sgemm_1024": {
+      "n": 1024,
+      "median_ms": 2.0352,
+      "gflops": 1055.17
+    },
+    "memcpy_64mb": {
+      "mb": 64,
+      "median_ms": 2.462,
+      "gb_per_s": 25.39
+    },
+    "single_core": {
+      "loop_2m_ms": 52.87
+    }
+  },
+  "hw_class": "cpu-apple-silicon"
+}
+  [OK]   hardware probe
+
+============================================================
+  3. ENCODER SCALING SWEEP  (compute vs lookahead x chunk x model size)
+============================================================
+taskpolicy: Could not parse 'user-interactive' as a QoS clamp
+Usage: taskpolicy [-x|-X] [-d <policy>] [-g <policy>] [-c <clamp>] [-b] [-t <tier>]
+                  [-l <tier>] [-a] [-s] [-S <shims>] [-P <control>]
+                  [-m <limit>] [-j <pri>] <program> [<pargs> [...]]
+       taskpolicy [-b|-B] [-t <tier>] [-l <tier>] -p pid
+  [FAIL] encoder scaling
+
+============================================================
+  4. CASCADE BENCHMARK (S1)
+============================================================
+taskpolicy: Could not parse 'user-interactive' as a QoS clamp
+Usage: taskpolicy [-x|-X] [-d <policy>] [-g <policy>] [-c <clamp>] [-b] [-t <tier>]
+                  [-l <tier>] [-a] [-s] [-S <shims>] [-P <control>]
+                  [-m <limit>] [-j <pri>] <program> [<pargs> [...]]
+       taskpolicy [-b|-B] [-t <tier>] [-l <tier>] -p pid
+  [FAIL] cascade
+
+============================================================
+  5. CAUSALITY SELF-TEST
+============================================================
+Does masking attention alone make WavLM causal? (spoiler: no -- pos_conv)
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+====================================================================
+CAUSALITY SELF-TEST  (does attention masking alone make WavLM causal?)
+====================================================================
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 46783.64it/s]
+Traceback (most recent call last):
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/bench/bench_content_degradation.py", line 603, in <module>
+    main()
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/bench/bench_content_degradation.py", line 453, in main
+    st = causality_selftest(device="cpu")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/bench/bench_content_degradation.py", line 216, in causality_selftest
+    f_full = features(model, wav, geom, device)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/bench/bench_content_degradation.py", line 193, in features
+    out = model(x, output_hidden_states=True)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 1067, in forward
+    encoder_outputs = self.encoder(
+                      ^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 422, in forward
+    layer_outputs = layer(
+                    ^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/transformers/modeling_layers.py", line 110, in __call__
+    return super().__call__(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/bench/bench_content_degradation.py", line 157, in fwd
+    return orig(hidden_states, m, *a, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 316, in forward
+    hidden_states, attn_weights, position_bias = self.attention(
+                                                 ^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 182, in forward
+    attn_output, attn_weights = self.torch_multi_head_self_attention(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 206, in torch_multi_head_self_attention
+    attn_output, attn_weights = F.multi_head_attention_forward(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/functional.py", line 6783, in multi_head_attention_forward
+    is_batched = _mha_shape_check(
+                 ^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/functional.py", line 6539, in _mha_shape_check
+    raise AssertionError(
+AssertionError: For batched (3-D) `query`, expected `key_padding_mask` to be `None` or 2-D but found 4-D tensor instead
+  [FAIL] causality self-test
+
+============================================================
+  6. CONTENT-DEGRADATION PILOT ON REAL L2-ARCTIC  (the RQ1 evidence)
+============================================================
+  !! No Hugging Face token found.
+  !! KoelLabs/L2Arctic is gated. Accept terms at
+  !!   https://huggingface.co/datasets/KoelLabs/L2Arctic
+  !! then run:  source .venv/bin/activate && huggingface-cli login
+  !! Falling back to synthetic audio so the pipeline is still exercised.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+====================================================================
+CAUSALITY SELF-TEST  (does attention masking alone make WavLM causal?)
+====================================================================
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 39788.37it/s]
+Traceback (most recent call last):
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/bench/bench_content_degradation.py", line 603, in <module>
+    main()
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/bench/bench_content_degradation.py", line 453, in main
+    st = causality_selftest(device="cpu")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/bench/bench_content_degradation.py", line 216, in causality_selftest
+    f_full = features(model, wav, geom, device)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/bench/bench_content_degradation.py", line 193, in features
+    out = model(x, output_hidden_states=True)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 1067, in forward
+    encoder_outputs = self.encoder(
+                      ^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 422, in forward
+    layer_outputs = layer(
+                    ^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/transformers/modeling_layers.py", line 110, in __call__
+    return super().__call__(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/bench/bench_content_degradation.py", line 157, in fwd
+    return orig(hidden_states, m, *a, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 316, in forward
+    hidden_states, attn_weights, position_bias = self.attention(
+                                                 ^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 182, in forward
+    attn_output, attn_weights = self.torch_multi_head_self_attention(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 206, in torch_multi_head_self_attention
+    attn_output, attn_weights = F.multi_head_attention_forward(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/functional.py", line 6783, in multi_head_attention_forward
+    is_batched = _mha_shape_check(
+                 ^^^^^^^^^^^^^^^^^
+  File "/Users/dipeshtripathi/Desktop/accent_con/research/.venv/lib/python3.11/site-packages/torch/nn/functional.py", line 6539, in _mha_shape_check
+    raise AssertionError(
+AssertionError: For batched (3-D) `query`, expected `key_padding_mask` to be `None` or 2-D but found 4-D tensor instead
+  [FAIL] pilot (synthetic)
+
+============================================================
+  7. TRANSLATOR SMOKE TEST
+============================================================
+Proves the training pipeline runs end-to-end (60 steps, 3 lookaheads).
+The full 14-condition sweep belongs on a GPU -- see notebooks/.
+ok  translator self-test (tokenizer, PER, vocab, sweep invariants)
+  [OK]   translator self-test
+  skipped: no Hugging Face token (see stage 6)
+
+============================================================
+  8. FIGURES
+============================================================
+wrote fig1_compute_vs_lookahead
+wrote fig2_algo_vs_compute
+wrote fig3_rtf_feasibility
+no quality CSVs yet -- fig4 waits for the November sweep
+
+figures in /Users/dipeshtripathi/Desktop/accent_con/research/results/figures
+  [OK]   figures
+
+============================================================
+  DONE
+============================================================
+STAGES THAT FAILED: encoder scaling cascade causality self-test pilot (synthetic)
+Full log: results/raw/run_m4_20260802_135116.log
+
+Results:
+total 152
+drwxr-xr-x   4 dipeshtripathi  staff    128 Aug  2 01:16 _superseded
+drwxr-xr-x  11 dipeshtripathi  staff    352 Aug  2 13:52 .
+drwxr-xr-x   4 dipeshtripathi  staff    128 Aug  2 00:52 ..
+-rw-r--r--   1 dipeshtripathi  staff   1260 Aug  2 01:07 cascade_asr_arm64_host.json
+-rw-r--r--   1 dipeshtripathi  staff    808 Aug  2 01:07 cascade_asr_arm64.csv
+-rw-r--r--   1 dipeshtripathi  staff   1565 Aug  2 01:07 cascade_asr_arm64.jsonl
+-rw-r--r--   1 dipeshtripathi  staff   7377 Aug  2 01:16 encoder_scaling_arm64.csv
+-rw-r--r--   1 dipeshtripathi  staff  28916 Aug  2 01:16 encoder_scaling_arm64.jsonl
+-rw-r--r--@  1 dipeshtripathi  staff   1653 Aug  2 13:52 hw_m4.json
+-rw-r--r--   1 dipeshtripathi  staff   1617 Aug  2 00:56 hw_sandbox_aarch64.json
+-rw-r--r--@  1 dipeshtripathi  staff  15438 Aug  2 13:53 run_m4_20260802_135116.log
+
+This window can be closed.

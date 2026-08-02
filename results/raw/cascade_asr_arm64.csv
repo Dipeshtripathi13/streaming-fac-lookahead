@@ -1,0 +1,4 @@
+component,quantised,threads,load_ms,feed_block_ms,compute_p50_ms,compute_p95_ms,compute_p99_ms,rtf_p50,rtf_p95,active_step_p50_ms,active_step_p95_ms,encoder_duty_cycle,rtf_amortised,model_decode_chunk_ms,model_right_context_ms,n_blocks,transcript,hw_class
+asr_streaming_zipformer,True,1,634.5,100.0,0.116,9.303,9.613,0.0012,0.093,9.081,9.496,0.313,0.0294,320.0,70.0,299,OH HER OVER HER OVER HER OVER HER WILL HURT HER OVER HER,cpu-arm64
+asr_streaming_zipformer,True,2,487.9,100.0,0.131,7.357,7.451,0.0013,0.0736,7.248,7.426,0.313,0.0236,320.0,70.0,299,OH HER OVER HER OVER HER OVER HER WILL HURT HER OVER HER,cpu-arm64
+asr_streaming_zipformer,True,4,503.3,100.0,0.133,14.994,20.631,0.0013,0.1499,12.264,18.57,0.316,0.0396,320.0,70.0,299,OH HER OVER HER OVER HER OVER HER WILL HURT HER OVER HER,cpu-arm64

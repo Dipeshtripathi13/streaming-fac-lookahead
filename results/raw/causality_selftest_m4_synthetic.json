@@ -1,0 +1,19 @@
+{
+  "with_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_future_frames_leaked": 64,
+    "pos_conv_leak_ms": 1280.0,
+    "max_abs_delta": 0.005359768867492676,
+    "relative_l2_delta": 0.005995647516101599,
+    "causal": false
+  },
+  "without_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_future_frames_leaked": 0,
+    "pos_conv_leak_ms": 0.0,
+    "max_abs_delta": 0.051471710205078125,
+    "relative_l2_delta": 0.011429516598582268,
+    "causal": false
+  },
+  "verdict": "CHECK MANUALLY: unexpected result, see numbers above."
+}

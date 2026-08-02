@@ -1,0 +1,16 @@
+# macOS / Windows / Linux CPU. Full evaluation stack.
+-r base.txt
+onnxruntime>=1.17
+sherpa-onnx>=1.10
+matplotlib>=3.7
+librosa>=0.10
+pandas>=2.0
+# third-party ASR for WER. faster-whisper is the default: int8 CPU, deterministic.
+faster-whisper>=1.0
+statsmodels>=0.14
+# the harness + the causal-WavLM pilot and the translator sweep
+torch>=2.2
+transformers>=4.40
+# KoelLabs/L2Arctic is a gated HF dataset -- `huggingface-cli login` once.
+datasets>=2.19
+huggingface_hub>=0.23

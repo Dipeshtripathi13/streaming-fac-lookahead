@@ -1,0 +1,4 @@
+tag,lookahead_ms,target,chunk_ms,t_algorithmic_ms,t_algorithmic_honest_ms,test_per,test_per_cross,n_test,params,steps,wall_s
+L0_native,0,native,40.0,40.0,45.0,1.0,1.0,28,24552741,60,181.7
+L80_native,80,native,40.0,120.0,125.0,1.0,1.0,28,24552741,60,168.7
+L640_native,640,native,40.0,680.0,685.0,1.0,1.0,28,24552741,60,188.8

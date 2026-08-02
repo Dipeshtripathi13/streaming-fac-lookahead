@@ -1,0 +1,153 @@
+=== content-degradation pilot (real L2-ARCTIC) ===
+====================================================================
+CAUSALITY SELF-TEST  (does attention masking alone make WavLM causal?)
+====================================================================
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 32592.43it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 49286.30it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 63772.14it/s]
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 44959.69it/s]
+{
+  "encoder": "microsoft/wavlm-base-plus",
+  "tolerance": 0.0001,
+  "mask_only": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.051471710205078125,
+    "relative_l2_delta": 0.011429516598582268,
+    "causal": false
+  },
+  "mask_posconv": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.005359768867492676,
+    "relative_l2_delta": 0.005995647516101599,
+    "causal": false
+  },
+  "mask_groupnorm": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.32654643058776855,
+    "relative_l2_delta": 0.025983180850744247,
+    "causal": false
+  },
+  "mask_both": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 8.732080459594727e-06,
+    "relative_l2_delta": 6.137697255326202e-06,
+    "causal": true
+  },
+  "verdict": "PASS. Masking attention alone does NOT make microsoft/wavlm-base-plus causal. The positional convolution (kernel 128) and the feature-encoder GroupNorm each leak future context; with both patched the truncation proof passes and the lookahead labels are valid.",
+  "with_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 8.732080459594727e-06,
+    "relative_l2_delta": 6.137697255326202e-06,
+    "causal": true
+  },
+  "without_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.051471710205078125,
+    "relative_l2_delta": 0.011429516598582268,
+    "causal": false
+  }
+}
+  audio auto-decode unavailable (ImportError); falling back to raw bytes + soundfile
+
+48 utterances (corpus split size 3599); per L1: {'Arabic': 8, 'Chinese': 8, 'Spanish': 8, 'Hindi': 8, 'Korean': 8, 'Vietnamese': 8}
+Loading weights:   0%|          | 0/248 [00:00<?, ?it/s]Loading weights: 100%|██████████| 248/248 [00:00<00:00, 34230.20it/s]
+encoder microsoft/wavlm-base-plus on cpu
+  pos_conv kernel 128 -> would leak 1280 ms; patched to left-only padding
+  feature-encoder GroupNorm present=True -> replaced with cumulative norm on 512 channels
+  8/48 utts  (6s, 0.8s/utt)
+  16/48 utts  (11s, 0.7s/utt)
+  24/48 utts  (17s, 0.7s/utt)
+  32/48 utts  (23s, 0.7s/utt)
+  40/48 utts  (29s, 0.7s/utt)
+  48/48 utts  (35s, 0.7s/utt)
+
+====================================================================
+CONTENT DEGRADATION vs LOOKAHEAD  (WavLM-base-plus layer 9)
+====================================================================
+  L (ms)   t_algo   divergence      CKA   sonorant  obstruent
+       0       40       0.5008   0.7678     0.5010     0.4999
+      20       60       0.4294   0.8102     0.4275     0.4206
+      40       80       0.3744   0.8355     0.3705     0.3668
+      80      120       0.3091   0.8688     0.3052     0.3015
+     160      200       0.2306   0.9072     0.2201     0.2218
+     320      360       0.1639   0.9341     0.1477     0.1532
+     640      680       0.1073   0.9555     0.0900     0.0961
+
+knee (divergence): nan ms   bootstrap 95% CI [160, 160] ms, modal 160 ms
+knee (1-CKA):      160 ms
+relative gain 0->640ms:  sonorant 0.820  obstruent 0.808  ->  H2-proxy SUPPORTED
+
+wrote results/raw/content_degradation_m4.csv
+
+=== commit delay ===
+  int8 encoder produced an empty hypothesis on this platform; retrying with the fp32 encoder (354 MB).
+2 utterances, 20 ms feed step, 1 thread(s), encoder=fp32
+
+
+!! 0.wav: 0 word(s) in 6.62s — the recogniser produced no usable hypothesis. Diagnostics:
+  sherpa_onnx version : 1.13.4
+  audio (wave module) : 6.62s, dtype=float32, contiguous=True, peak=0.535, rms=0.0471
+  soundfile available : yes
+  model encoder-epoch-99-avg-1.int8.onnx   187823992
+  model encoder-epoch-99-avg-1.onnx        353707185
+  model joiner-epoch-99-avg-1.int8.onnx    259335
+  model tokens.txt                         5048
+  [wav via wave module | int8=True | whole clip]
+      result: ''  tokens: []
+  [wav via wave module | int8=True | 20 ms chunks]
+      result: ''  tokens: []
+  [wav via wave module | int8=False | whole clip]
+      result: ''  tokens: []
+  [wav via wave module | int8=False | 20 ms chunks]
+      result: ''  tokens: []
+  [synthetic probe (known-good) | int8=True | whole clip]
+      result: ''  tokens: []
+  [synthetic probe (known-good) | int8=True | 20 ms chunks]
+      result: ''  tokens: []
+  [synthetic probe (known-good) | int8=False | whole clip]
+      result: ''  tokens: []
+  [synthetic probe (known-good) | int8=False | 20 ms chunks]
+      result: ''  tokens: []
+aborting: cannot measure commit delay without hypotheses
+
+=== figures ===
+wrote fig1_compute_vs_lookahead
+wrote fig2_algo_vs_compute
+wrote fig3_rtf_feasibility
+wrote fig5_commit_delay
+no quality CSVs yet -- fig4 waits for the November sweep
+
+figures in /Users/dipeshtripathi/Desktop/accent_con/research/results/figures
+
+log: results/raw/quick_20260802_151507.log
+This window can be closed.
