@@ -151,9 +151,16 @@ model you trained.
    the least productive doubling measured.** Report the exchange rate, not an
    operating point.
 
-Compute-side, correctness, and encoder-level results only. No accent-conversion
-model is trained yet — finding 0 was the prerequisite for the lookahead labels
-meaning anything.
+8. **The trained translator (H3 supported).** 14 conditions on a T4, 2.5 h.
+   Conversion (CTC on canonical `g2p`) gains **0.521** from lookahead against
+   transcription's (`ipa`) **0.351** — **1.48×**, on arms that differ in one
+   label tensor. And the model's preference for canonical over produced phones
+   grows **monotonically, 2.8×** (+.036 → +.103): more right context makes it
+   *more converting*, not merely more accurate.
+
+Correctness, latency, encoder-level and task-level results. **No audio is
+synthesised and no listening test has been run** — F11 measures phone error,
+not perceptual accentedness.
 
 **Two errors worth reading about** (`docs/RESULTS_M4.md` F8): a 10 ms sampling
 grid was invalid because lookahead is quantised to the 20 ms frame rate (half

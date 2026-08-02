@@ -24,11 +24,17 @@ With a provably causal encoder we then ask what lookahead buys. On 198
 L2-ARCTIC utterances, representation drift from the bidirectional reference is
 strongly log-linear in lookahead (R²=0.994 vs 0.727 linear) with no cliff: every
 doubling buys ≈0.081, and the marginal return *peaks* at 100–200 ms — 2.5–5×
-the 40 ms budget used by current streaming AC. We further separate algorithmic
-from computational latency and find they are independently controllable: over
-0–640 ms of lookahead per-chunk compute changes by −1.5% to +14%, while
-algorithmic latency changes by up to 32×. Chunk size, not lookahead, determines
-deployability. We release the harness, the causality proof, and all raw data.
+the 40 ms budget used by current streaming AC. Training a causal phone translator over
+that encoder, in which accent conversion and accent-faithful transcription
+differ by a single label tensor, conversion gains **1.48×** more from lookahead
+than transcription, and the model's preference for canonical over produced
+phones grows **monotonically, 2.8×**, from *L*=0 to *L*=640 ms: more right
+context makes the model more *converting*, not merely more accurate. We further
+separate algorithmic from computational latency and find they are independently
+controllable: over 0–640 ms of lookahead per-chunk compute changes by −1.5% to
++14%, while algorithmic latency changes by up to 32×. Chunk size, not lookahead,
+determines deployability. We release the harness, the causality proof, and all
+raw data.
 
 ---
 
@@ -60,10 +66,13 @@ Contributions:
    independently controllable and trade asymmetrically (§4). **[M]**
 3. **The lookahead exchange rate** at the encoder level on real accented speech:
    log-linear, no cliff, marginal return peaking at 100–200 ms (§5). **[M]**
-4. **A properly decomposed streaming ASR→TTS cascade baseline**, showing it
+4. **A trained accent translator** whose conversion/transcription control differs
+   in one label tensor, showing conversion needs 1.48× more lookahead and that
+   the conversion signal grows monotonically with it (§5.2). **[M]**
+5. **A properly decomposed streaming ASR→TTS cascade baseline**, showing it
    loses structurally (95% of its latency is algorithmic) rather than
    computationally (§4.3). **[M]**
-5. **A public harness** with machine-checked guards against a confounded sweep,
+6. **A public harness** with machine-checked guards against a confounded sweep,
    the causality proof, and all raw data.
 
 ---
@@ -244,14 +253,80 @@ from lookahead than obstruent/transient ones (paired, n=48, bootstrap 95% CI
 effect is small on a crude proxy; a forced-alignment test against L2-ARCTIC's
 phone annotations is required before claiming a phoneme-class story.
 
-### 5.2 Trained accent translator **[TBD]**
+### 5.2 Trained accent translator **[M]**
 
-The encoder result bounds information *available*; it does not show what the
-*task* needs. We train a causal phone translator (CTC over the patched encoder)
-at 7 lookaheads × 2 targets — canonical phones `g2p` (accent conversion) vs
-produced phones `ipa` (accent-faithful transcription) — differing in a single
-label tensor. Mean PER between the two targets is 0.175, confirming they are
-genuinely different tasks. *Results pending; running at time of writing.*
+The encoder result bounds the information *available*; it does not show what the
+*task* needs. We now train.
+
+**Task.** `KoelLabs/L2Arctic` ships, per utterance, the **canonical** phone
+sequence a native speaker would produce (`g2p`) and the **produced** sequence
+this L2 speaker actually said (`ipa`). That makes PHONOS's supervised core
+directly trainable: a causal translator from non-native audio to the *native*
+phone sequence, via CTC against `g2p`.
+
+**The control is one tensor.** Identical architecture, capacity, seed, data
+order and step count; only the target changes — `g2p` (accent **conversion**:
+decide what the speaker *should* have said) vs `ipa` (accent-faithful
+**transcription**: report the local gesture). Mean PER between the two targets
+is **0.175**, confirming they are genuinely different tasks.
+
+**Setup.** 4-layer causal conversion stack (masked self-attention +
+left-padded depthwise conv + FiLM) and a linear CTC head over a **frozen**
+WavLM-base-plus with both causality patches of §3; 24.6 M trainable parameters,
+vocabulary 37. Chunk 40 ms, look-back 2 s. AdamW, OneCycle, lr 3e-4, batch 8,
+**1200 steps** per condition. 3599 utterances, **speaker-disjoint** splits
+stratified by L1 (1800 train / 899 val / 900 test; 6 held-out speakers each for
+val and test) — a random utterance split would make this speaker memorisation.
+14 conditions × 638 s ≈ **2.5 h on one Tesla T4**. The causality proof runs
+before training and aborts it on failure.
+
+**Results.** Test PER, speaker-disjoint:
+
+| *L* (ms) | *t*<sub>algo</sub> | conversion (`g2p`) | transcription (`ipa`) |
+|---:|---:|---:|---:|
+| 0 | 40 | 0.547 | 0.585 |
+| 20 | 60 | 0.502 | 0.492 |
+| 40 | 80 | 0.431 | 0.470 |
+| 80 | 120 | 0.378 | 0.416 |
+| 160 | 200 | 0.346 | 0.404 |
+| 320 | 360 | 0.329 | 0.409 |
+| 640 | 680 | **0.262** | 0.380 |
+| **relative gain 0→640** | | **0.521** | **0.351** |
+
+**H3 is supported.** Conversion gains **0.521** from lookahead against
+transcription's **0.351** — a 1.48× ratio, far above the ~0.006 PER noise floor
+implied by the single non-monotone step in the transcription curve. The task
+that must decide *what should have been said* benefits substantially more from
+right context than the task that need only report what was said.
+
+**The conversion signal itself grows with lookahead.** Scoring the
+conversion-trained model against *both* targets isolates how strongly it prefers
+the canonical sequence over the produced one:
+
+| *L* (ms) | 0 | 20 | 40 | 80 | 160 | 320 | 640 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| PER vs `g2p` | .547 | .502 | .431 | .378 | .346 | .329 | .262 |
+| PER vs `ipa` | .583 | .550 | .487 | .449 | .433 | .428 | .364 |
+| **preference** | **+.036** | +.048 | +.056 | +.071 | +.087 | +.099 | **+.103** |
+
+The preference is **monotone increasing in lookahead** and grows **2.8×** from
+*L*=0 to *L*=640. More right context does not merely make the model more
+accurate — it makes it *more converting and less transcribing*. Unlike the raw
+PER curves this quantity is monotone at every step, so it is the more robust
+form of the result.
+
+**Task vs representation.** The trained curve is shallower than the encoder one
+(slope −0.056 vs −0.081 per doubling, R²<sub>log</sub> 0.96 vs 0.99). The
+representation therefore loses information faster than the task can exploit it,
+which is what one expects if the encoder is a bound and not a bottleneck —
+consistent with, but not proof of, the §5 reading.
+
+**Limits.** One seed per condition, 1200 steps, and a frozen encoder. The
+transcription curve is non-monotone once (160→320 ms, +0.006 PER), which sets
+the resolution: differences below ~0.01 PER are not resolvable here. Both curves
+have only 7 points and are therefore **underpowered for knee detection** by the
+criterion of §5. Absolute PER is high because training is deliberately short;
+the comparisons are relative and all conditions share a budget.
 
 ---
 
@@ -289,9 +364,13 @@ specifications**, which is precisely the argument for measuring it.
 
 ## 7. Limitations
 
-- **No converted audio, no listening test.** §5 measures representation drift,
-  not perceptual accentedness. The trained translator (§5.2) is the first task-
-  level evidence; subjective evaluation is future work.
+- **No converted audio, no listening test.** §5 and §5.2 measure representation
+  drift and phone error, not perceptual accentedness. Synthesis and subjective
+  evaluation are future work.
+- **One seed, 1200 steps, frozen encoder** in §5.2. Differences below ~0.01 PER
+  are unresolved; multiple seeds and a longer budget are needed before the
+  per-condition ordering can be trusted in detail. The H3 gap (1.48×) and the
+  monotone preference growth (2.8×) are both far above that floor.
 - **The Pi row is projected.** §6, flagged throughout.
 - **Commit delay** measured on 66 words of clean read speech; accented speech
   should revise more, which would strengthen the argument, but is unmeasured.

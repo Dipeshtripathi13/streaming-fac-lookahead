@@ -491,6 +491,66 @@ precisions; Kokoro ships int8 only. Until that is measured the vocoder claim
 stands unsupported, and the paper says so.
 
 
+## Finding 11 — the trained translator: H3 supported, and the conversion signal grows
+
+The first task-level result. 14 conditions (7 lookaheads × 2 targets), Tesla T4,
+2.5 h wall clock.
+
+**Setup.** Causal 4-layer conversion stack + linear CTC head over a **frozen**
+WavLM-base-plus carrying both causality patches; 24,552,741 trainable
+parameters, vocabulary 37. Chunk 40 ms, look-back 2 s, AdamW + OneCycle,
+lr 3e-4, batch 8, **1200 steps** per condition (638 s each). 3599 utterances,
+**speaker-disjoint** splits stratified by L1: 1800 train / 899 val / 900 test,
+with 6 held-out speakers each for val (ASI, BWC, HKK, MBMPS, TLV, YBAA) and test
+(ABA, EBVS, HJK, LXC, PNV, SVBI). Mean PER between the two targets is **0.175**,
+so the arms are genuinely different tasks. The causality proof ran first and
+would have aborted training.
+
+**Test PER:**
+
+| *L* (ms) | conversion (`g2p`) | transcription (`ipa`) |
+|---:|---:|---:|
+| 0 | 0.5469 | 0.5849 |
+| 20 | 0.5015 | 0.4923 |
+| 40 | 0.4312 | 0.4699 |
+| 80 | 0.3778 | 0.4162 |
+| 160 | 0.3463 | 0.4039 |
+| 320 | 0.3290 | 0.4095 |
+| 640 | **0.2619** | 0.3795 |
+| **gain 0→640** | **0.521** | **0.351** |
+
+**H3 supported: 1.48×.** The task that must decide *what should have been said*
+benefits substantially more from right context than the one that need only
+report what was said.
+
+**The better result: the conversion signal itself grows with lookahead.**
+Scoring the conversion-trained model against *both* targets isolates how much it
+prefers canonical over produced phones:
+
+| *L* (ms) | 0 | 20 | 40 | 80 | 160 | 320 | 640 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| preference (PER<sub>ipa</sub> − PER<sub>g2p</sub>) | +.036 | +.048 | +.056 | +.071 | +.087 | +.099 | **+.103** |
+
+**Monotone increasing at every step, growing 2.8×.** More right context does not
+just make the model more accurate — it makes it *more converting and less
+transcribing*. Because this quantity is monotone where the raw PER curves are
+not, it is the more robust form of the finding.
+
+**Task vs representation.** The trained curve is shallower than the encoder one
+(−0.056 vs −0.081 per doubling; R²_log 0.96 vs 0.99). The representation loses
+information faster than the task can exploit it — consistent with the encoder
+being a bound rather than the binding constraint.
+
+**Limits, stated plainly.** One seed, 1200 steps, frozen encoder. The
+transcription curve has one uphill step (160→320 ms, +0.006 PER), which sets the
+resolution: **differences below ~0.01 PER are not resolvable here.** Both curves
+have 7 points and are therefore underpowered for knee detection by the same
+criterion applied in F8. Absolute PER is high because the budget is deliberately
+small; every comparison is relative and all conditions share it. The H3 gap
+(1.48×) and the preference growth (2.8×) are both far above the noise floor;
+the per-condition ordering in the middle of the range is not.
+
+
 ---
 
 ## Scope

@@ -89,6 +89,26 @@ def main():
     ax.set_title("PROJECTED p95 RTF (green<0.8 deployable)", fontsize=7)
     for e in ("pdf","png"): fig.savefig(f"{FIG}/fig4_projected_feasibility.{e}")
     plt.close(fig); print("fig4_projected_feasibility")
+    # --- F5: trained sweep -- H3 and the conversion signal ---
+    S=json.load(open(f"{RAW}/translator_sweep_summary.json"))
+    R={(r["target"],r["lookahead_ms"]):r for r in S["results"]}
+    Ls=[0,20,40,80,160,320,640]; x=[max(L,10) for L in Ls]
+    fig,(b1,b2)=plt.subplots(2,1,figsize=(W,3.1),height_ratios=[1.45,1])
+    b1.semilogx(x,[R[("native",L)]["test_per"] for L in Ls],"o-",ms=3,lw=1,
+                base=2,label="conversion (g2p)")
+    b1.semilogx(x,[R[("produced",L)]["test_per"] for L in Ls],"s--",ms=3,lw=1,
+                base=2,label="transcription (ipa)")
+    b1.set_ylabel("test PER"); b1.legend(loc="upper right")
+    b1.set_title("Conversion gains 1.48x more from lookahead", fontsize=7)
+    b1.tick_params(labelbottom=False)
+    pref=[R[("native",L)]["test_per_cross"]-R[("native",L)]["test_per"] for L in Ls]
+    b2.semilogx(x,pref,"^-",ms=3,lw=1,base=2,c="tab:green")
+    b2.set_xlabel("lookahead $L$ (ms)   [0 plotted at 10]")
+    b2.set_ylabel("prefers g2p\nover ipa")
+    b2.set_title("...and becomes more converting, monotonically (2.8x)", fontsize=6.5)
+    for e in ("pdf","png"): fig.savefig(f"{FIG}/fig5_trained_sweep.{e}")
+    plt.close(fig); print("fig5_trained_sweep")
+
     print(f"\nwrote to {os.path.abspath(FIG)}")
 
 if __name__ == "__main__":

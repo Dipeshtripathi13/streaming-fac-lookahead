@@ -155,7 +155,15 @@ conditions that reweight the fit. **(b)** A 7-point geometric grid is
 > Original test: identical pipeline in AC and VC-only modes (`sfac.pipeline.Mode`).
 > Kept for the full synthesis study.
 >
-> **New primary test, available now:** the same causal phone translator trained
+> **ANSWERED (§7 F11, 14 conditions on a T4): H3 SUPPORTED, 1.48×.**
+> Conversion gains 0.521 from lookahead, transcription 0.351. And the
+> conversion-trained model's preference for canonical over produced phones grows
+> **monotonically 2.8×** (+.036 at L=0 → +.103 at L=640) — more lookahead makes
+> it *more converting*, not just more accurate. One seed, 1200 steps, frozen
+> encoder; noise floor ~0.01 PER, so the 1.48× gap and the 2.8× growth hold but
+> the mid-range per-condition ordering does not.
+>
+> **The test, available now:** the same causal phone translator trained
 > against the CANONICAL phone sequence (`g2p`) versus the PRODUCED one (`ipa`).
 > Conversion must decide what the speaker *should* have said — lexically and
 > coarticulatorily conditioned. Transcription need only report the local
