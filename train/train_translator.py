@@ -200,12 +200,71 @@ class Frontend:
 
 
 # ==========================================================================
+# Frozen-encoder feature cache
+# ==========================================================================
+
+def cache_features(fe: "Frontend", items, device: str, batch: int = 8,
+                   log_every: int = 400):
+    """Run the frozen encoder ONCE per utterance and keep the result.
+
+    The encoder is frozen and the lookahead mask is fixed within a condition,
+    so its output for a given utterance never changes during training. The
+    first sweep recomputed it every time an utterance came round -- with 1800
+    training utterances and 1200 steps at batch 8, that is ~5.3 redundant
+    forward passes per utterance, and it dominated the 0.50 s/step budget.
+
+    Caching turns a ~10.6 min condition into ~2.5 min, which is what makes
+    3 seeds x 14 conditions affordable. It changes nothing scientifically:
+    identical inputs, identical mask, identical frozen weights.
+
+    Stored on CPU in fp16 (~1 GB for 3600 utterances of ~3.7 s), moved to the
+    device per batch. fp16 is safe here because these are inputs to a trained
+    head, not accumulations -- but we cast back to fp32 on use so the head
+    itself trains in full precision.
+    """
+    import torch
+    out = []
+    t0 = time.time()
+    for i in range(0, len(items), batch):
+        chunk = items[i:i + batch]
+        h, kpm, fl = fe([c["wav"] for c in chunk])
+        h = h.half().cpu()
+        kpm = kpm.cpu()
+        for j, c in enumerate(chunk):
+            out.append({"feat": h[j, :fl[j]].clone(), "n": fl[j], "item": c})
+        if log_every and (i // batch) % (log_every // batch) == 0 and i:
+            print(f"      cached {i}/{len(items)} ({time.time()-t0:.0f}s)", flush=True)
+    return out
+
+
+def collate_cached(entries, device):
+    """Pad a list of cached (T_i, D) features into (B, T, D) + key-padding mask."""
+    import torch
+    n = [e["n"] for e in entries]
+    mx = max(n)
+    D = entries[0]["feat"].shape[-1]
+    x = torch.zeros(len(entries), mx, D, dtype=torch.float32)
+    kpm = torch.ones(len(entries), mx, dtype=torch.bool)
+    for i, e in enumerate(entries):
+        x[i, :e["n"]] = e["feat"].float()
+        kpm[i, :e["n"]] = False
+    return x.to(device), kpm.to(device), n
+
+
+# ==========================================================================
 # Train one condition
 # ==========================================================================
 
 def train_one(cfg: TranslatorConfig, items, vocab: PhoneVocab, device: str,
               steps: int, ckpt_dir: Optional[str], log_every: int = 200,
-              eval_every: int = 1000, unfreeze: bool = False) -> Dict[str, object]:
+              eval_every: int = 1000, unfreeze: bool = False,
+              cached=None):
+    """Train one (lookahead, target, seed). Returns (result, feature_cache).
+
+    `cached` lets the caller reuse the frozen-encoder features across seeds of
+    the SAME condition -- exact, because the encoder does not depend on the
+    seed.
+    """
     import torch
     import torch.nn as nn
 
@@ -214,7 +273,22 @@ def train_one(cfg: TranslatorConfig, items, vocab: PhoneVocab, device: str,
     val = [i for i in items if i["split"] == "val"]
     test = [i for i in items if i["split"] == "test"]
 
-    fe = Frontend(cfg, device)
+    if cached is None:
+        fe = Frontend(cfg, device)
+        t_cache = time.time()
+        print(f"    caching frozen-encoder features "
+              f"({len(train)}+{len(val[:200])}+{len(test[:400])} utts)...", flush=True)
+        cached = (cache_features(fe, train, device),
+                  cache_features(fe, val[:200], device, log_every=0),
+                  cache_features(fe, test[:400], device, log_every=0))
+        del fe
+        import gc as _gc; _gc.collect()
+        if device == "cuda":
+            torch.cuda.empty_cache()
+        print(f"    cached in {time.time()-t_cache:.0f}s "
+              f"(reused for every seed of this condition)", flush=True)
+    c_train, c_val, c_test = cached
+
     model, info = build_translator(cfg, vocab)
     model.to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=cfg.lr, weight_decay=0.01)
@@ -224,7 +298,7 @@ def train_one(cfg: TranslatorConfig, items, vocab: PhoneVocab, device: str,
 
     # identical data order across every condition -- part of the invariant
     rng = random.Random(cfg.seed)
-    order = list(range(len(train)))
+    order = list(range(len(c_train)))
     rng.shuffle(order)
 
     def batches(pool, bs, shuffled_order=None, loop=True):
@@ -240,24 +314,25 @@ def train_one(cfg: TranslatorConfig, items, vocab: PhoneVocab, device: str,
             yield [pool[i] for i in idxs[p:p + bs]]
             p += bs
 
-    gen = batches(train, cfg.batch_size, order)
+    gen = batches(c_train, cfg.batch_size, order)
 
-    def evaluate(pool, max_n=200):
+    def evaluate(pool, max_n=400):
         model.eval()
-        refs, hyps = [], []
+        refs, hyps, items_seen = [], [], []
         with torch.no_grad():
             for b in batches(pool[:max_n], cfg.batch_size, loop=False):
-                feats, kpm, fl = fe([x["wav"] for x in b])
+                feats, kpm, fl = collate_cached(b, device)
                 logits = model(feats, kpm)
                 dec = greedy_ctc_decode(logits, vocab)
-                for x, d, n in zip(b, dec, fl):
-                    refs.append(x[key])
+                for e, d in zip(b, dec):
+                    refs.append(e["item"][key])
                     hyps.append(d)
+                    items_seen.append(e["item"])
         model.train()
         pers = [per(r, h) for r, h in zip(refs, hyps)]
         # the cross-score: how well does this model predict the OTHER target?
         other = "ipa" if key == "g2p" else "g2p"
-        cross = [per(x[other], h) for x, h in zip(pool[:len(hyps)], hyps)]
+        cross = [per(x[other], h) for x, h in zip(items_seen, hyps)]
         return {"per": float(np.mean(pers)),
                 "per_cross": float(np.mean(cross)),
                 "n": len(pers)}
@@ -267,10 +342,10 @@ def train_one(cfg: TranslatorConfig, items, vocab: PhoneVocab, device: str,
     model.train()
     for step in range(1, steps + 1):
         b = next(gen)
-        feats, kpm, fl = fe([x["wav"] for x in b])
+        feats, kpm, fl = collate_cached(b, device)
         logits = model(feats, kpm)                    # (B,T,V)
         logp = logits.log_softmax(-1).transpose(0, 1)  # (T,B,V)
-        tgt = [torch.tensor(vocab.encode(x[key]), dtype=torch.long) for x in b]
+        tgt = [torch.tensor(vocab.encode(e["item"][key]), dtype=torch.long) for e in b]
         tgt_len = torch.tensor([len(t) for t in tgt], dtype=torch.long)
         in_len = torch.tensor(fl, dtype=torch.long)
         # CTC requires input_length >= target_length; drop the rare violation
@@ -289,12 +364,12 @@ def train_one(cfg: TranslatorConfig, items, vocab: PhoneVocab, device: str,
             print(f"    {cfg.tag()} step {step}/{steps} loss {loss.item():.4f} "
                   f"({(time.time()-t0)/step:.2f}s/step)", flush=True)
         if step % eval_every == 0 or step == steps:
-            e = evaluate(val)
+            e = evaluate(c_val, max_n=200)
             history.append({"step": step, "loss": float(loss.item()), **e})
             print(f"    {cfg.tag()} step {step}  val PER {e['per']:.4f}  "
                   f"cross-PER {e['per_cross']:.4f}", flush=True)
 
-    final = evaluate(test, max_n=400)
+    final = evaluate(c_test, max_n=400)
     result = {
         "tag": cfg.tag(),
         "lookahead_ms": cfg.lookahead_ms,
@@ -316,12 +391,12 @@ def train_one(cfg: TranslatorConfig, items, vocab: PhoneVocab, device: str,
                     "lookahead_ms": cfg.lookahead_ms, "vocab": vocab.to_dict(),
                     "result": {k: v for k, v in result.items() if k != "history"}},
                    os.path.join(ckpt_dir, f"{cfg.tag()}.pt"))
-    del model, fe
+    del model
     import gc, torch as _t
     gc.collect()
     if device == "cuda":
         _t.cuda.empty_cache()
-    return result
+    return result, cached
 
 
 # ==========================================================================
@@ -333,6 +408,11 @@ def main() -> None:
     ap.add_argument("--targets", nargs="+", default=["native", "produced"],
                     choices=["native", "produced"])
     ap.add_argument("--steps", type=int, default=8000)
+    ap.add_argument("--seeds", type=int, nargs="+", default=[1337],
+                    help="one training run per seed per condition. Multiple "
+                         "seeds are what turn a per-condition point into an "
+                         "interval; the single-seed sweep could not resolve "
+                         "differences below ~0.01 PER.")
     ap.add_argument("--batch-size", type=int, default=8)
     ap.add_argument("--chunk-ms", type=float, default=40.0)
     ap.add_argument("--lookback-ms", type=float, default=2000.0)
@@ -388,26 +468,58 @@ def main() -> None:
     print(f"\n{len(cfgs)} conditions x {a.steps} steps\n")
 
     results = []
+    total = len(cfgs) * len(a.seeds)
+    k = 0
     for i, cfg in enumerate(cfgs, 1):
-        print(f"[{i}/{len(cfgs)}] {cfg.tag()}  {cfg.geometry.describe()}")
-        results.append(train_one(cfg, items, vocab, device, a.steps,
-                                 a.ckpt_dir, unfreeze=a.unfreeze))
+        # Cache the frozen-encoder features ONCE per condition and reuse them
+        # for every seed. The encoder does not depend on the seed, so this is
+        # exact -- and it is what makes 3 seeds cost ~1.2x a single seed rather
+        # than 3x.
+        shared = None
+        for sd in a.seeds:
+            k += 1
+            c = TranslatorConfig(**{**cfg.fingerprint(), "lookahead_ms":
+                                    cfg.lookahead_ms, "target": cfg.target,
+                                    "seed": sd})
+            print(f"[{k}/{total}] {c.tag()} seed={sd}  {c.geometry.describe()}")
+            r, shared = train_one(c, items, vocab, device, a.steps,
+                                  a.ckpt_dir, unfreeze=a.unfreeze,
+                                  cached=shared)
+            r["seed"] = sd
+            results.append(r)
 
     # ---- curves ----
     summary: Dict[str, object] = {"corpus": stats, "device": device,
                                   "steps": a.steps, "chunk_ms": a.chunk_ms,
                                   "results": results}
     for t in a.targets:
-        arm = sorted([r for r in results if r["target"] == t],
-                     key=lambda r: r["lookahead_ms"])
-        Ls = [r["lookahead_ms"] for r in arm]
-        pers = [r["test_per"] for r in arm]
+        arm_all = [r for r in results if r["target"] == t]
+        Ls = sorted({r["lookahead_ms"] for r in arm_all})
+        # aggregate seeds: mean, sd and range per condition
+        agg = []
+        for L in Ls:
+            v = [r["test_per"] for r in arm_all if r["lookahead_ms"] == L]
+            c = [r["test_per_cross"] for r in arm_all if r["lookahead_ms"] == L]
+            agg.append({"lookahead_ms": L, "n_seeds": len(v),
+                        "per_mean": float(np.mean(v)),
+                        "per_sd": float(np.std(v, ddof=1)) if len(v) > 1 else 0.0,
+                        "per_min": float(np.min(v)), "per_max": float(np.max(v)),
+                        "per_all": v,
+                        "cross_mean": float(np.mean(c)),
+                        "preference_mean": float(np.mean(c) - np.mean(v))})
+        summary[f"per_condition_{t}"] = agg
+        pers = [x["per_mean"] for x in agg]
         if len(Ls) >= 3:
             k = find_knee(Ls, pers)
-            summary[f"curve_{t}"] = {"lookaheads_ms": Ls, "test_per": pers,
-                                     "knee": k,
-                                     "relative_gain_0_to_max":
-                                         (pers[0] - pers[-1]) / pers[0] if pers[0] else None}
+            sds = [x["per_sd"] for x in agg]
+            summary[f"curve_{t}"] = {
+                "lookaheads_ms": Ls, "test_per": pers,
+                "test_per_sd": sds,
+                "n_seeds": agg[0]["n_seeds"],
+                "pooled_sd": float(np.sqrt(np.mean(np.square(sds)))),
+                "knee": k,
+                "relative_gain_0_to_max":
+                    (pers[0] - pers[-1]) / pers[0] if pers[0] else None}
 
     if "native" in a.targets and "produced" in a.targets:
         cn = summary.get("curve_native", {})
@@ -432,12 +544,20 @@ def main() -> None:
         for r in results:
             w.writerow({c: r[c] for c in cols})
 
-    print("\n" + "=" * 66)
-    print(f"{'target':<12}{'L (ms)':>8}{'t_algo':>9}{'test PER':>11}{'cross-PER':>11}")
-    for r in sorted(results, key=lambda r: (r["target"], r["lookahead_ms"])):
-        print(f"{r['target']:<12}{r['lookahead_ms']:>8.0f}"
-              f"{r['t_algorithmic_ms']:>9.0f}{r['test_per']:>11.4f}"
-              f"{r['test_per_cross']:>11.4f}")
+    print("\n" + "=" * 76)
+    print(f"{'target':<12}{'L (ms)':>8}{'seeds':>7}{'PER mean':>10}{'sd':>8}"
+          f"{'range':>16}{'prefers g2p':>13}")
+    for t in a.targets:
+        for x in summary.get(f"per_condition_{t}", []):
+            print(f"{t:<12}{x['lookahead_ms']:>8.0f}{x['n_seeds']:>7}"
+                  f"{x['per_mean']:>10.4f}{x['per_sd']:>8.4f}"
+                  f"{x['per_min']:>8.4f}-{x['per_max']:<7.4f}"
+                  f"{x['preference_mean']:>+13.4f}")
+    for t in a.targets:
+        c = summary.get(f"curve_{t}")
+        if c and c.get("pooled_sd") is not None:
+            print(f"  {t}: pooled seed sd = {c['pooled_sd']:.4f} PER "
+                  f"-> differences below ~{2*c['pooled_sd']:.4f} are not resolved")
     for t in a.targets:
         c = summary.get(f"curve_{t}")
         if c:

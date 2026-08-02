@@ -121,7 +121,9 @@ class TranslatorConfig:
         return d
 
     def tag(self) -> str:
-        return f"L{self.lookahead_ms:g}_{self.target.value}"
+        """Run label. Includes the seed so multi-seed runs cannot overwrite
+        each other's checkpoints -- a silent way to lose 2/3 of a sweep."""
+        return f"L{self.lookahead_ms:g}_{self.target.value}_s{self.seed}"
 
 
 def assert_only_L_varies(cfgs: Sequence[TranslatorConfig]) -> None:
@@ -347,6 +349,9 @@ if __name__ == "__main__":
     assert v.itos[0] == PhoneVocab.BLANK and len(v) == 4
     assert v.decode(v.encode(["AH", "B", "K"])) == ["AH", "B", "K"]
 
+    assert TranslatorConfig(lookahead_ms=80, target=Target.NATIVE, seed=7).tag() \
+        != TranslatorConfig(lookahead_ms=80, target=Target.NATIVE, seed=8).tag(), \
+        "tags must differ by seed or checkpoints collide"
     cfgs = sweep_configs()
     assert len(cfgs) == 14
     nat = [c for c in cfgs if c.target is Target.NATIVE]
