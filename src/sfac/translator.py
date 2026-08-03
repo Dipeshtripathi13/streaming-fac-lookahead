@@ -263,16 +263,28 @@ def build_translator(cfg: TranslatorConfig, vocab: PhoneVocab):
             self.drop = nn.Dropout(c.dropout)
 
         def forward(self, x, attn_mask, key_padding_mask=None):
+            # `key_padding_mask` is honoured by attention but NOT by the conv or
+            # the feed-forward. With a batch padded to its longest utterance,
+            # the causal depthwise conv would pull padded positions into the
+            # last (k-1) real frames of every shorter utterance -- a
+            # batch-composition-dependent artefact that shows up as noise
+            # between otherwise identical runs. Zero the padding explicitly at
+            # every stage instead of trusting the attention mask to cover it.
+            def _z(t):
+                return t if key_padding_mask is None else t.masked_fill(
+                    key_padding_mask.unsqueeze(-1), 0.0)
+
+            x = _z(x)
             h = self.n1(x)
             a, _ = self.att(h, h, h, attn_mask=attn_mask,
                             key_padding_mask=key_padding_mask,
                             need_weights=False)
-            x = x + self.drop(a)
+            x = _z(x + self.drop(a))
             # causal depthwise conv: left-only padding, never symmetric
-            h = self.nc(x).transpose(1, 2)
+            h = _z(self.nc(x)).transpose(1, 2)
             h = torch.nn.functional.pad(h, (self.k - 1, 0))
-            x = x + self.pw(self.dw(h)).transpose(1, 2)
-            return x + self.drop(self.ff(self.n2(x)))
+            x = _z(x + self.pw(self.dw(h)).transpose(1, 2))
+            return _z(x + self.drop(self.ff(self.n2(x))))
 
     class Translator(nn.Module):
         def __init__(self, c: TranslatorConfig, V: int):

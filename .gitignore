@@ -20,3 +20,5 @@ results/raw/_superseded/
 
 # OS
 .DS_Store
+results/synth/
+results/listening_test/

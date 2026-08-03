@@ -316,7 +316,14 @@ def train_one(cfg: TranslatorConfig, items, vocab: PhoneVocab, device: str,
 
     gen = batches(c_train, cfg.batch_size, order)
 
-    def evaluate(pool, max_n=400):
+    def evaluate(pool, max_n=400, keep=False):
+        """keep=True also returns the decoded hypotheses.
+
+        PER alone cannot be listened to. Saving the predicted phone sequences
+        is what makes synth/ and the listening test possible at all -- and it
+        costs nothing here, whereas re-running the sweep to get them costs the
+        whole sweep.
+        """
         model.eval()
         refs, hyps, items_seen = [], [], []
         with torch.no_grad():
@@ -333,9 +340,17 @@ def train_one(cfg: TranslatorConfig, items, vocab: PhoneVocab, device: str,
         # the cross-score: how well does this model predict the OTHER target?
         other = "ipa" if key == "g2p" else "g2p"
         cross = [per(x[other], h) for x, h in zip(items_seen, hyps)]
-        return {"per": float(np.mean(pers)),
-                "per_cross": float(np.mean(cross)),
-                "n": len(pers)}
+        out = {"per": float(np.mean(pers)),
+               "per_cross": float(np.mean(cross)),
+               "n": len(pers)}
+        if keep:
+            out["hyps"] = [
+                {"speaker": it["speaker"], "l1": it["l1"],
+                 "text": it.get("text", ""),
+                 "g2p": it["g2p"], "ipa": it["ipa"], "pred": h,
+                 "per": round(per(it[key], h), 4)}
+                for it, h in zip(items_seen, hyps)]
+        return out
 
     history = []
     t0 = time.time()
@@ -369,7 +384,7 @@ def train_one(cfg: TranslatorConfig, items, vocab: PhoneVocab, device: str,
             print(f"    {cfg.tag()} step {step}  val PER {e['per']:.4f}  "
                   f"cross-PER {e['per_cross']:.4f}", flush=True)
 
-    final = evaluate(c_test, max_n=400)
+    final = evaluate(c_test, max_n=400, keep=save_hyps)
     result = {
         "tag": cfg.tag(),
         "lookahead_ms": cfg.lookahead_ms,
@@ -385,6 +400,15 @@ def train_one(cfg: TranslatorConfig, items, vocab: PhoneVocab, device: str,
         "wall_s": round(time.time() - t0, 1),
         "history": history,
     }
+    if save_hyps and final.get("hyps") is not None and hyp_dir:
+        os.makedirs(hyp_dir, exist_ok=True)
+        hp = os.path.join(hyp_dir, f"hyps_{cfg.tag()}.json")
+        with open(hp, "w") as f:
+            json.dump({"tag": cfg.tag(), "lookahead_ms": cfg.lookahead_ms,
+                       "target": cfg.target.value, "seed": cfg.seed,
+                       "test_per": final["per"], "hyps": final["hyps"]}, f)
+        result["hyp_file"] = hp
+    final.pop("hyps", None)
     if ckpt_dir:
         os.makedirs(ckpt_dir, exist_ok=True)
         torch.save({"model": model.state_dict(), "cfg": cfg.fingerprint(),
@@ -420,6 +444,11 @@ def main() -> None:
     ap.add_argument("--n-max", type=int, default=None)
     ap.add_argument("--unfreeze", action="store_true")
     ap.add_argument("--ckpt-dir", default=None)
+    ap.add_argument("--save-hyps", action="store_true",
+                    help="dump decoded test phone sequences per condition. "
+                         "Required for synthesis and the listening test; "
+                         "without them those need a full re-run.")
+    ap.add_argument("--hyp-dir", default=None)
     ap.add_argument("--out", default="results/raw/translator_sweep")
     ap.add_argument("--smoke", action="store_true",
                     help="60 steps, 3 lookaheads, 120 utts -- proves the pipeline runs")
@@ -484,7 +513,9 @@ def main() -> None:
             print(f"[{k}/{total}] {c.tag()} seed={sd}  {c.geometry.describe()}")
             r, shared = train_one(c, items, vocab, device, a.steps,
                                   a.ckpt_dir, unfreeze=a.unfreeze,
-                                  cached=shared)
+                                  cached=shared, save_hyps=a.save_hyps,
+                                  hyp_dir=a.hyp_dir or (
+                                      os.path.dirname(a.out) or "."))
             r["seed"] = sd
             results.append(r)
 
