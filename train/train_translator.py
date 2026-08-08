@@ -258,7 +258,8 @@ def collate_cached(entries, device):
 def train_one(cfg: TranslatorConfig, items, vocab: PhoneVocab, device: str,
               steps: int, ckpt_dir: Optional[str], log_every: int = 200,
               eval_every: int = 1000, unfreeze: bool = False,
-              cached=None):
+              cached=None, save_hyps: bool = False,
+              hyp_dir: Optional[str] = None):
     """Train one (lookahead, target, seed). Returns (result, feature_cache).
 
     `cached` lets the caller reuse the frozen-encoder features across seeds of
