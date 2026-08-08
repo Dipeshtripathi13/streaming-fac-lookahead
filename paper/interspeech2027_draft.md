@@ -26,10 +26,13 @@ strongly log-linear in lookahead (R²=0.994 vs 0.727 linear) with no cliff: ever
 doubling buys ≈0.081, and the marginal return *peaks* at 100–200 ms — 2.5–5×
 the 40 ms budget used by current streaming AC. Training a causal phone translator over
 that encoder, in which accent conversion and accent-faithful transcription
-differ by a single label tensor, conversion gains **1.48×** more from lookahead
-than transcription, and the model's preference for canonical over produced
-phones grows **monotonically, 2.8×**, from *L*=0 to *L*=640 ms: more right
-context makes the model more *converting*, not merely more accurate. We further
+differ by a single label tensor, the model's preference for canonical over
+produced phones grows **monotonically in all three seeds** — 18/18 comparisons,
+tripling from *L*=0 to *L*=640 ms — while the transcription control drifts the
+other way: more right context makes the model more *converting*, not merely more
+accurate. Three seeds per condition also show that this margin, not phone error
+rate, is the measurement that survives: PER's seed spread swamps every
+individual doubling of lookahead, so curves of this kind cannot locate a knee. We further
 separate algorithmic from computational latency and find they are independently
 controllable: over 0–640 ms of lookahead per-chunk compute changes by −1.5% to
 +14%, while algorithmic latency changes by up to 32×. Chunk size, not lookahead,
@@ -67,8 +70,10 @@ Contributions:
 3. **The lookahead exchange rate** at the encoder level on real accented speech:
    log-linear, no cliff, marginal return peaking at 100–200 ms (§5). **[M]**
 4. **A trained accent translator** whose conversion/transcription control differs
-   in one label tensor, showing conversion needs 1.48× more lookahead and that
-   the conversion signal grows monotonically with it (§5.2). **[M]**
+   in one label tensor, showing that the conversion signal grows monotonically
+   with lookahead while the transcription control does not — and, from three
+   seeds per condition, that phone error rate is too seed-noisy to support the
+   per-condition claims such curves are usually asked to carry (§5.2). **[M]**
 5. **A properly decomposed streaming ASR→TTS cascade baseline**, showing it
    loses structurally (95% of its latency is algorithmic) rather than
    computationally (§4.3). **[M]**
@@ -277,56 +282,97 @@ vocabulary 37. Chunk 40 ms, look-back 2 s. AdamW, OneCycle, lr 3e-4, batch 8,
 **1200 steps** per condition. 3599 utterances, **speaker-disjoint** splits
 stratified by L1 (1800 train / 899 val / 900 test; 6 held-out speakers each for
 val and test) — a random utterance split would make this speaker memorisation.
-14 conditions × 638 s ≈ **2.5 h on one Tesla T4**. The causality proof runs
-before training and aborts it on failure.
+**Three seeds, not one.** Every condition is trained at seeds {1337, 7, 99}:
+7 lookaheads × 2 targets × 3 seeds = **42 runs**. Caching the frozen encoder's
+features once per condition and reusing them across seeds makes three seeds cost
+about 1.2× one seed rather than 3×, so the whole design is ≈**2.3 h on one Tesla
+T4**. The causality proof runs before training and aborts it on failure.
 
-**Results.** Test PER, speaker-disjoint:
+**Results.** Test PER, speaker-disjoint, mean ± SD over 3 seeds:
 
 | *L* (ms) | *t*<sub>algo</sub> | conversion (`g2p`) | transcription (`ipa`) |
 |---:|---:|---:|---:|
-| 0 | 40 | 0.547 | 0.585 |
-| 20 | 60 | 0.502 | 0.492 |
-| 40 | 80 | 0.431 | 0.470 |
-| 80 | 120 | 0.378 | 0.416 |
-| 160 | 200 | 0.346 | 0.404 |
-| 320 | 360 | 0.329 | 0.409 |
-| 640 | 680 | **0.262** | 0.380 |
-| **relative gain 0→640** | | **0.521** | **0.351** |
+| 0 | 40 | 0.447 ± 0.005 | 0.451 ± 0.006 |
+| 20 | 60 | 0.397 ± 0.011 | 0.398 ± 0.001 |
+| 40 | 80 | 0.363 ± 0.027 | 0.380 ± 0.008 |
+| 80 | 120 | 0.335 ± 0.030 | 0.379 ± 0.032 |
+| 160 | 200 | 0.303 ± 0.011 | 0.345 ± 0.029 |
+| 320 | 360 | 0.302 ± 0.052 | 0.321 ± 0.020 |
+| 640 | 680 | **0.234 ± 0.021** | 0.280 ± 0.017 |
+| **relative gain 0→640** | | **0.476 ± 0.043** | **0.380 ± 0.046** |
 
-**H3 is supported.** Conversion gains **0.521** from lookahead against
-transcription's **0.351** — a 1.48× ratio, far above the ~0.006 PER noise floor
-implied by the single non-monotone step in the transcription curve. The task
-that must decide *what should have been said* benefits substantially more from
-right context than the task that need only report what was said.
+**Most of this curve is not resolved, and that is the finding.** Blocking on
+seed — the correct analysis, since an unlucky seed raises PER at *every*
+lookahead — only the 0→20 ms step is significant at α=.05 in the conversion arm
+(*t*(2)=+11.1). The 160→320 ms step is **−0.0009 PER with 1 of 3 seeds
+improving**: the mid-range plateau visible in a single-seed run is noise. What
+*is* solid is the endpoint, −0.212 ± 0.018 PER, *t*(2)=+20.1, unanimous. **The
+curve is real and no individual doubling on it is.** Any published claim of the
+form "the knee is at *X* ms" cannot be supported by an experiment of this size,
+including ours.
 
-**The conversion signal itself grows with lookahead.** Scoring the
-conversion-trained model against *both* targets isolates how strongly it prefers
-the canonical sequence over the produced one:
+> **Figure 6** (`results/figures/fig_3seed_margin_vs_per.pdf`) plots both panels
+> on the same 42 runs with per-seed traces drawn under the ±SD ribbons. Panel A's
+> ribbons overlap almost everywhere; panel B's do not. That contrast, not either
+> curve alone, is the argument for changing instruments.
+
+**A more stable instrument.** Scoring each model against *both* label sets gives
+a **preference margin** (PER against the other target minus PER against its own).
+Its seed SD is **0.0023** against **0.0223** for PER — roughly **10× more
+stable**, because the margin is a within-model difference and the seed's effect
+on overall accuracy cancels:
 
 | *L* (ms) | 0 | 20 | 40 | 80 | 160 | 320 | 640 |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| PER vs `g2p` | .547 | .502 | .431 | .378 | .346 | .329 | .262 |
-| PER vs `ipa` | .583 | .550 | .487 | .449 | .433 | .428 | .364 |
-| **preference** | **+.036** | +.048 | +.056 | +.071 | +.087 | +.099 | **+.103** |
+| conversion margin | **+.032** | +.043 | +.052 | +.068 | +.084 | +.094 | **+.101** |
+| transcription margin | +.037 | +.039 | +.038 | +.032 | +.027 | +.027 | +.026 |
 
-The preference is **monotone increasing in lookahead** and grows **2.8×** from
-*L*=0 to *L*=640. More right context does not merely make the model more
-accurate — it makes it *more converting and less transcribing*. Unlike the raw
-PER curves this quantity is monotone at every step, so it is the more robust
-form of the result.
+The conversion margin is **strictly monotone increasing in all 3 seeds**, with
+**18/18** adjacent step × seed comparisons positive (exact sign test
+*p*=7.6×10⁻⁶), tripling from *L*=0 to *L*=640. The transcription arm — same
+architecture, same budget, one different label tensor — does the opposite:
+**0/3** seeds monotone, 7/18 positive (*p*=0.48), drifting *down* by 0.010. More
+right context does not merely make the conversion model more accurate; it makes
+it **more converting and less transcribing**.
+
+**H3 is supported on both readings, but they differ in strength.** By relative
+PER gain, conversion 0.476 vs transcription 0.380, paired difference
++0.096 ± 0.006, *t*(2)=+25.9. By margin growth, +0.069 vs −0.010, paired
+difference +0.079 ± 0.003, *t*(2)=+41.4. The margin is the stronger and more
+stable statement and is the one we lead with.
+
+**The obvious objection, controlled.** Any model that gets better at its own
+target must widen its margin, and the conversion arm does improve more in
+absolute terms (0.212 vs 0.171 PER). We therefore compare the two arms **at
+matched own-target PER**. At *L*≥160 ms the conversion margin is **3.46×** the
+PER-matched transcription margin; at *L*=0 it is **0.88×**, i.e. slightly
+*smaller*. The divergence is created by lookahead, not by accuracy.
 
 **Task vs representation.** The trained curve is shallower than the encoder one
-(slope −0.056 vs −0.081 per doubling, R²<sub>log</sub> 0.96 vs 0.99). The
-representation therefore loses information faster than the task can exploit it,
-which is what one expects if the encoder is a bound and not a bottleneck —
-consistent with, but not proof of, the §5 reading.
+(R²<sub>log</sub> 0.96 vs 0.99). The representation loses information faster
+than the task can exploit it, which is what one expects if the encoder is a
+bound and not a bottleneck — consistent with, but not proof of, the §5 reading.
 
-**Limits.** One seed per condition, 1200 steps, and a frozen encoder. The
-transcription curve is non-monotone once (160→320 ms, +0.006 PER), which sets
-the resolution: differences below ~0.01 PER are not resolvable here. Both curves
-have only 7 points and are therefore **underpowered for knee detection** by the
-criterion of §5. Absolute PER is high because training is deliberately short;
-the comparisons are relative and all conditions share a budget.
+**Knee, with a stated detection limit.** At *n*=21 per arm, BIC prefers a single
+log-linear regime (ΔBIC = +5.27 conversion, +4.25 transcription; the best
+breakpoint is pinned at the grid edge, itself a signature of no interior knee).
+Crucially we now calibrate the test: **planting** a 0.08 PER cliff at 160 ms is
+*still missed* in the conversion arm (ΔBIC −2.93, short of the −6 threshold).
+So this experiment excludes discontinuities larger than roughly **0.08 PER
+(≈18 % relative)** and says nothing about smaller ones. The earlier 7-point
+result carried no such bound and should not have been read as evidence of
+absence.
+
+**Limits.** 1200 steps, a frozen encoder, and three seeds — enough for the
+endpoint and the margin, not for adjacent doublings. Absolute PER is high
+because training is deliberately short; every comparison above is relative and
+all conditions share a budget. A **zero-padding bug** was present in both this
+run and the earlier single-seed run: the causal depthwise conv and the
+feed-forward ignored `key_padding_mask`, so batch composition leaked into the
+last *k*−1 real frames of every shorter utterance. It is now fixed, but a
+bug-free replication is still pending, so absolute PERs must not be compared
+across runs — only within one. All claims in this section are within-run
+comparisons, which a constant offset does not affect.
 
 ---
 
@@ -367,10 +413,16 @@ specifications**, which is precisely the argument for measuring it.
 - **No converted audio, no listening test.** §5 and §5.2 measure representation
   drift and phone error, not perceptual accentedness. Synthesis and subjective
   evaluation are future work.
-- **One seed, 1200 steps, frozen encoder** in §5.2. Differences below ~0.01 PER
-  are unresolved; multiple seeds and a longer budget are needed before the
-  per-condition ordering can be trusted in detail. The H3 gap (1.48×) and the
-  monotone preference growth (2.8×) are both far above that floor.
+- **Three seeds, 1200 steps, frozen encoder** in §5.2. Adjacent doublings of
+  lookahead are not resolved in PER, so the per-condition ordering must not be
+  read in detail; only the endpoint effect and the margin are supported. Knee
+  detection is bounded at ~0.08 PER by the planted-cliff calibration, not
+  claimed absent.
+- **A zero-padding bug was present in both §5.2 runs** (conv and FFN ignored
+  `key_padding_mask`, letting batch composition leak into the last 30 frames of
+  shorter utterances). Fixed; replication on the fixed code is pending, so
+  absolute PERs are comparable only within a run. Every claim in §5.2 is a
+  within-run comparison.
 - **The Pi row is projected.** §6, flagged throughout.
 - **Commit delay** measured on 66 words of clean read speech; accented speech
   should revise more, which would strengthen the argument, but is unmeasured.

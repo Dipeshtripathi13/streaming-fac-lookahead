@@ -155,13 +155,21 @@ conditions that reweight the fit. **(b)** A 7-point geometric grid is
 > Original test: identical pipeline in AC and VC-only modes (`sfac.pipeline.Mode`).
 > Kept for the full synthesis study.
 >
-> **ANSWERED (§7 F11, 14 conditions on a T4): H3 SUPPORTED, 1.48×.**
-> Conversion gains 0.521 from lookahead, transcription 0.351. And the
-> conversion-trained model's preference for canonical over produced phones grows
-> **monotonically 2.8×** (+.036 at L=0 → +.103 at L=640) — more lookahead makes
-> it *more converting*, not just more accurate. One seed, 1200 steps, frozen
-> encoder; noise floor ~0.01 PER, so the 1.48× gap and the 2.8× growth hold but
-> the mid-range per-condition ordering does not.
+> **ANSWERED (§7 F12/F13, 42 conditions = 3 seeds on a T4): H3 SUPPORTED.**
+> The conversion-trained model's preference for canonical over produced phones
+> grows **monotonically in 3/3 seeds** (+.032 at L=0 → +.101 at L=640; 18/18
+> adjacent step × seed comparisons positive, sign p=7.6e-6), while the
+> transcription control is 0/3 monotone and drifts *down*. Paired by seed the
+> gap is t(2)=+41. At matched own-target PER the conversion margin is 3.46× the
+> transcription margin for L≥160 ms and 0.88× at L=0, so lookahead — not
+> accuracy — creates the divergence.
+>
+> **What three seeds took away:** PER itself is too seed-noisy to carry
+> per-condition claims. Blocked on seed, only 0→20 ms is resolved at α=.05;
+> 160→320 ms is −0.0009 PER with 1/3 seeds improving, so F11's mid-range
+> plateau was noise. The 0→640 ms endpoint (−0.212 ± 0.018, t(2)=+20) holds.
+> Superseded F11's 1.48× / 2.8× framing: those came from one seed and the
+> margin, not the PER ratio, is the defensible statistic.
 >
 > **The test, available now:** the same causal phone translator trained
 > against the CANONICAL phone sequence (`g2p`) versus the PRODUCED one (`ipa`).

@@ -587,3 +587,112 @@ python3 bench/bench_commit_delay.py    # Finding 6, ~1 min, no dataset needed
 *Finding 6 note:* commit delay is a property of the model's decoding, not of
 the host CPU — the measurement is deterministic and portable, so the result
 above is tagged `zipformer` rather than `m4`.
+
+---
+
+## Finding 12 — PER is the wrong instrument; the preference margin is the right one
+
+**Run:** 42 conditions (7 lookaheads × 2 targets × 3 seeds {1337, 7, 99}),
+1200 steps, batch 8, chunk 40 ms, frozen WavLM-base + both §3 causality
+patches, Tesla T4, ~2.3 h. Analysis: `eval/analyse_3seed.py` →
+`results/analysis_3seed.json`.
+
+The point of three seeds was error bars on the mid-range. The error bars
+arrived and disqualified most of the curve.
+
+**PER, blocked on seed** (the right analysis: an unlucky seed raises PER at
+*every* lookahead, so that variance cancels within a seed):
+
+| step | ΔPER (conversion) | seeds improving | *t*(2) | resolved α=.05 |
+|---|---:|---:|---:|:--|
+| 0→20 | −0.0500 ± 0.0078 | 3/3 | +11.09 | **yes** |
+| 20→40 | −0.0339 ± 0.0269 | 3/3 | +2.18 | no |
+| 40→80 | −0.0274 ± 0.0128 | 3/3 | +3.71 | no |
+| 80→160 | −0.0321 ± 0.0195 | 3/3 | +2.85 | no |
+| 160→320 | **−0.0009 ± 0.0411** | **1/3** | +0.04 | no |
+| 320→640 | −0.0681 ± 0.0520 | 3/3 | +2.27 | no |
+| **0→640** | **−0.2124 ± 0.0183** | 3/3 | **+20.07** | **yes** |
+
+The 160→320 ms step is essentially zero with only one seed improving. The
+mid-range "plateau" in Finding 11 was noise. The endpoint effect is large and
+unanimous. **The curve is real; no individual doubling on it is.**
+
+**The margin is ~10× more seed-stable.** Margin = PER against the other label
+set minus PER against its own. Mean seed SD across conditions: **0.0023** for
+the margin vs **0.0223** for PER.
+
+| *L* (ms) | 0 | 20 | 40 | 80 | 160 | 320 | 640 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| conversion | +.0324 | +.0427 | +.0524 | +.0684 | +.0836 | +.0943 | +.1014 |
+| transcription | +.0367 | +.0388 | +.0375 | +.0324 | +.0274 | +.0271 | +.0264 |
+
+Conversion: strictly monotone in **3/3** seeds, **18/18** adjacent step × seed
+comparisons positive, exact sign *p* = 7.6×10⁻⁶. Transcription: **0/3**
+monotone, 7/18 positive (*p* = 0.48), net **−0.0103**. Same architecture, same
+budget, one different label tensor.
+
+**H3, paired by seed:** relative PER gain 0.476 ± 0.043 vs 0.380 ± 0.046,
+paired diff +0.096 ± 0.006, *t*(2) = +25.9. Margin growth +0.069 ± 0.002 vs
+−0.010 ± 0.002, paired diff +0.079 ± 0.003, *t*(2) = +41.4.
+
+**Control (the reviewer's first question).** A model improving at its own
+target must widen its margin, and conversion does improve more (0.212 vs
+0.171 PER). Compared at *matched own-target PER*: at *L* ≥ 160 ms the
+conversion margin is **3.46×** the transcription margin; at *L* = 0 it is
+**0.88×**. The divergence is produced by lookahead, not by accuracy.
+
+## Finding 13 — no knee, now with a stated detection limit
+
+At *n* = 21 per arm BIC prefers a single log-linear regime: ΔBIC **+5.27**
+(conversion), **+4.25** (transcription), best breakpoint pinned at the grid
+edge — itself a signature of no interior knee.
+
+The part that was missing before: **power**. Planting a cliff of known size at
+160 ms and re-testing:
+
+| planted cliff | ΔBIC conversion | ΔBIC transcription |
+|---:|---:|:--|
+| 0.02 PER | +5.57 missed | +4.14 missed |
+| 0.04 PER | +3.85 missed | +1.82 missed |
+| 0.08 PER | −2.93 **missed** | −6.41 detected |
+
+So this experiment excludes discontinuities above roughly **0.08 PER (≈18 %
+relative)** in the conversion arm and says nothing about smaller ones. Finding
+7 and Finding 11's knee statements were absence of evidence; this is the first
+version with a bound attached.
+
+## Known issue — zero-pad contamination, fixed but not yet replicated
+
+`MaskedBlock.forward` passed `key_padding_mask` to attention only. The causal
+depthwise conv (k=31) and the feed-forward did not honour it, so with a batch
+padded to its longest utterance the conv pulled padded positions into the last
+30 real frames of every shorter utterance — a **batch-composition-dependent**
+artefact. Feature caching changed batch composition, which is why the same
+condition/seed/step gave val PER 0.5314 uncached and 0.4530 cached (see
+`docs/CACHING_CHANGED_THE_NUMBERS.md`; the earlier commit message claiming
+caching was numerically neutral was wrong).
+
+Fixed by zeroing padded positions at every stage. **Both** the single-seed and
+3-seed runs predate the fix, so absolute PERs are not comparable across runs.
+Findings 12 and 13 are entirely within-run comparisons, which a constant offset
+does not affect — but the published table should come from bug-free code.
+
+**Re-run required, and no longer optional:** the Colab runtime disconnected on
+idle after the sweep, wiping `/content` including the 42 saved hypothesis files
+and all checkpoints. Those hypotheses were the input to the listening test, so
+they have to be regenerated regardless. Recipe:
+
+```
+1. Reconnect T4 runtime; re-run notebook cells 1-5 (clone, deps, HF login,
+   dataset). HF login needs the device-code approval in the browser.
+2. Confirm the padding fix is present:
+   grep -c '_z(' research/src/sfac/translator.py   # expect > 0
+   (if the fix is not yet pushed, apply the base64 patcher from this session)
+3. python train/train_translator.py --lookaheads 0 20 40 80 160 320 640 \
+     --targets native produced --seeds 1337 7 99 --steps 1200 --batch-size 8 \
+     --device cuda --save-hyps --out {RES}/translator_sweep_3seed
+4. Sanity gate: L0_native_s1337 val PER at step 1000 should land near 0.53
+   (the uncached value) if padding was the cause, near 0.45 if precision was.
+   Record which -- that resolves CACHING_CHANGED_THE_NUMBERS.md.
+5. Copy results AND hyps off /content before the runtime idles out.
+```
