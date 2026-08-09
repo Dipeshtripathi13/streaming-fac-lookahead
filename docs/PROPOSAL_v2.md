@@ -399,8 +399,26 @@ Three commitments that make the numbers believable:
   This is the cheapest possible defence against the single most damaging
   reviewer question.
 
-**Subjective:** accentedness + naturalness MOS, 1–5, native raters, ~30 raters
-× ~30 stimuli × 3 rounds. **Pilot in October, not December.**
+**Subjective:** *not funded for now* (decision 2026-08-09, see
+`docs/DECISIONS.md`). The design and tooling are complete — `listening_test.py`
+builds condition-blind stimuli from the hypothesis dumps via a single fixed
+Piper voice, with ceiling/floor attention checks and a Bradley–Terry scorer, and
+74 hyps files are already on disk. Only the raters were cut, so this is a budget
+decision rather than a capability gap.
+
+> **Wording discipline that follows.** Every headline number in this paper is a
+> phone-sequence measurement. The saturation point (~240 ms) says marginal *PER*
+> gain falls below the noise floor; it does **not** say listeners stop noticing
+> improvement. The "40% forgone at 40 ms" figure is PER-relative, not
+> quality-relative. No claim about perceived naturalness or accentedness is
+> supported. H3 is unaffected — the preference margin is objective and needs no
+> listeners.
+>
+> The honest risk: for an accent-conversion paper, accentedness is definitionally
+> perceptual, so this is the most likely reviewer objection and a fair one. Two
+> zero-cost mitigations remain available (build the stimuli and listen
+> informally; NISQA-MOS as an automatic naturalness proxy with
+> `metrics.degradation_control` as its guard) — see `docs/DECISIONS.md`.
 
 **Statistics:** mixed-effects model with speaker, rater and utterance as random
 effects. Report CIs, not means. Pre-register H1's knee and H2's class ordering.
@@ -729,9 +747,9 @@ rounding error.
 |---|---|---|
 | **Aug 2026** | Read the survey (2604.27281), then PHONOS, TVTSyn, DarkStream in full. **Email Quamer / Gutierrez-Osuna.** Request L2-ARCTIC **today** — it is on the critical path. Buy the Pi. Reproduce one offline FAC baseline. | Baseline runs end-to-end |
 | **Sep 2026** | Harness first: metrics, accent probe, `verify_prompt_overlap.py`. Run S0/S2/S5. | Harness emits numbers for S0, S2, S5 |
-| **Oct 2026** | Train S4 at one accent pair, all L. **Pilot listening test.** Re-run S1 with a *streaming* TTS. | One full L sweep, GPU only |
+| **Oct 2026** | Train S4 at one accent pair, all L. ~~Pilot listening test~~ → *build stimuli only (free); rater study unfunded, see `docs/DECISIONS.md`*. Re-run S1 with a *streaming* TTS. | One full L sweep, GPU only |
 | **Nov 2026** | Full sweep: 224 conditions across 4 hardware classes. Randomise condition order (thermal). | Objective metrics complete |
-| **Dec 2026** | Human listening tests (20 conditions). Phoneme-class analysis. | H1/H2 confirmed or refuted |
+| **Dec 2026** | ~~Human listening tests (20 conditions)~~ → *unfunded; automatic proxies only (NISQA + accent probe)*. Phoneme-class analysis. | H2 confirmed or refuted; H1 already answered (§7 F15) |
 | **Jan 2027** | Ablations, first draft, **arXiv preprint** | Circulated to 2+ outside readers |
 | **Feb 2027** | Revise to 4+2 pages, internal review | Submission-ready 2 weeks early |
 | **~1 Mar 2027** | **Submit** | |
@@ -752,7 +770,7 @@ L2-ARCTIC request form, and the email to TAMU.
 | **The knee lands at ≤40 ms** | Medium | **Low — v1 treated this as failure** | Then we are the evidence for a budget the field currently assumes. Restated H1 (§3) makes this a finding, not a null. |
 | Annotated L2-ARCTIC subset underpowers H2 | **Medium — now partly quantified** | High | The HF release is 3599 annotated utterances / 6 L1s ≈ **600 per L1**: enough for class-level slopes, thin for per-phone slopes. Also: it ships IPA *strings*, not TextGrids, so per-phone attribution needs forced alignment. `bench_content_degradation.py` therefore uses an explicitly-labelled acoustic proxy (voicing × spectral flux) until an aligner is in place. |
 | Base SSL encoders cannot be made causal (third leak) | Low — two found and fixed | High | The truncation proof is a gate: training aborts rather than producing mislabelled conditions. Fallback is a `-large` checkpoint (`feat_extract_norm="layer"`, causal-safe by construction) at higher compute cost. |
-| Human eval underpowered / unreliable raters | Medium | Medium | Pilot in October. Attention checks. NISQA as primary automatic proxy. |
+| **No perceptual evaluation at all** (rater study unfunded, 2026-08-09) | **High** | **Medium–High** | Most likely reviewer objection for an accent-conversion paper. Mitigations: scope every claim to PER explicitly; build stimuli and listen informally (free); NISQA-MOS + accent probe as automatic proxies with `metrics.degradation_control`. Fund the study if a reviewer requires it. |
 | Solo first-time author, no affiliation | High | Medium | Find a co-author with a record. The harness release is the credibility. |
 | Scope creep into "also beat SOTA" | High | High | **Explicitly out of scope.** Written into the repo README. |
 

@@ -1,0 +1,574 @@
+{
+  "provenance": {
+    "hyp_dir": "results/raw/hyps",
+    "target": "native",
+    "n_files": 21,
+    "lookaheads": [
+      0.0,
+      20.0,
+      40.0,
+      80.0,
+      160.0,
+      320.0,
+      640.0
+    ],
+    "seeds_per_lookahead": {
+      "0.0": [
+        "1337",
+        "7",
+        "99"
+      ],
+      "20.0": [
+        "1337",
+        "7",
+        "99"
+      ],
+      "40.0": [
+        "1337",
+        "7",
+        "99"
+      ],
+      "80.0": [
+        "1337",
+        "7",
+        "99"
+      ],
+      "160.0": [
+        "1337",
+        "7",
+        "99"
+      ],
+      "320.0": [
+        "1337",
+        "7",
+        "99"
+      ],
+      "640.0": [
+        "1337",
+        "7",
+        "99"
+      ]
+    },
+    "utterances_per_lookahead": {
+      "0.0": 1200,
+      "20.0": 1200,
+      "40.0": 1200,
+      "80.0": 1200,
+      "160.0": 1200,
+      "320.0": 1200,
+      "640.0": 1200
+    },
+    "l1s": [
+      "Arabic",
+      "Chinese",
+      "Hindi",
+      "Korean",
+      "Spanish",
+      "Vietnamese"
+    ]
+  },
+  "noise_2sigma": 0.00436,
+  "per_lookahead_class_rates": {
+    "0.0": {
+      "affricate": {
+        "error_rate": 0.4663023679417122,
+        "sub_rate": 0.25956284153005466,
+        "del_rate": 0.20673952641165755,
+        "opportunities": 1098.0
+      },
+      "approximant": {
+        "error_rate": 0.4172677595628415,
+        "sub_rate": 0.2509289617486339,
+        "del_rate": 0.16633879781420766,
+        "opportunities": 4575.0
+      },
+      "fricative": {
+        "error_rate": 0.4048831440135788,
+        "sub_rate": 0.2590416503459982,
+        "del_rate": 0.14584149366758062,
+        "opportunities": 7659.0
+      },
+      "nasal": {
+        "error_rate": 0.3034825870646766,
+        "sub_rate": 0.19502487562189055,
+        "del_rate": 0.10845771144278607,
+        "opportunities": 4020.0
+      },
+      "stop": {
+        "error_rate": 0.4324706547871588,
+        "sub_rate": 0.2798755480130109,
+        "del_rate": 0.15259510677414792,
+        "opportunities": 7071.0
+      },
+      "vowel_diph": {
+        "error_rate": 0.3439054726368159,
+        "sub_rate": 0.21040630182421227,
+        "del_rate": 0.13349917081260365,
+        "opportunities": 4824.0
+      },
+      "vowel_mono": {
+        "error_rate": 0.3929889298892989,
+        "sub_rate": 0.29182041820418203,
+        "del_rate": 0.10116851168511685,
+        "opportunities": 13008.0
+      }
+    },
+    "20.0": {
+      "affricate": {
+        "error_rate": 0.42349726775956287,
+        "sub_rate": 0.22859744990892533,
+        "del_rate": 0.19489981785063754,
+        "opportunities": 1098.0
+      },
+      "approximant": {
+        "error_rate": 0.33792349726775955,
+        "sub_rate": 0.2056830601092896,
+        "del_rate": 0.13224043715846995,
+        "opportunities": 4575.0
+      },
+      "fricative": {
+        "error_rate": 0.33346389868129,
+        "sub_rate": 0.22405013709361535,
+        "del_rate": 0.10941376158767463,
+        "opportunities": 7659.0
+      },
+      "nasal": {
+        "error_rate": 0.24502487562189054,
+        "sub_rate": 0.15771144278606966,
+        "del_rate": 0.0873134328358209,
+        "opportunities": 4020.0
+      },
+      "stop": {
+        "error_rate": 0.37774006505444774,
+        "sub_rate": 0.24692405600339415,
+        "del_rate": 0.1308160090510536,
+        "opportunities": 7071.0
+      },
+      "vowel_diph": {
+        "error_rate": 0.28689883913764513,
+        "sub_rate": 0.18138474295190712,
+        "del_rate": 0.10551409618573798,
+        "opportunities": 4824.0
+      },
+      "vowel_mono": {
+        "error_rate": 0.3404827798277983,
+        "sub_rate": 0.25453567035670355,
+        "del_rate": 0.08594710947109471,
+        "opportunities": 13008.0
+      }
+    },
+    "40.0": {
+      "affricate": {
+        "error_rate": 0.37340619307832423,
+        "sub_rate": 0.1994535519125683,
+        "del_rate": 0.17395264116575593,
+        "opportunities": 1098.0
+      },
+      "approximant": {
+        "error_rate": 0.27650273224043714,
+        "sub_rate": 0.1696174863387978,
+        "del_rate": 0.10688524590163935,
+        "opportunities": 4575.0
+      },
+      "fricative": {
+        "error_rate": 0.2884188536362449,
+        "sub_rate": 0.2019845932889411,
+        "del_rate": 0.08643426034730382,
+        "opportunities": 7659.0
+      },
+      "nasal": {
+        "error_rate": 0.19975124378109452,
+        "sub_rate": 0.12512437810945273,
+        "del_rate": 0.07462686567164178,
+        "opportunities": 4020.0
+      },
+      "stop": {
+        "error_rate": 0.33064630179606846,
+        "sub_rate": 0.21001272804412388,
+        "del_rate": 0.12063357375194456,
+        "opportunities": 7071.0
+      },
+      "vowel_diph": {
+        "error_rate": 0.26181592039800994,
+        "sub_rate": 0.16355721393034825,
+        "del_rate": 0.09825870646766169,
+        "opportunities": 4824.0
+      },
+      "vowel_mono": {
+        "error_rate": 0.30227552275522757,
+        "sub_rate": 0.2301660516605166,
+        "del_rate": 0.07210947109471094,
+        "opportunities": 13008.0
+      }
+    },
+    "80.0": {
+      "affricate": {
+        "error_rate": 0.31693989071038253,
+        "sub_rate": 0.14663023679417123,
+        "del_rate": 0.1703096539162113,
+        "opportunities": 1098.0
+      },
+      "approximant": {
+        "error_rate": 0.23737704918032787,
+        "sub_rate": 0.14404371584699455,
+        "del_rate": 0.09333333333333334,
+        "opportunities": 4575.0
+      },
+      "fricative": {
+        "error_rate": 0.23332027679853767,
+        "sub_rate": 0.15733124428776601,
+        "del_rate": 0.07598903251077165,
+        "opportunities": 7659.0
+      },
+      "nasal": {
+        "error_rate": 0.15049751243781095,
+        "sub_rate": 0.08980099502487562,
+        "del_rate": 0.06069651741293532,
+        "opportunities": 4020.0
+      },
+      "stop": {
+        "error_rate": 0.2754914439258945,
+        "sub_rate": 0.17508131805968039,
+        "del_rate": 0.10041012586621412,
+        "opportunities": 7071.0
+      },
+      "vowel_diph": {
+        "error_rate": 0.21766169154228857,
+        "sub_rate": 0.13246268656716417,
+        "del_rate": 0.08519900497512438,
+        "opportunities": 4824.0
+      },
+      "vowel_mono": {
+        "error_rate": 0.25161439114391143,
+        "sub_rate": 0.18880688806888068,
+        "del_rate": 0.06280750307503075,
+        "opportunities": 13008.0
+      }
+    },
+    "160.0": {
+      "affricate": {
+        "error_rate": 0.2768670309653916,
+        "sub_rate": 0.1284153005464481,
+        "del_rate": 0.14845173041894352,
+        "opportunities": 1098.0
+      },
+      "approximant": {
+        "error_rate": 0.19256830601092897,
+        "sub_rate": 0.11540983606557377,
+        "del_rate": 0.07715846994535519,
+        "opportunities": 4575.0
+      },
+      "fricative": {
+        "error_rate": 0.1762632197414806,
+        "sub_rate": 0.11541976759368064,
+        "del_rate": 0.06084345214779997,
+        "opportunities": 7659.0
+      },
+      "nasal": {
+        "error_rate": 0.13059701492537312,
+        "sub_rate": 0.07835820895522388,
+        "del_rate": 0.05223880597014925,
+        "opportunities": 4020.0
+      },
+      "stop": {
+        "error_rate": 0.22853910338000283,
+        "sub_rate": 0.13831141281289774,
+        "del_rate": 0.09022769056710507,
+        "opportunities": 7071.0
+      },
+      "vowel_diph": {
+        "error_rate": 0.15630182421227198,
+        "sub_rate": 0.0914179104477612,
+        "del_rate": 0.06488391376451078,
+        "opportunities": 4824.0
+      },
+      "vowel_mono": {
+        "error_rate": 0.19218942189421895,
+        "sub_rate": 0.14152829028290284,
+        "del_rate": 0.050661131611316114,
+        "opportunities": 13008.0
+      }
+    },
+    "320.0": {
+      "affricate": {
+        "error_rate": 0.2586520947176685,
+        "sub_rate": 0.11202185792349727,
+        "del_rate": 0.14663023679417123,
+        "opportunities": 1098.0
+      },
+      "approximant": {
+        "error_rate": 0.1637158469945355,
+        "sub_rate": 0.09202185792349726,
+        "del_rate": 0.07169398907103826,
+        "opportunities": 4575.0
+      },
+      "fricative": {
+        "error_rate": 0.1500195848021935,
+        "sub_rate": 0.09727118422770596,
+        "del_rate": 0.05274840057448753,
+        "opportunities": 7659.0
+      },
+      "nasal": {
+        "error_rate": 0.10895522388059702,
+        "sub_rate": 0.06467661691542288,
+        "del_rate": 0.044278606965174126,
+        "opportunities": 4020.0
+      },
+      "stop": {
+        "error_rate": 0.19799179748267573,
+        "sub_rate": 0.11455239711497667,
+        "del_rate": 0.08343940036769905,
+        "opportunities": 7071.0
+      },
+      "vowel_diph": {
+        "error_rate": 0.1287313432835821,
+        "sub_rate": 0.07566334991708126,
+        "del_rate": 0.05306799336650083,
+        "opportunities": 4824.0
+      },
+      "vowel_mono": {
+        "error_rate": 0.1541359163591636,
+        "sub_rate": 0.11269987699876999,
+        "del_rate": 0.041436039360393605,
+        "opportunities": 13008.0
+      }
+    },
+    "640.0": {
+      "affricate": {
+        "error_rate": 0.22131147540983606,
+        "sub_rate": 0.09380692167577413,
+        "del_rate": 0.12750455373406194,
+        "opportunities": 1098.0
+      },
+      "approximant": {
+        "error_rate": 0.1250273224043716,
+        "sub_rate": 0.07016393442622951,
+        "del_rate": 0.054863387978142074,
+        "opportunities": 4575.0
+      },
+      "fricative": {
+        "error_rate": 0.12690951821386603,
+        "sub_rate": 0.07794751273012143,
+        "del_rate": 0.04896200548374462,
+        "opportunities": 7659.0
+      },
+      "nasal": {
+        "error_rate": 0.086318407960199,
+        "sub_rate": 0.05049751243781095,
+        "del_rate": 0.03582089552238806,
+        "opportunities": 4020.0
+      },
+      "stop": {
+        "error_rate": 0.16659595531042284,
+        "sub_rate": 0.09489464007919672,
+        "del_rate": 0.07170131523122614,
+        "opportunities": 7071.0
+      },
+      "vowel_diph": {
+        "error_rate": 0.11898839137645108,
+        "sub_rate": 0.07172470978441128,
+        "del_rate": 0.0472636815920398,
+        "opportunities": 4824.0
+      },
+      "vowel_mono": {
+        "error_rate": 0.128690036900369,
+        "sub_rate": 0.09540282902829028,
+        "del_rate": 0.03328720787207872,
+        "opportunities": 13008.0
+      }
+    }
+  },
+  "insertions": {
+    "0.0": {
+      "insertions_total": 1600
+    },
+    "20.0": {
+      "insertions_total": 1742
+    },
+    "40.0": {
+      "insertions_total": 1831
+    },
+    "80.0": {
+      "insertions_total": 1804
+    },
+    "160.0": {
+      "insertions_total": 1679
+    },
+    "320.0": {
+      "insertions_total": 1481
+    },
+    "640.0": {
+      "insertions_total": 1362
+    }
+  },
+  "h2": {
+    "direction_only": true,
+    "effect_size_between_over_pooled_sd": 0.6649148498103823,
+    "between_group_difference": 0.04006227232884574,
+    "within_group_range_breaks_first": 0.046358245309250146,
+    "within_group_range_survives": 0.19018314549180326,
+    "ordering_violations": [
+      "fricative > vowel_diph",
+      "nasal > vowel_diph",
+      "fricative > vowel_mono",
+      "nasal > vowel_mono",
+      "nasal > approximant"
+    ],
+    "n_ordering_violations": 5,
+    "n_ordering_pairs": 12,
+    "observed_rank_by_gain": [
+      "nasal",
+      "approximant",
+      "fricative",
+      "vowel_mono",
+      "vowel_diph",
+      "stop",
+      "affricate"
+    ],
+    "metric": "error_rate",
+    "x_axis": "log2(lookahead_ms), L=0 at 10 ms",
+    "lookaheads_ms": [
+      0.0,
+      20.0,
+      40.0,
+      80.0,
+      160.0,
+      320.0,
+      640.0
+    ],
+    "per_class_fit": {
+      "affricate": {
+        "slope_per_doubling": -0.041471506635441066,
+        "r2": 0.9828398653452705,
+        "rate_at_Lmin": 0.4663023679417122,
+        "rate_at_Lmax": 0.22131147540983606,
+        "absolute_gain": 0.24499089253187614,
+        "relative_gain": 0.525390625,
+        "opportunities": 1098.0,
+        "resolvable": true
+      },
+      "approximant": {
+        "slope_per_doubling": -0.046752537080405936,
+        "r2": 0.9725118822395875,
+        "rate_at_Lmin": 0.4172677595628415,
+        "rate_at_Lmax": 0.1250273224043716,
+        "absolute_gain": 0.2922404371584699,
+        "relative_gain": 0.7003666841278156,
+        "opportunities": 4575.0,
+        "resolvable": true
+      },
+      "fricative": {
+        "slope_per_doubling": -0.04689161210900342,
+        "r2": 0.9756897155921807,
+        "rate_at_Lmin": 0.4048831440135788,
+        "rate_at_Lmax": 0.12690951821386603,
+        "absolute_gain": 0.27797362579971274,
+        "relative_gain": 0.6865527249274428,
+        "opportunities": 7659.0,
+        "resolvable": true
+      },
+      "nasal": {
+        "slope_per_doubling": -0.03545664534470505,
+        "r2": 0.9559685914779507,
+        "rate_at_Lmin": 0.3034825870646766,
+        "rate_at_Lmax": 0.086318407960199,
+        "absolute_gain": 0.2171641791044776,
+        "relative_gain": 0.7155737704918033,
+        "opportunities": 4020.0,
+        "resolvable": true
+      },
+      "stop": {
+        "slope_per_doubling": -0.044972422571064916,
+        "r2": 0.9888313659283473,
+        "rate_at_Lmin": 0.4324706547871588,
+        "rate_at_Lmax": 0.16659595531042284,
+        "absolute_gain": 0.2658746994767359,
+        "relative_gain": 0.6147809025506866,
+        "opportunities": 7071.0,
+        "resolvable": true
+      },
+      "vowel_diph": {
+        "slope_per_doubling": -0.039164297559819955,
+        "r2": 0.9743430867568921,
+        "rate_at_Lmin": 0.3439054726368159,
+        "rate_at_Lmax": 0.11898839137645108,
+        "absolute_gain": 0.22491708126036486,
+        "relative_gain": 0.6540084388185654,
+        "opportunities": 4824.0,
+        "resolvable": true
+      },
+      "vowel_mono": {
+        "slope_per_doubling": -0.045559875241609565,
+        "r2": 0.9918960008557599,
+        "rate_at_Lmin": 0.3929889298892989,
+        "rate_at_Lmax": 0.128690036900369,
+        "absolute_gain": 0.2642988929889299,
+        "relative_gain": 0.6725352112676056,
+        "opportunities": 13008.0,
+        "resolvable": true
+      }
+    },
+    "breaks_first_classes": [
+      "vowel_diph",
+      "vowel_mono",
+      "approximant"
+    ],
+    "survives_classes": [
+      "stop",
+      "fricative",
+      "affricate",
+      "nasal"
+    ],
+    "mean_relative_gain_breaks_first": 0.6756367780713289,
+    "mean_relative_gain_survives": 0.6355745057424832,
+    "mean_slope_breaks_first": -0.04382556996061182,
+    "mean_slope_survives": -0.04219804666505361,
+    "H2_supported": false,
+    "H2_direction_supported": true,
+    "gain_ratio": 1.063033164431359
+  },
+  "by_l1": {
+    "Arabic": {
+      "H2_supported": false,
+      "H2_direction_supported": true,
+      "gain_ratio": 1.0786070583752345,
+      "mean_relative_gain_breaks_first": 0.727103138389651,
+      "mean_relative_gain_survives": 0.674113091272485
+    },
+    "Chinese": {
+      "H2_supported": false,
+      "H2_direction_supported": false,
+      "gain_ratio": 0.9229907623334483,
+      "mean_relative_gain_breaks_first": 0.5920286598172447,
+      "mean_relative_gain_survives": 0.6414242525250354
+    },
+    "Hindi": {
+      "H2_supported": false,
+      "H2_direction_supported": false,
+      "gain_ratio": 0.9867847148199081,
+      "mean_relative_gain_breaks_first": 0.6282411890883681,
+      "mean_relative_gain_survives": 0.6366547633472661
+    },
+    "Korean": {
+      "H2_supported": true,
+      "H2_direction_supported": true,
+      "gain_ratio": 1.1883010281684987,
+      "mean_relative_gain_breaks_first": 0.8377297656483979,
+      "mean_relative_gain_survives": 0.704981099729899
+    },
+    "Spanish": {
+      "H2_supported": false,
+      "H2_direction_supported": false,
+      "gain_ratio": 1.0230005732617762,
+      "mean_relative_gain_breaks_first": 0.5922619047619048,
+      "mean_relative_gain_survives": 0.5789458190365554
+    },
+    "Vietnamese": {
+      "H2_supported": false,
+      "H2_direction_supported": true,
+      "gain_ratio": 1.2336643353406302,
+      "mean_relative_gain_breaks_first": 0.7610273552092957,
+      "mean_relative_gain_survives": 0.6168836476894393
+    }
+  }
+}

@@ -1,36 +1,54 @@
-t_buffer on M4: jitter measured at ~0.1 ms, I/O term still unmeasured
+RQ2/H2 not supported: manner class is the wrong axis
 
-Jitter is resolved and negligible. Two independent 30 s duplex runs at 40 ms
-blocks: required buffer 0.143 and 0.080 ms, p99 lateness 0.065/0.060 ms, zero
-xruns, zero late callbacks, clock drift <1.3e-4 %. That retires the jitter part
-of the ~30 ms placeholder with a measurement.
+Tests H2 at the sequence level from the hypothesis dumps -- no audio needed. New
+eval/analyse_h2_sequences.py (21 self-tests). Result: a clean negative on a
+pre-registered hypothesis.
 
-The I/O term is NOT measured and the fallback figure must not be cited. The
-acoustic loopback failed 20/20 on both runs (correlation 0.042-0.046 vs a 0.20
-threshold; pure noise scores 0.029), so the tool fell back to device-reported
-latency: 639.7 ms, correctly labelled "LOWER BOUND -- not measured".
+Relative error-rate reduction L=0 -> 640 ms, native arm, 21 files, 42255
+reference phones per lookahead:
 
-The new blocksize sweep shows why that figure is meaningless: the excess over
-the requested block is identically 201.69 ms at both 10 and 20 ms blocks, then
-roughly doubles and quadruples (211.7 / 221.7 / 412.4 / 793.7 ms for 10/20/40/80
-ms blocks, 9.9-21.2x the block). That is driver queueing, not ADC/DAC delay, and
-the low/high latency hint is ignored. Real macOS audio does sub-20 ms
-round-trip.
+  nasal       0.716  (survives)     <- largest gain, wrong group
+  approximant 0.700  (breaks-first)
+  fricative   0.687  (survives)
+  vowel_mono  0.673  (breaks-first)
+  vowel_diph  0.654  (breaks-first)
+  stop        0.615  (survives)
+  affricate   0.525  (survives)
 
-The capture diagnostics refuted our first hypothesis. We guessed macOS mic
-permission, because macOS returns silence rather than an error when access is
-denied. Measured: input_rms 1.21e-3, peak 5.0e-3, input_silent false. The mic is
-capturing room noise; the chirp specifically is absent. Leading explanation is
-macOS echo cancellation, which exists precisely to remove speaker output from
-mic input -- so an acoustic loopback through built-in speaker to built-in mic is
-structurally hostile on this platform. Without these diagnostics "silent input"
-and "captured but decorrelated" are indistinguishable and need opposite fixes;
-we would have raised --amplitude against the wrong cause.
+Group means differ in the predicted direction (0.676 vs 0.636) but three harder
+checks fail: effect size 0.66 (between-group difference 0.040 < pooled SD
+0.060); the survives group's internal spread is 0.190, i.e. 4.7x the
+between-group difference; and 5 of 12 pairwise orderings are violated, with nasal
+beating all three breaks-first classes. By L1 only 3 of 6 support even the
+directional reading, and the gain ratio straddles 1.0 (0.92 Chinese to 1.23
+Vietnamese).
 
-Adds gitsave.sh: the sandbox mount denies unlink inside .git, so every git write
-from the assistant leaves an orphaned zero-byte lock that blocks the next one.
-The script clears only empty locks older than 60 s, so it cannot stomp a lock
-held by a live git process.
+The finding is NOT that lookahead fails to help vowels -- every class improves
+52-72% relative, all above the 0.0044 noise floor. The finding is that manner
+class does not predict which sounds need right context.
 
-Next: Mic Mode -> Wide Spectrum during the run, else a wired loopback with
---distance-m 0, which AEC cannot touch.
+A bug nearly produced a fake answer, and it is documented rather than quietly
+fixed. phoneme_analysis.CLASS_OF is keyed on ARPAbet (IY, TH, NG); the sweep
+emits IPA (i, theta, eng). Applying one to the other sent 8094 of 14085
+reference tokens (57%) to class "other", including EVERY vowel and /r/, leaving
+breaks_first with l and w alone -- while still printing per-class slopes, an H2
+verdict and a by-L1 table. The first run was invalid and looked fine.
+
+Two properties of the transcription then forced context-sensitive mapping, both
+verified empirically before being encoded: diphthongs are decomposed (a+I, a+U,
+e+I, o+U, O+I) yet the offglides also stand alone -- I follows a diphthong onset
+only 38.6% of the time and U 78.5%, so a context-free map would relabel
+thousands of genuine monophthongs; and affricates are decomposed (t+S, d+Z), so
+without sequence detection the pre-registered affricate class is empty and H2's
+survives group silently loses a member.
+
+Guards added: coverage assertion that no declared phone maps to "other", ten
+contextual class tests, a reachability test for all seven pre-registered classes,
+and a stricter H2 criterion -- direction alone had called a 6% group difference
+"supported", so it now also requires effect size >= 1.0 and a minority of
+ordering violations. H2_PREDICTION itself is imported unchanged; only the symbol
+inventory was translated.
+
+Full write-up in docs/H2_NOT_SUPPORTED.md, including what the audio-domain form
+of the test would settle: whether the grouping is wrong or sequence-level PER is
+simply blind to formant-trajectory effects.

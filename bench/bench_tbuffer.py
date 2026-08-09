@@ -309,6 +309,62 @@ def mode_jitter(
     return res
 
 
+def amplitude_invariance(sd, sr: int, chirp_ms: float, tail_ms: float,
+                         lo_amp: float = 0.25, hi_amp: float = 0.95,
+                         reps: int = 4) -> Dict[str, object]:
+    """Does the captured level respond to output amplitude at all?
+
+    This is the decisive diagnostic and it is cheap. If the speaker signal is
+    reaching the microphone -- however attenuated -- then nearly quadrupling the
+    output amplitude must raise the captured peak roughly proportionally. If the
+    captured level is *invariant*, the output contributes nothing: either it is
+    not being emitted (routing/mute) or it is being actively cancelled (macOS
+    echo cancellation, which scales with its reference and so defeats louder
+    signals by design).
+
+    Observed on an M4: 0.5 -> 0.95 amplitude moved the captured peak from
+    0.00505 to 0.00468, i.e. slightly DOWN. That is noise, not signal.
+    """
+    n_ref = int(round(sr * chirp_ms / 1000.0))
+    pad = int(round(sr * tail_ms / 1000.0))
+    out: Dict[str, object] = {"lo_amp": lo_amp, "hi_amp": hi_amp, "reps": reps}
+    levels = {}
+    for tag, amp in (("lo", lo_amp), ("hi", hi_amp)):
+        peaks = []
+        ref = chirp(n_ref, sr) * amp
+        play = np.concatenate([ref, np.zeros(pad, dtype=np.float32)])
+        for _ in range(reps):
+            try:
+                rec = sd.playrec(play, samplerate=sr, channels=1, blocking=True)
+            except Exception as e:
+                return {"error": f"playrec failed: {e}"}
+            peaks.append(float(np.max(np.abs(np.asarray(rec[:, 0])))))
+            time.sleep(0.05)
+        levels[tag] = float(np.median(peaks))
+    out["captured_peak_lo"] = round(levels["lo"], 6)
+    out["captured_peak_hi"] = round(levels["hi"], 6)
+    amp_ratio = hi_amp / max(lo_amp, 1e-9)
+    cap_ratio = levels["hi"] / max(levels["lo"], 1e-12)
+    out["amplitude_ratio"] = round(amp_ratio, 2)
+    out["captured_ratio"] = round(cap_ratio, 3)
+    # If output were reaching the mic, captured_ratio should track amp_ratio.
+    # Allow a wide margin; we only need to catch total invariance.
+    out["output_reaches_mic"] = cap_ratio > 1.5
+    if not out["output_reaches_mic"]:
+        out["diagnosis"] = (
+            f"Captured level is INVARIANT to output amplitude "
+            f"({amp_ratio:.1f}x louder gave {cap_ratio:.2f}x captured). The "
+            "speaker signal is not reaching the microphone at all. Either the "
+            "output is not being emitted (check volume/routing -- can you HEAR "
+            "the chirps?) or it is being actively cancelled by the OS. macOS "
+            "echo cancellation scales with its reference, so a louder chirp "
+            "cannot defeat it. An acoustic loopback is not usable here; use a "
+            "wired loopback with --distance-m 0, or measure on a platform "
+            "without AEC in the path."
+        )
+    return out
+
+
 def mode_loopback(
     sr: int, reps: int, chirp_ms: float, tail_ms: float,
     distance_m: float, amplitude: float, min_peak: float,
@@ -390,6 +446,11 @@ def mode_loopback(
                 "loopback and pass --distance-m 0."
             )
         out["error"] = "every rep failed the correlation threshold"
+        # The loopback failed. Establish whether the output reaches the mic at
+        # all -- that single fact separates "cancelled/muted" from "present but
+        # decorrelated", and it took three manual runs to notice by hand.
+        out["amplitude_invariance"] = amplitude_invariance(
+            sd, sr, chirp_ms, tail_ms)
         return out
 
     raw = _dist(lat_ms)

@@ -66,11 +66,39 @@ input_peak_p50  0.005046      input_clipped  false
 The microphone is capturing — that level is ambient room noise, about −46 dBFS —
 but the chirp specifically is absent. Signal present, target absent.
 
-**Leading explanation: macOS echo cancellation.** When one process holds both
-the microphone and the speaker, macOS applies AEC whose explicit purpose is to
-remove the speaker's output from the microphone input. An acoustic loopback
-through built-in speaker → built-in mic is therefore structurally hostile on
-this platform: the OS is designed to defeat exactly this measurement.
+**Then a third run settled it: the captured level is invariant to output
+amplitude.**
+
+| output amplitude | captured peak | captured rms | correlation peak |
+|---:|---:|---:|---:|
+| 0.50 | 0.00505 | 0.001213 | 0.042 |
+| 0.95 | 0.00468 | 0.001128 | 0.029 |
+| 0.95 (repeat) | 0.00446 | 0.000956 | 0.033 |
+
+Nearly doubling the output changed the captured signal by **nothing** — it
+drifted slightly *down*, consistent with room-noise variation. If the chirp were
+reaching the microphone at all, even heavily attenuated, doubling amplitude would
+roughly double the captured peak. It does not. **The speaker contributes zero
+measurable energy to the microphone input.**
+
+That leaves exactly two causes, distinguished by one free observation — whether
+the chirps are audible:
+
+- **Audible** → output works, so the OS is cancelling it. macOS applies echo
+  cancellation whenever one process holds both mic and speaker, and adaptive
+  cancellation scales with its reference, which is precisely why a louder chirp
+  cannot defeat it. An acoustic loopback is then *structurally* unmeasurable on
+  this platform: the OS is designed to defeat this measurement.
+- **Inaudible** → the output is not being emitted (routing or volume), and
+  amplitude is equally irrelevant.
+
+Either way the acoustic route is a dead end on this machine, and amplitude is
+not the lever.
+
+*Tooling consequence:* `amplitude_invariance()` now runs automatically whenever
+the loopback fails, comparing captured level at 0.25 vs 0.95 amplitude. It took
+three manual runs to notice the invariance by hand; the tool now reports it in
+one.
 
 *Methodological note worth keeping:* without the RMS/peak diagnostics, "silent
 input" and "chirp captured but decorrelated" are indistinguishable, and they
@@ -80,18 +108,26 @@ would have concluded "mic permission" and been wrong.
 
 ## 4. What to do next
 
-In order of cost:
+`--amplitude` has been tried and ruled out (see the invariance table above).
+Remaining options, in order of value:
 
-1. **Disable mic processing.** Launch the benchmark, then *while it runs* set
-   Control Center → Mic Mode → **Wide Spectrum** (the control only appears while
-   an app holds the microphone). Raise speaker volume and use
-   `--amplitude 0.95`.
-2. **Wired loopback.** A 3.5 mm headphone-to-mic cable, or any USB audio
-   interface, with `--distance-m 0`. The signal never goes acoustic so AEC
-   cannot touch it. This is the definitive measurement.
-3. **Failing both**, report the budget with the jitter term measured (~0.1 ms)
-   and the I/O term as an explicit stated limitation. Do **not** substitute the
+1. **Wired loopback.** A 3.5 mm headphone-to-mic cable, or any USB audio
+   interface, with `--distance-m 0`. The signal never goes acoustic, so AEC
+   cannot touch it. This is the definitive measurement and the only one that
+   fully settles the I/O term on this machine.
+2. **Measure on a platform without AEC in the path.** The project already
+   targets a Raspberry Pi and ARM64 Linux (§8), neither of which applies
+   system-wide echo cancellation. Arguably *more* relevant than the Mac anyway:
+   the paper's claim is about commodity and embedded deployment, and an
+   AEC-free Linux measurement would characterise the class of device the
+   deployment argument is actually about.
+3. **Report the limitation as it stands.** Jitter measured (~0.1 ms), I/O term
+   explicitly unmeasured with the reason given. Do **not** substitute the
    device-reported number.
+
+Option 2 is probably the better use of effort than hunting for a cable: it
+serves the paper's actual claim rather than just closing a hole on hardware the
+paper does not centre.
 
 ## 5. What the paper should say now
 
