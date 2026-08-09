@@ -1,0 +1,36 @@
+t_buffer on M4: jitter measured at ~0.1 ms, I/O term still unmeasured
+
+Jitter is resolved and negligible. Two independent 30 s duplex runs at 40 ms
+blocks: required buffer 0.143 and 0.080 ms, p99 lateness 0.065/0.060 ms, zero
+xruns, zero late callbacks, clock drift <1.3e-4 %. That retires the jitter part
+of the ~30 ms placeholder with a measurement.
+
+The I/O term is NOT measured and the fallback figure must not be cited. The
+acoustic loopback failed 20/20 on both runs (correlation 0.042-0.046 vs a 0.20
+threshold; pure noise scores 0.029), so the tool fell back to device-reported
+latency: 639.7 ms, correctly labelled "LOWER BOUND -- not measured".
+
+The new blocksize sweep shows why that figure is meaningless: the excess over
+the requested block is identically 201.69 ms at both 10 and 20 ms blocks, then
+roughly doubles and quadruples (211.7 / 221.7 / 412.4 / 793.7 ms for 10/20/40/80
+ms blocks, 9.9-21.2x the block). That is driver queueing, not ADC/DAC delay, and
+the low/high latency hint is ignored. Real macOS audio does sub-20 ms
+round-trip.
+
+The capture diagnostics refuted our first hypothesis. We guessed macOS mic
+permission, because macOS returns silence rather than an error when access is
+denied. Measured: input_rms 1.21e-3, peak 5.0e-3, input_silent false. The mic is
+capturing room noise; the chirp specifically is absent. Leading explanation is
+macOS echo cancellation, which exists precisely to remove speaker output from
+mic input -- so an acoustic loopback through built-in speaker to built-in mic is
+structurally hostile on this platform. Without these diagnostics "silent input"
+and "captured but decorrelated" are indistinguishable and need opposite fixes;
+we would have raised --amplitude against the wrong cause.
+
+Adds gitsave.sh: the sandbox mount denies unlink inside .git, so every git write
+from the assistant leaves an orphaned zero-byte lock that blocks the next one.
+The script clears only empty locks older than 60 s, so it cannot stomp a lock
+held by a live git process.
+
+Next: Mic Mode -> Wide Spectrum during the run, else a wired loopback with
+--distance-m 0, which AEC cannot touch.
