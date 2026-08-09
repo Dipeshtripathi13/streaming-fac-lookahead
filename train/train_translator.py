@@ -520,6 +520,22 @@ def main() -> None:
             r["seed"] = sd
             results.append(r)
 
+            # Append this condition's result before starting the next one.
+            # The summary JSON is only written after all conditions finish, so
+            # without this a runtime that dies on the last run destroys every
+            # earlier result too. Learned the hard way: a recycled Colab VM
+            # took 41 of 42 completed runs with it. One line per run, flushed
+            # and fsynced, so the file is intact even on an abrupt kill.
+            try:
+                with open(a.out + ".jsonl", "a") as jf:
+                    jf.write(json.dumps({k2: v for k2, v in r.items()
+                                         if k2 != "history"}, default=str) + "\n")
+                    jf.flush()
+                    os.fsync(jf.fileno())
+            except Exception as e:  # never let bookkeeping kill a sweep
+                print(f"    WARNING: could not append to {a.out}.jsonl: {e}",
+                      flush=True)
+
     # ---- curves ----
     summary: Dict[str, object] = {"corpus": stats, "device": device,
                                   "steps": a.steps, "chunk_ms": a.chunk_ms,

@@ -36,13 +36,15 @@ from __future__ import annotations
 
 import json
 import math
+import os
+import sys
 from typing import Dict, List, Sequence, Tuple
 
 L = [0, 20, 40, 80, 160, 320, 640]
 SEEDS = [1337, 7, 99]
 
 # test_per: PER against the arm's own target labels
-OWN: Dict[str, Dict[int, List[float]]] = {
+OWN_PREFIX_BUG: Dict[str, Dict[int, List[float]]] = {
     "native": {
         1337: [.4495, .3961, .3928, .3613, .3148, .3514, .2245],
         7:    [.4490, .4079, .3542, .3411, .3013, .3068, .2576],
@@ -55,7 +57,7 @@ OWN: Dict[str, Dict[int, List[float]]] = {
     },
 }
 # test_per_cross: same model, scored against the *other* label set
-CROSS: Dict[str, Dict[int, List[float]]] = {
+CROSS_PREFIX_BUG: Dict[str, Dict[int, List[float]]] = {
     "native": {
         1337: [.4838, .4409, .4433, .4311, .4018, .4488, .3261],
         7:    [.4795, .4481, .4089, .4125, .3839, .4001, .3590],
@@ -67,6 +69,74 @@ CROSS: Dict[str, Dict[int, List[float]]] = {
         99:   [.4917, .4375, .4101, .3757, .3443, .3368, .2942],
     },
 }
+
+
+# --------------------------------------------------------------------------
+# Current data = the padding-FIXED sweep, loaded from disk.
+#
+# The literal tables above are the PRE-FIX sweep. They are kept because
+# compare_padding_fix.py needs them as its baseline, and because the paper
+# already cites them -- but nothing should analyse them as if they were
+# current. `OWN`/`CROSS` therefore point at the corrected data read from
+# results/raw/translator_sweep_3seed.jsonl, so figure and analysis scripts
+# that import them cannot silently regenerate pre-fix numbers.
+#
+# If the JSONL is absent we fall back to the literals and say so loudly,
+# rather than failing or pretending.
+# --------------------------------------------------------------------------
+
+_SWEEP_JSONL = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "..", "results", "raw",
+                            "translator_sweep_3seed.jsonl")
+
+
+def _load_fixed_sweep(path: str = _SWEEP_JSONL):
+    """Return (own, cross, provenance) from the corrected sweep, or None."""
+    if not os.path.exists(path):
+        return None
+    idx = {float(v): i for i, v in enumerate(L)}
+    acc_o = {a: {s: [[] for _ in L] for s in SEEDS} for a in ("native", "produced")}
+    acc_c = {a: {s: [[] for _ in L] for s in SEEDS} for a in ("native", "produced")}
+    n = 0
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                r = json.loads(line)
+            except json.JSONDecodeError:
+                continue          # truncated final line from an abrupt kill
+            a, sd_, lm = r.get("target"), r.get("seed"), r.get("lookahead_ms")
+            if a not in acc_o or sd_ not in SEEDS or float(lm) not in idx:
+                continue
+            i = idx[float(lm)]
+            acc_o[a][sd_][i].append(float(r["test_per"]))
+            acc_c[a][sd_][i].append(float(r["test_per_cross"]))
+            n += 1
+    own, cross = {}, {}
+    for a in acc_o:
+        own[a], cross[a] = {}, {}
+        for s in SEEDS:
+            if any(not v for v in acc_o[a][s]):
+                return None       # incomplete: refuse rather than half-fill
+            own[a][s] = [sum(v) / len(v) for v in acc_o[a][s]]
+            cross[a][s] = [sum(v) / len(v) for v in acc_c[a][s]]
+    return own, cross, {"source": path, "rows": n}
+
+
+_fixed = _load_fixed_sweep()
+if _fixed is not None:
+    OWN, CROSS, SWEEP_PROVENANCE = _fixed
+    SWEEP_IS_PADDING_FIXED = True
+else:
+    OWN, CROSS = OWN_PREFIX_BUG, CROSS_PREFIX_BUG
+    SWEEP_IS_PADDING_FIXED = False
+    SWEEP_PROVENANCE = {"source": "hardcoded PRE-FIX literals"}
+    print("WARNING: results/raw/translator_sweep_3seed.jsonl not found; "
+          "falling back to PRE-FIX tables. Any figure or statistic produced "
+          "now carries the zero-pad bug. See docs/PADDING_FIX_RESOLVED.md.",
+          file=sys.stderr)
 
 
 def margin(arm: str, seed: int) -> List[float]:

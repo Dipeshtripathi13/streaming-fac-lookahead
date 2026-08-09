@@ -70,12 +70,18 @@ def panel(ax, kind, title, ylabel):
 def main():
     fig, (a, b) = plt.subplots(1, 2, figsize=(9.4, 3.7))
 
-    panel(a, "per", "A  own-target PER: adjacent doublings are not resolved",
+    panel(a, "per", "A  own-target PER: every doubling resolves, 3/3 seeds",
           "test PER (speaker-disjoint)")
     # the step that mattered
     i0, i1 = L.index(160), L.index(320)
     y = mean([OWN["native"][s][i1] for s in SEEDS])
-    a.annotate("160$\\to$320 ms:\n$-$0.0009 PER,\n1/3 seeds improve",
+    # Computed, not hardcoded: this annotation previously asserted
+    # "-0.0009 PER, 1/3 seeds improve", which was a zero-pad artefact. Deriving
+    # it from OWN means it tracks the data instead of contradicting it.
+    _d = [OWN["native"][s][i1] - OWN["native"][s][i0] for s in SEEDS]
+    _mean = mean(_d)
+    _n_imp = sum(1 for v in _d if v < 0)
+    a.annotate(f"160$\\to$320 ms:\n${_mean:+.4f}$ PER,\n{_n_imp}/3 seeds improve",
                xy=(X[i1], y), xytext=(X[i0] - 0.55, y + 0.085),
                fontsize=7.4, color="#1b4f72",
                arrowprops=dict(arrowstyle="->", color="#1b4f72", lw=0.8))
@@ -93,6 +99,7 @@ def main():
            bbox=dict(boxstyle="round,pad=0.35", fc="white", ec="#999", lw=0.6))
 
     fig.suptitle("42 runs: 7 lookaheads $\\times$ 2 targets $\\times$ 3 seeds, "
+                 "padding-fixed, "
                  "1200 steps, frozen causal WavLM-base, Tesla T4",
                  fontsize=8.6, y=1.005, color="#444")
     fig.tight_layout()

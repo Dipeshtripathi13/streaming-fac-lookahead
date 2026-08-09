@@ -1,0 +1,180 @@
+
+============================================================
+  0. ENVIRONMENT
+============================================================
+repo   : /Users/dipeshtripathi/Desktop/accent_con/research
+log    : results/raw/tbuffer_20260809_165117.log
+ProductName:		macOS ProductVersion:		26.5 BuildVersion:		25F71 
+Apple M4
+Now drawing from 'AC Power'
+
+Audio devices are listed in stage 2. If the defaults are wrong, set them
+in System Settings > Sound before re-running.
+python : python3.11 (Python 3.11.15)
+installing sounddevice ...
+==> Running `brew cleanup portaudio`...
+Disable this behaviour by setting `HOMEBREW_NO_INSTALL_CLEANUP=1`.
+Hide these hints with `HOMEBREW_NO_ENV_HINTS=1` (see `man brew`).
+  [OK]   sounddevice
+
+============================================================
+  1. ESTIMATOR SELF-TEST  (no sound card needed)
+============================================================
+Validates cross-correlation delay recovery, low-confidence rejection,
+drift-vs-jitter separation, and the no-double-counting subtraction.
+bench_tbuffer self-test (no audio hardware required)
+  delay     0 ->     0  peak=1.000  ok
+  delay   137 ->   137  peak=1.000  ok
+  delay  1024 ->  1024  peak=1.000  ok
+  delay  5000 ->  5000  peak=1.000  ok
+  noisy/attenuated 911 -> 911  peak=0.649  ok
+  pure noise peak=0.0286 (want <0.2)  ok
+  clean stream buffer=0.000 ms (want ~0)  ok
+  spiky stream buffer=11.75 ms, max=11.80 (want spike visible)  ok
+  drifting clock buffer=0.000 ms, drift=0.100%  ok
+  capture_beyond_block(dev=40.0, block=40.0) = 0.0 (want 0.0)  ok
+  capture_beyond_block(dev=52.0, block=40.0) = 12.0 (want 12.0)  ok
+  capture_beyond_block(dev=10.0, block=40.0) = 0.0 (want 0.0)  ok
+
+ALL PASS
+  [OK]   self-test
+
+============================================================
+  2. DEVICE-REPORTED LATENCY
+============================================================
+== probe: device-reported latency ==
+{
+  "blocksize_frames": 1920,
+  "samplerate": 48000,
+  "default_device": "MacBook Pro Microphone",
+  "default_output": "MacBook Pro Speakers",
+  "low_input_ms": 412.354,
+  "low_output_ms": 267.292,
+  "low_reported_roundtrip_ms": 679.646,
+  "low_capture_beyond_block_ms": 372.354,
+  "high_input_ms": 412.354,
+  "high_output_ms": 267.292,
+  "high_reported_roundtrip_ms": 679.646,
+  "high_capture_beyond_block_ms": 372.354,
+  "caveat": "PortAudio-reported latency omits ADC/DAC group delay and undisclosed driver buffering. Treat as a lower bound; prefer loopback."
+}
+
+== t_buffer ==
+{
+  "source": "device-reported (LOWER BOUND -- not measured)",
+  "io_ms": 639.65,
+  "jitter_buffer_ms": 0.0,
+  "t_buffer_ms": 639.65,
+  "excludes": "block accumulation (40.0 ms), already counted in t_algorithmic as chunk_ms"
+}
+  [OK]   probe
+
+============================================================
+  3. CALLBACK JITTER  (30 s duplex stream)
+============================================================
+Measures how late callbacks actually arrive; the tail sets the buffer.
+
+== jitter: 30s duplex stream ==
+{
+  "n": 748.0,
+  "measured_period_ms": 40.00000863730683,
+  "nominal_period_ms": 40.0,
+  "clock_drift_pct": 2.1593267067743227e-05,
+  "lateness_p50_ms": 0.0028913802057104476,
+  "lateness_p95_ms": 0.04665683236107725,
+  "lateness_p99_ms": 0.06482865511627087,
+  "lateness_max_ms": 0.16588273050183489,
+  "gap_max_ms": 40.158666998147964,
+  "late_callback_rate": 0.0,
+  "target_underrun_prob": 0.001,
+  "required_buffer_ms": 0.1434691711352838,
+  "dropped_warmup_callbacks": 5.0,
+  "xrun_statuses": [],
+  "xrun_count": 0.0
+}
+
+== t_buffer ==
+{
+  "source": "unavailable"
+}
+  [OK]   jitter
+
+============================================================
+  4. ACOUSTIC LOOPBACK  (ground truth)
+============================================================
+You will hear ~20 short chirps. Unmute the speaker.
+Default assumes ~30 cm from speaker to mic; edit --distance-m if not.
+
+wrote results/raw/tbuffer_m4.json
+== probe: device-reported latency ==
+{
+  "blocksize_frames": 1920,
+  "samplerate": 48000,
+  "default_device": "MacBook Pro Microphone",
+  "default_output": "MacBook Pro Speakers",
+  "low_input_ms": 412.354,
+  "low_output_ms": 267.292,
+  "low_reported_roundtrip_ms": 679.646,
+  "low_capture_beyond_block_ms": 372.354,
+  "high_input_ms": 412.354,
+  "high_output_ms": 267.292,
+  "high_reported_roundtrip_ms": 679.646,
+  "high_capture_beyond_block_ms": 372.354,
+  "caveat": "PortAudio-reported latency omits ADC/DAC group delay and undisclosed driver buffering. Treat as a lower bound; prefer loopback."
+}
+
+== jitter: 30s duplex stream ==
+{
+  "n": 747.0,
+  "measured_period_ms": 40.000016882435844,
+  "nominal_period_ms": 40.0,
+  "clock_drift_pct": 4.220608960991967e-05,
+  "lateness_p50_ms": 0.0023357164027402177,
+  "lateness_p95_ms": 0.049927060368645464,
+  "lateness_p99_ms": 0.07110317514516275,
+  "lateness_max_ms": 0.43619592415052466,
+  "gap_max_ms": 40.328666001558304,
+  "late_callback_rate": 0.0,
+  "target_underrun_prob": 0.001,
+  "required_buffer_ms": 0.19102368128350644,
+  "dropped_warmup_callbacks": 5.0,
+  "xrun_statuses": [],
+  "xrun_count": 0.0
+}
+
+== loopback (acoustic @0.3 m): 20 chirps ==
+{
+  "reps": 20,
+  "accepted": 0,
+  "rejected_low_correlation": 20,
+  "min_peak_threshold": 0.2,
+  "peak_p50": 0.0458,
+  "air_propagation_ms": 0.875,
+  "distance_m": 0.3,
+  "error": "every rep failed the correlation threshold. Raise --amplitude, unmute the speaker, or check that input/output are real devices."
+}
+
+== t_buffer ==
+{
+  "source": "device-reported (LOWER BOUND -- not measured)",
+  "io_ms": 639.65,
+  "jitter_buffer_ms": 0.19,
+  "t_buffer_ms": 639.84,
+  "excludes": "block accumulation (40.0 ms), already counted in t_algorithmic as chunk_ms"
+}
+  [OK]   loopback
+
+============================================================
+  DONE
+============================================================
+All stages completed.
+
+Measured t_buffer is the 'verdict' block in:
+  results/raw/tbuffer_m4.json
+
+If 'source' says 'device-reported (LOWER BOUND)', the loopback did not
+succeed and the number should not be cited as measured -- check that the
+speaker was unmuted and rerun stage 4.
+
+Log: results/raw/tbuffer_20260809_165117.log
+This window can be closed.

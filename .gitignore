@@ -22,3 +22,8 @@ results/raw/_superseded/
 .DS_Store
 results/synth/
 results/listening_test/
+
+# Hypothesis dumps: the extracted per-condition JSON under results/raw/hyps/ is
+# the source of truth for the listening test. The zips are redundant with it and
+# never delta-compress, so they stay out of history.
+results/raw/*hyps*.zip

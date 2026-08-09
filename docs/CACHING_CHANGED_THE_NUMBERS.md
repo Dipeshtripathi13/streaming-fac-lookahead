@@ -1,6 +1,13 @@
 # The feature cache is not numerically neutral — and it looks like a bug fix
 
-**Status: open. Must be resolved before the 3-seed numbers go in the paper.**
+**Status: RESOLVED (9 Aug 2026). See `docs/PADDING_FIX_RESOLVED.md`.**
+
+> Answer: candidate 2 (zero-pad contamination) was correct, and the effect
+> was *not* a constant offset. Fixing it changed the shape of the PER curve
+> (16.4x the measured noise floor), strengthened the endpoint gain from
+> 47.6% to 63.2% relative, and reversed RQ1's 'no knee' finding. H3 was
+> unaffected because it lives on a difference. Do not cite the pre-fix
+> absolute PERs.
 
 ## What happened
 

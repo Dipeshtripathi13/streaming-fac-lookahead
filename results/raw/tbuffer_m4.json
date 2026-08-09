@@ -1,0 +1,64 @@
+{
+  "schema": "tbuffer/1",
+  "timestamp": "2026-08-09T16:52:00",
+  "platform": {
+    "system": "Darwin",
+    "machine": "arm64",
+    "release": "25.5.0",
+    "python": "3.11.15"
+  },
+  "config": {
+    "samplerate": 48000,
+    "blocksize_ms": 40.0,
+    "chunk_ms": 40.0
+  },
+  "probe": {
+    "blocksize_frames": 1920,
+    "samplerate": 48000,
+    "default_device": "MacBook Pro Microphone",
+    "default_output": "MacBook Pro Speakers",
+    "low_input_ms": 412.354,
+    "low_output_ms": 267.292,
+    "low_reported_roundtrip_ms": 679.646,
+    "low_capture_beyond_block_ms": 372.354,
+    "high_input_ms": 412.354,
+    "high_output_ms": 267.292,
+    "high_reported_roundtrip_ms": 679.646,
+    "high_capture_beyond_block_ms": 372.354,
+    "caveat": "PortAudio-reported latency omits ADC/DAC group delay and undisclosed driver buffering. Treat as a lower bound; prefer loopback."
+  },
+  "jitter": {
+    "n": 747.0,
+    "measured_period_ms": 40.000016882435844,
+    "nominal_period_ms": 40.0,
+    "clock_drift_pct": 4.220608960991967e-05,
+    "lateness_p50_ms": 0.0023357164027402177,
+    "lateness_p95_ms": 0.049927060368645464,
+    "lateness_p99_ms": 0.07110317514516275,
+    "lateness_max_ms": 0.43619592415052466,
+    "gap_max_ms": 40.328666001558304,
+    "late_callback_rate": 0.0,
+    "target_underrun_prob": 0.001,
+    "required_buffer_ms": 0.19102368128350644,
+    "dropped_warmup_callbacks": 5.0,
+    "xrun_statuses": [],
+    "xrun_count": 0.0
+  },
+  "loopback": {
+    "reps": 20,
+    "accepted": 0,
+    "rejected_low_correlation": 20,
+    "min_peak_threshold": 0.2,
+    "peak_p50": 0.0458,
+    "air_propagation_ms": 0.875,
+    "distance_m": 0.3,
+    "error": "every rep failed the correlation threshold. Raise --amplitude, unmute the speaker, or check that input/output are real devices."
+  },
+  "verdict": {
+    "source": "device-reported (LOWER BOUND -- not measured)",
+    "io_ms": 639.65,
+    "jitter_buffer_ms": 0.19,
+    "t_buffer_ms": 639.84,
+    "excludes": "block accumulation (40.0 ms), already counted in t_algorithmic as chunk_ms"
+  }
+}

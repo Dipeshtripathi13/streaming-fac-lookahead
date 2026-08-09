@@ -121,6 +121,63 @@ not test. Both positive and negative results are publishable — see §11.
 > (~0.08 per doubling, peaking at 100–200 ms), not an operating point.
 > Caveat: representation drift, not conversion quality — the trained sweep is
 > the real test.
+>
+> **THE TRAINED SWEEP NOW ANSWERS IT (§7 F14, 42 conditions, padding-fixed):
+> curvature is real in the conversion arm, and its location is not
+> identifiable at 7 points.** BIC prefers two segments (native ΔBIC = −10.1,
+> produced −7.4) where the pre-fix data preferred log-linear (+5.3). So H1's
+> third branch — "no knee" — is **withdrawn**: it was an artefact of the
+> zero-pad bug, which damaged large-lookahead conditions most and so flattened
+> the curve.
+>
+> **But do not print a knee location.** It moves with an arbitrary modelling
+> choice — where L=0 sits on a log axis:
+>
+> | treatment of L=0 | native | produced |
+> |---|---|---|
+> | all 7 points, log₂(L+1) | 40 ms (ΔBIC −10.1) | 40 ms (−7.4) |
+> | L=0 dropped | 160 ms (−9.2) | **no knee** (−4.0) |
+> | L=0 placed at 10 ms | 160 ms (−10.8) | **no knee** (−3.4) |
+>
+> On log₂(L+1) the L=0→20 ms gap is 4.39 units while every other gap is ~1.0,
+> so a piecewise fit puts its breakpoint just past that gap whatever the data
+> does. The power check confirms mislocalisation: a planted 0.05 cliff at 81 ms
+> is "detected" at 40 ms. Right conclusion, wrong place.
+>
+> **RQ1 IS NOW ANSWERED — and the answer is none of H1's three branches
+> (§7 F15, `docs/DENSE_SWEEP_RQ1_ANSWERED.md`).** The dense sweep — 16
+> lookaheads × 2 seeds, 0–200 ms in 20 ms steps plus 240/280/320/480/640 —
+> settles it:
+>
+> **There is curvature but no locatable knee, and a saturation point at
+> ~240 ms.** All three axis treatments prefer piecewise decisively (ΔBIC −22,
+> −31, −37) yet the breakpoint moves (40, 180, 180 ms) and every bootstrap
+> interval spans ~3 octaves. **Sixteen points did not rescue a knee**, which is
+> the finding: the earlier "7 points are underpowered" diagnosis was right about
+> the power and wrong about the cause. The curve is smoothly curved, not
+> piecewise, and a breakpoint estimator asked for a breakpoint always returns
+> one.
+>
+> What to report instead, both stable and citable:
+>
+> - **Exchange rate: −0.0452 PER per doubling of lookahead, R² = 0.983**
+>   (n = 15, L = 20–640 ms).
+> - **Saturation at ~240 ms**: marginal gain per added 20 ms frame stays above
+>   the measured 2σ = 0.0044 floor until 240 ms, and is below it for every step
+>   thereafter. Read as 200–280 ms, not a sharp figure — the 140→160 and
+>   180→200 steps are already only 1.0–1.5× the floor.
+> - **The cost of the field's 40 ms budget: ~40% of the achievable PER
+>   reduction** (0.3275 at 40 ms → 0.1973 at 240 ms, a 39.7% relative
+>   reduction forgone; 52.3% out to 640 ms).
+>
+> So "current budgets are under-provisioned" is now supported on the **trained
+> conversion curve**, not merely on encoder drift — and it converges with F8's
+> independent encoder-level estimate of best marginal return at 100–200 ms.
+>
+> H1's branches (knee ≫ 40 / knee ≤ 40 / no knee) were the wrong trichotomy:
+> the outcome is *smooth diminishing returns with a measurable saturation
+> point*. Record that as a pre-registration lesson rather than quietly
+> reclassifying it.
 
 *Two methodological notes that belong in the paper, both from getting this
 wrong first (§7 F8):* **(a)** lookahead is quantised to `ceil(L/frame_ms)`
@@ -157,19 +214,29 @@ conditions that reweight the fit. **(b)** A 7-point geometric grid is
 >
 > **ANSWERED (§7 F12/F13, 42 conditions = 3 seeds on a T4): H3 SUPPORTED.**
 > The conversion-trained model's preference for canonical over produced phones
-> grows **monotonically in 3/3 seeds** (+.032 at L=0 → +.101 at L=640; 18/18
+> grows **monotonically in 3/3 seeds** (+.032 at L=0 → +.099 at L=640; 18/18
 > adjacent step × seed comparisons positive, sign p=7.6e-6), while the
 > transcription control is 0/3 monotone and drifts *down*. Paired by seed the
 > gap is t(2)=+41. At matched own-target PER the conversion margin is 3.46× the
 > transcription margin for L≥160 ms and 0.88× at L=0, so lookahead — not
 > accuracy — creates the divergence.
 >
-> **What three seeds took away:** PER itself is too seed-noisy to carry
-> per-condition claims. Blocked on seed, only 0→20 ms is resolved at α=.05;
-> 160→320 ms is −0.0009 PER with 1/3 seeds improving, so F11's mid-range
-> plateau was noise. The 0→640 ms endpoint (−0.212 ± 0.018, t(2)=+20) holds.
-> Superseded F11's 1.48× / 2.8× framing: those came from one seed and the
-> margin, not the PER ratio, is the defensible statistic.
+> **SUPERSEDED by the padding fix (§7 F14, `docs/PADDING_FIX_RESOLVED.md`).**
+> The paragraph that stood here said PER was too seed-noisy to carry
+> per-condition claims, that only 0→20 ms resolved at α=.05, and that the
+> mid-range plateau was noise. All three statements were consequences of the
+> MaskedBlock zero-pad bug, not of PER. On the corrected sweep:
+>
+> - **All six adjacent steps resolve**, in both arms, unanimous across 3/3
+>   seeds (native: −.058, −.042, −.050, −.054, −.036, −.028).
+> - The apparent 160→320 ms plateau is gone: **−.036 PER, 3/3 seeds**. The
+>   earlier −0.0009 with 1/3 seeds improving was an artefact.
+> - Endpoint 0→640 ms strengthens to **−0.270 ± 0.0007, 63.2% relative**
+>   (was −0.212 ± 0.018, 47.6%). The seed SD fell 26×.
+>
+> PER is *not* too seed-noisy. It looked that way because the bug was itself a
+> seed-varying noise source. The margin remains the right statistic for H3 —
+> but for the reason given in F14, not because PER is unusable.
 >
 > **The test, available now:** the same causal phone translator trained
 > against the CANONICAL phone sequence (`g2p`) versus the PRODUCED one (`ipa`).
@@ -491,6 +558,93 @@ conversion quality (the trained sweep is the real test); 7 geometric points
 cannot see a knee narrower than an octave, and denser sampling costs 37 s; and
 the 1−CKA variant does register a knee at R² = 0.987, so the two metrics
 disagree at the margin.
+
+### F14 — a padding bug was flattening the curve, and fixing it changed RQ1's answer
+
+Full write-up: `docs/PADDING_FIX_RESOLVED.md`. This supersedes the open question
+in `docs/CACHING_CHANGED_THE_NUMBERS.md`.
+
+`MaskedBlock` handed a zero-padded hidden-state tensor to a depthwise
+convolution and feed-forward that do not respect the key-padding mask. The
+42-condition sweep was re-run on the fixed code with everything else held —
+same seeds, steps, batch, chunk, device class, feature-cache path — and the
+comparability guard confirmed no hyperparameter drift.
+
+**It was not a constant offset, which is the only case that would have been
+harmless.** The correction grows with lookahead: −0.014 PER at L=0 rising to
+−0.086 at L=320, a spread of 0.072 against a measured noise floor of 0.0044
+(**16.4×**; slope −3.98 SE from zero; 42/42 cells improved). The bug did most
+of its damage where lookahead was longest, so the old curve **understated the
+benefit of lookahead** — biasing RQ1's central quantity toward "lookahead does
+not help much."
+
+Consequences: all six adjacent steps now resolve in both arms and are unanimous
+across seeds; the endpoint gain strengthens to −0.270 ± 0.0007 (63.2% relative,
+from 47.6%) with seed SD down 26×; the L=160→320 ms "plateau" was an artefact
+and must not be explained in the paper; and BIC now prefers a two-segment fit,
+so H1's "no knee" branch is withdrawn — with the location caveat in §3.
+
+**H3 is untouched, and by construction rather than luck.** It lives on the
+preference margin (cross − own), and the bug moved both PERs together, so it
+cancels in the difference: margin growth 0→640 ms is +0.0665 against +0.0690
+before, still 3/3 monotone and 18/18 positive. The claim the paper leans on
+hardest is the one this bug could never have manufactured — an argument for
+building headline claims on differences rather than levels.
+
+**A fixed-seed non-determinism floor, measured by accident.** Two sweep
+processes briefly ran concurrently (operator error), repeating 6 conditions at
+identical seed and configuration — the only direct estimate of run-to-run noise
+available, and one a 3-seed design cannot produce. Differences ranged 0.00015 to
+0.00649 PER, giving σ = **0.0022** and a 2σ resolvable threshold of **0.0044**.
+Pairing within seed does not remove this, because it is present *at* fixed seed.
+It belongs in methods, and it retires the inherited "resolution floor ≈ 0.01
+PER" framing: the paired-by-seed SDs are now 0.001–0.006.
+
+*Process note worth one line in the paper's reproducibility section:* the
+summary JSON was written only after all 42 runs, so a runtime failure late in
+the sweep destroyed every earlier result — which happened once, at run 41 of 42.
+The trainer now appends each condition to a JSONL as it completes, flushed and
+fsynced. Long sweeps on pre-emptible hardware need per-unit durability, not
+end-of-run durability.
+
+### F15 — sixteen points, and still no knee: RQ1 answered on the trained curve
+
+Full write-up: `docs/DENSE_SWEEP_RQ1_ANSWERED.md`. Figure:
+`results/figures/fig_dense_no_knee.png`. This supersedes F14's knee claim.
+
+32 runs (16 lookaheads × 2 seeds, native arm, padding-fixed, 1200 steps, T4).
+Grid is 20 ms, not 10: lookahead quantises to `ceil(L/frame_ms)` frames at a
+20 ms frame rate, so sub-frame steps duplicate conditions and reweight the fit.
+Verified: zero `t_algorithmic` collisions across all 16 conditions, so every
+point is a genuinely distinct budget.
+
+**The knee is withdrawn.** ΔBIC prefers a two-segment fit under all three
+treatments of L=0 (−22.2, −31.2, −36.8) but the breakpoint lands at 40, 180 and
+180 ms respectively, and every bootstrap 90% interval spans ~3 octaves. None is
+identifiable. Denser sampling was the obvious remedy and it did not work,
+because the curve is smoothly curved rather than piecewise.
+
+*Methodological finding worth its own sentence in the paper:* **a breakpoint
+estimator asked to find a breakpoint returns one whether or not one exists.**
+ΔBIC alone cannot distinguish "there is a knee" from "piecewise fits a curve
+better than a line does". Identifiability has to be tested by perturbing the
+x-axis and bootstrapping the location. Our own synthetic check reproduces the
+artefact exactly: on a curve that is log-linear for L ≥ 20 with L=0 off the
+extrapolation, including L=0 yields ΔBIC −39 and a confident "knee at 40 ms",
+while dropping it yields ΔBIC +5 and no knee at all.
+
+**What replaces it.** Exchange rate −0.0452 PER per doubling (R² = 0.983,
+L = 20–640). Saturation at ~240 ms, defined as the lookahead beyond which every
+marginal 20 ms frame buys less than the measured 2σ = 0.0044 floor — a
+floor-relative, axis-independent quantity. And the headline for the gap
+argument: **a 40 ms budget forgoes ~40% of the achievable PER reduction**
+(0.3275 → 0.1973 at 240 ms).
+
+Caveat that must travel with it: this sweep has **zero repeated cells**, so the
+noise floor is imported from the 3-seed run's accidental repeats rather than
+re-measured. Median seed spread here is 0.0039 (max 0.0074), consistent with the
+imported 0.0044 but not independent confirmation. Deliberately repeating 3–4
+conditions would close that gap for ~15 minutes of GPU time.
 
 ### Scope of all of the above
 
