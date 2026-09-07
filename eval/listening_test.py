@@ -259,9 +259,28 @@ def bradley_terry(wins: Dict[Tuple[str, str], int], conds: Sequence[str],
 
 
 def score(votes_csv: str, manifest: Optional[str], boot: int) -> None:
-    rows = list(csv.DictReader(open(votes_csv)))
+    # Each rater downloads their OWN csv from the browser, so the realistic
+    # input is a directory or a glob, not one file. Accept all three and merge,
+    # rather than making the operator concatenate by hand and get the repeated
+    # header rows wrong.
+    if os.path.isdir(votes_csv):
+        paths = sorted(glob.glob(os.path.join(votes_csv, "*.csv")))
+    else:
+        paths = sorted(glob.glob(votes_csv)) or [votes_csv]
+    rows: List[dict] = []
+    for path in paths:
+        rows.extend(csv.DictReader(open(path)))
+    if len(paths) > 1:
+        print(f"merged {len(paths)} vote files")
     if not rows:
-        sys.exit("no votes")
+        sys.exit(f"no votes in {votes_csv}")
+
+    # A rater id collision across separately-downloaded files would silently
+    # pool two people. The ids are random 8-char strings, so a collision is
+    # unlikely but not impossible, and it would be invisible.
+    if len({r["rater"] for r in rows}) < len(paths):
+        print("  WARNING: fewer distinct rater ids than vote files -- check for "
+              "a duplicated or re-submitted file")
     print(f"{len(rows)} votes from {len({r['rater'] for r in rows})} raters")
 
     # attention checks first: drop raters who fail
