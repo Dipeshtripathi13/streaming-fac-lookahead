@@ -60,6 +60,64 @@ def raspberry_pi_model() -> Optional[str]:
     return None
 
 
+def android_device() -> Optional[Dict[str, str]]:
+    """Identify an Android host, including under Termux.
+
+    This matters more than it looks. On Termux `platform.system()` is "Linux"
+    and `platform.machine()` is "aarch64", which is EXACTLY what a Neoverse
+    cloud instance reports -- so without this a phone is silently filed as
+    `cpu-arm64` and pooled with a datacentre VM. The two are not the same
+    hardware class and must never share a label.
+    """
+    hints = []
+    if os.environ.get("ANDROID_ROOT") or os.environ.get("ANDROID_DATA"):
+        hints.append("env")
+    if "com.termux" in (os.environ.get("PREFIX", "") or ""):
+        hints.append("termux")
+    if os.path.exists("/system/build.prop"):
+        hints.append("build.prop")
+    if not hints:
+        return None
+    out = {"detected_by": ",".join(hints)}
+    for key, prop in (("model", "ro.product.model"),
+                      ("brand", "ro.product.brand"),
+                      ("soc", "ro.soc.model"),
+                      ("soc_manufacturer", "ro.soc.manufacturer"),
+                      ("android_release", "ro.build.version.release")):
+        v = _sh(f"getprop {prop}")
+        if v:
+            out[key] = v
+    return out
+
+
+def cpu_core_layout() -> Dict[str, object]:
+    """Per-core maximum frequency, which is how a big.LITTLE split shows up.
+
+    F4 (num_threads = cpu_count is the wrong default) is a big.LITTLE finding,
+    and a phone is the most big.LITTLE device most people own. Recording the
+    cluster layout is what lets a thread-count result be interpreted rather
+    than merely reported.
+    """
+    out: Dict[str, object] = {}
+    freqs = []
+    try:
+        import glob as _glob
+        for path in sorted(_glob.glob("/sys/devices/system/cpu/cpu[0-9]*/cpufreq/cpuinfo_max_freq")):
+            try:
+                freqs.append(int(open(path).read().strip()) // 1000)
+            except Exception:
+                pass
+    except Exception:
+        pass
+    if freqs:
+        out["max_freq_mhz_per_cpu"] = freqs
+        clusters = sorted(set(freqs))
+        out["distinct_max_freqs_mhz"] = clusters
+        out["is_big_little"] = len(clusters) > 1
+        out["n_cores"] = len(freqs)
+    return out
+
+
 def mem_total_gb() -> Optional[float]:
     s = platform.system()
     if s == "Linux":
@@ -95,6 +153,35 @@ def thermal_state() -> Dict[str, object]:
             out["thermal_zone0_c"] = int(f.read().strip()) / 1000.0
     except Exception:
         pass
+    # Android has no vcgencmd equivalent, so the throttle evidence has to be
+    # reconstructed: current clock against each core's own maximum. A sustained
+    # ratio well below 1.0 is the phone's version of `throttled != 0x0`.
+    try:
+        import glob as _glob
+        cur, mx = [], []
+        for c in sorted(_glob.glob("/sys/devices/system/cpu/cpu[0-9]*/cpufreq")):
+            try:
+                cur.append(int(open(c + "/scaling_cur_freq").read().strip()))
+                mx.append(int(open(c + "/cpuinfo_max_freq").read().strip()))
+            except Exception:
+                pass
+        if cur and mx and sum(mx):
+            out["cpu_cur_over_max"] = round(sum(cur) / sum(mx), 3)
+            out["scaling_cur_freq_mhz"] = [v // 1000 for v in cur]
+    except Exception:
+        pass
+    zones = []
+    try:
+        import glob as _glob
+        for z in sorted(_glob.glob("/sys/class/thermal/thermal_zone*/temp")):
+            try:
+                zones.append(int(open(z).read().strip()) / 1000.0)
+            except Exception:
+                pass
+    except Exception:
+        pass
+    if zones:
+        out["thermal_zones_c_max"] = max(zones)
     if platform.system() == "Darwin":
         out["note"] = "macOS: no user-space throttle counter; run `pmset -g thermlog` alongside"
     return out
@@ -206,6 +293,8 @@ def probe(run_calibration: bool = True) -> Dict[str, object]:
             "memcpy_64mb": bench_memcpy(),
             "single_core": bench_single_core(),
         }
+    d["android"] = android_device()
+    d["core_layout"] = cpu_core_layout()
     d["hw_class"] = classify(d)
     return d
 
@@ -218,6 +307,8 @@ def classify(d: Dict[str, object]) -> str:
         return "gpu"
     if d.get("pi_model"):
         return "embedded-pi"
+    if d.get("android"):
+        return "mobile-android"   # never fall through to cpu-arm64: see android_device()
     if sysname == "Darwin" and mach in ("arm64", "aarch64"):
         return "cpu-apple-silicon"
     if mach in ("aarch64", "arm64"):
@@ -227,11 +318,55 @@ def classify(d: Dict[str, object]) -> str:
     return "unknown"
 
 
+
+def _self_test() -> int:
+    """Exercise classify() on synthetic hosts. The phone cases matter most:
+    they cannot be tested on the machine that writes them."""
+    print("hardware_probe self-test")
+    cases = [
+        ("Android phone under Termux",
+         {"system": "Linux", "machine": "aarch64", "libs": {},
+          "android": {"model": "Pixel 7"}}, "mobile-android"),
+        ("Android phone must NOT be filed as cpu-arm64",
+         {"system": "Linux", "machine": "aarch64", "libs": {},
+          "android": {"model": "SM-S911B"}}, "mobile-android"),
+        ("ARM64 cloud VM (no android markers)",
+         {"system": "Linux", "machine": "aarch64", "libs": {}}, "cpu-arm64"),
+        ("Raspberry Pi still wins over arm64",
+         {"system": "Linux", "machine": "aarch64", "libs": {},
+          "pi_model": "Raspberry Pi 5 Model B"}, "embedded-pi"),
+        ("GPU beats everything",
+         {"system": "Linux", "machine": "x86_64", "libs": {"torch_cuda": True},
+          "android": {"model": "x"}}, "gpu"),
+        ("Apple Silicon Mac",
+         {"system": "Darwin", "machine": "arm64", "libs": {}}, "cpu-apple-silicon"),
+        ("x86 laptop",
+         {"system": "Linux", "machine": "x86_64", "libs": {}}, "cpu-x86"),
+    ]
+    ok = True
+    for name, d, want in cases:
+        got = classify(d)
+        good = got == want
+        ok &= good
+        print(f"  {name:<48s} {'ok' if good else 'FAIL'} ({got})")
+    layout = cpu_core_layout()
+    print(f"  cpu_core_layout() returns a dict on this host       "
+          f"{'ok' if isinstance(layout, dict) else 'FAIL'}")
+    th = thermal_state()
+    print(f"  thermal_state() returns a dict on this host         "
+          f"{'ok' if isinstance(th, dict) else 'FAIL'}")
+    print("\nALL PASS" if ok else "\nFAILURES ABOVE")
+    return 0 if ok else 1
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
+    ap.add_argument("--self-test", action="store_true")
     ap.add_argument("--out", default=None)
     ap.add_argument("--no-calibration", action="store_true")
     a = ap.parse_args()
+    if getattr(a, "self_test", False):
+        raise SystemExit(_self_test())
     d = probe(run_calibration=not a.no_calibration)
     txt = json.dumps(d, indent=2, default=str)
     print(txt)
