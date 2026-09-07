@@ -37,10 +37,40 @@ server under one label.
 `--self-test` cases exist solely to pin that ordering, because they cannot be
 tested on the machine that writes them.
 
+## Getting a Python on the phone
+
+**Do not use the Play Store Termux.** It was abandoned around 2020 when Google
+policy blocked apps that download executable code; it is frozen at v0.101 and
+`pkg install` fails because the repositories moved. It installs fine and then
+breaks at the second step, which is the worst way for a dependency to fail.
+
+If the F-Droid install errors with a vague "App not installed", the usual cause
+is a **signature conflict**: an older Play Store Termux is still present under
+the same package name but a different signing key. Uninstall it first. Also
+check Settings -> Apps -> Special access -> Install unknown apps.
+
+Simplest route, skipping the F-Droid client entirely: take the APK from
+`github.com/termux/termux-app/releases` (`...arm64-v8a.apk`). Same app, same
+key.
+
+Fallbacks if Termux cannot be made to work, both on the Play Store:
+
+| runtime | how it differs | caveat |
+|---|---|---|
+| **UserLAnd** | real Debian/Ubuntu userspace; `apt install python3 python3-numpy` | runs under proot, so `/system` may not be mounted inside the guest |
+| **Pydroid 3** | bundles Python and numpy, runs natively | no git; copy the repo across manually |
+
+`android_device()` therefore checks **six independent signals** -- `ANDROID_ROOT`
+/`ANDROID_DATA`, a `com.termux` PREFIX, `/system/build.prop`, `/system/bin`,
+"android" in `/proc/version`, and Android filesystem markers -- so that any of
+the three runtimes is recognised. Two `--self-test` cases assert that the env
+signal alone and the Termux signal alone are each sufficient, because the
+failure is silent: an undetected phone is filed as `cpu-arm64` and averaged in
+with a datacentre VM.
+
 ## Android (primary path)
 
-1. Install **Termux** from F-Droid, not the Play Store build (that one is
-   stale and its package set is broken).
+1. Install **Termux**, by whichever of the routes above works.
 2. ```bash
    pkg update && pkg install python clang cmake libopenblas
    pip install numpy onnxruntime

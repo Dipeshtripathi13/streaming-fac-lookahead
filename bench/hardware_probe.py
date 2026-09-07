@@ -69,6 +69,12 @@ def android_device() -> Optional[Dict[str, str]]:
     `cpu-arm64` and pooled with a datacentre VM. The two are not the same
     hardware class and must never share a label.
     """
+    # Deliberately several independent signals. Termux sets ANDROID_ROOT and a
+    # com.termux PREFIX; a proot distro (UserLAnd) may expose neither, because
+    # /system is not always mounted inside the guest rootfs; a plain Python app
+    # host (Pydroid) sets the env but has no PREFIX. Detection has to survive
+    # all three, because the failure mode is silent: an undetected phone is
+    # filed as `cpu-arm64` and pooled with a datacentre VM.
     hints = []
     if os.environ.get("ANDROID_ROOT") or os.environ.get("ANDROID_DATA"):
         hints.append("env")
@@ -76,6 +82,19 @@ def android_device() -> Optional[Dict[str, str]]:
         hints.append("termux")
     if os.path.exists("/system/build.prop"):
         hints.append("build.prop")
+    if os.path.isdir("/system/bin") or os.path.exists("/system/bin/getprop"):
+        hints.append("system-bin")
+    try:
+        # proot distros keep the host kernel, and Android kernels announce
+        # themselves in the version string even when /system is hidden.
+        with open("/proc/version") as f:
+            v = f.read().lower()
+        if "android" in v:
+            hints.append("proc-version")
+    except Exception:
+        pass
+    if os.path.exists("/dev/socket/adbd") or os.path.isdir("/data/dalvik-cache"):
+        hints.append("android-fs")
     if not hints:
         return None
     out = {"detected_by": ",".join(hints)}
@@ -349,6 +368,26 @@ def _self_test() -> int:
         good = got == want
         ok &= good
         print(f"  {name:<48s} {'ok' if good else 'FAIL'} ({got})")
+    # Each detection signal must independently be enough. These stand in for
+    # the three runtimes (Termux / proot distro / app host) that cannot all be
+    # tested from a laptop.
+    import unittest.mock as _mock
+    for sig, patch in (
+        ("env only (Pydroid-like)", {"ANDROID_ROOT": "/system"}),
+        ("termux PREFIX only", {"PREFIX": "/data/data/com.termux/files/usr"}),
+    ):
+        with _mock.patch.dict(os.environ, patch, clear=True):
+            got = android_device()
+            good = got is not None
+            ok &= good
+            print(f"  detected via {sig:<34s} {'ok' if good else 'FAIL'} ({got})")
+    with _mock.patch.dict(os.environ, {}, clear=True):
+        got = android_device()
+        good = got is None
+        ok &= good
+        print(f"  no android signals -> None (this Mac)              "
+              f"{'ok' if good else 'FAIL'} ({got})")
+
     layout = cpu_core_layout()
     print(f"  cpu_core_layout() returns a dict on this host       "
           f"{'ok' if isinstance(layout, dict) else 'FAIL'}")
