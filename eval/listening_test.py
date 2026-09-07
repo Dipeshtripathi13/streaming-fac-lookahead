@@ -126,6 +126,24 @@ def build(hyp_dir: str, out_dir: str, n_utts: int, seed: int,
                             "n_phones": len(phones),
                             "duration_s": meta["duration_s"]})
 
+    # An utterance whose canonical (g2p) and produced (ipa) phone strings are
+    # identical yields two IDENTICAL clips -- synthesis is deterministic. Using
+    # that as the attention check asks a rater which of two identical sounds is
+    # more native, and then DROPS them for guessing wrong. One of twelve pairs
+    # was degenerate this way in the first build, which is enough to fail an
+    # honest listener and would have silently discarded paid raters too.
+    degenerate = set()
+    for ui in sorted({s["utt"] for s in stimuli}):
+        got = {s["cond"]: s for s in stimuli if s["utt"] == ui}
+        if "ceiling" in got and "floor" in got:
+            fa = os.path.join(audio_dir, got["ceiling"]["file"])
+            fb = os.path.join(audio_dir, got["floor"]["file"])
+            if open(fa, "rb").read() == open(fb, "rb").read():
+                degenerate.add(ui)
+    if degenerate:
+        print(f"  {len(degenerate)} utterance(s) have identical ceiling/floor "
+              f"audio and are excluded as attention checks: {sorted(degenerate)}")
+
     # balanced pair sampling within each utterance
     conds = sorted({s["cond"] for s in stimuli})
     pairs: List[Dict[str, object]] = []
@@ -135,7 +153,8 @@ def build(hyp_dir: str, out_dir: str, n_utts: int, seed: int,
             x, y = (a, b) if rng.random() < .5 else (b, a)
             pairs.append({"utt": ui, "A": got[x]["file"], "B": got[y]["file"],
                           "cond_A": x, "cond_B": y,
-                          "is_attention_check": {x, y} == {"ceiling", "floor"}})
+                          "is_attention_check": ({x, y} == {"ceiling", "floor"}
+                                                 and ui not in degenerate)})
     rng.shuffle(pairs)
 
     manifest = {"target": target, "lookaheads_ms": Ls, "conditions": conds,
