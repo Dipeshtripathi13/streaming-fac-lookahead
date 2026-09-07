@@ -1,0 +1,20 @@
+{
+  "slope_deviation": -0.05204824287793718,
+  "slope_unchanged": -0.039358081511536344,
+  "difference": -0.012690161366400839,
+  "ratio": 1.3224283521716167,
+  "speaker_bootstrap": {
+    "n": 2000,
+    "ci95": [
+      -0.021080471646521368,
+      -0.006945344547007494
+    ],
+    "frac_deviation_steeper": 1.0,
+    "excludes_zero": true
+  },
+  "phone_matched": {
+    "n_phones": 35,
+    "mean_difference": -0.00976283508686124,
+    "n_deviation_steeper": 26
+  }
+}
