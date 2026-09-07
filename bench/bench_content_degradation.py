@@ -254,12 +254,15 @@ class MaskInjector:
         return m
 
     def _wrap_mha(self, orig):
-        def mha(hidden_states, attention_mask, gated_position_bias,
-                output_attentions, *a, **kw):
+        # transformers <=5.15 called this with a positional `output_attentions`;
+        # 5.16 dropped it. Take the trailing arguments as *a and pass them
+        # straight through, so one wrapper serves both signatures -- a pinned
+        # version would otherwise silently decide whether the mask is applied.
+        def mha(hidden_states, attention_mask, gated_position_bias, *a, **kw):
             m = self._mask2d(hidden_states.shape[1], gated_position_bias.dtype,
                              gated_position_bias.device)
             return orig(hidden_states, attention_mask,
-                        gated_position_bias + m, output_attentions, *a, **kw)
+                        gated_position_bias + m, *a, **kw)
         return mha
 
     def _wrap_layer(self, orig):
