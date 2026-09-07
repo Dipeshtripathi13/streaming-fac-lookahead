@@ -260,6 +260,62 @@ steady-state throughput constraint
 which lookahead leaves untouched but chunk size and hardware do not. Increasing $L$ adds little per-chunk compute over the tested range;
 being able to run at all is a separate constraint.
 
+\subsection{Is the curve an optimization-rate curve?}
+\label{sec:convergence}
+
+Every condition elsewhere is trained for a fixed 1200 steps, so what is
+measured directly is \emph{lookahead $\rightarrow$ performance after 1200
+optimization steps}. That equals \emph{lookahead $\rightarrow$ attainable
+performance} only if the conditions sit at comparable points in optimization.
+If longer lookahead simply trained faster, part of the exchange rate would be
+an optimization-rate difference rather than a context effect. We test this
+rather than list it as a caveat.
+
+Five representative budgets ($L\in\{0,40,160,240,640\}$\,ms) were trained for
+6000 steps --- five times the standard budget --- with validation every 500
+steps, giving a 12-point trace per condition (Table~\ref{tab:conv}).
+
+\begin{table}[t]
+\centering\small
+\caption{Convergence check: validation PER against optimization step, single
+seed. The ranking is correct at all 12 checkpoints and the fitted exchange
+rate is stable from step 1000 onward.}
+\label{tab:conv}
+\begin{tabular}{rrrrrr}
+\toprule
+step & $L{=}0$ & $40$ & $160$ & $240$ & $640$ \\
+\midrule
+500  & 0.5301 & 0.4375 & 0.3288 & 0.2946 & 0.2574 \\
+1000 & 0.4715 & 0.3601 & 0.2588 & 0.2353 & 0.2012 \\
+2000 & 0.4480 & 0.3392 & 0.2332 & 0.2054 & 0.1717 \\
+3000 & 0.4340 & 0.3293 & 0.2131 & 0.1930 & 0.1622 \\
+4000 & 0.4135 & 0.3152 & 0.1992 & 0.1873 & 0.1533 \\
+5000 & 0.4092 & 0.3108 & 0.1962 & 0.1838 & 0.1473 \\
+6000 & 0.4060 & 0.3100 & 0.1951 & 0.1822 & 0.1468 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three results. \textbf{Training does flatten}: over the final 1500 steps every
+condition moves by $0.0005$--$0.0045$ PER, at or below the $0.0044$
+repeatability floor. \textbf{The ranking never reorders}: the ordering
+$L{=}0 > 40 > 160 > 240 > 640$ holds at \textbf{12 of 12} checkpoints,
+including the earliest at step 500. \textbf{The exchange rate is stable}:
+fitted over $L\geq40$ it stays within $-0.0396$ to $-0.0461$ PER per doubling
+at every checkpoint, and the value at the 1200-step budget used elsewhere
+($\approx-0.0405$) agrees with the 6000-step value ($-0.0414$) to within
+$0.001$, far inside the noise floor.
+
+Improvement from step 1500 to 6000 is also roughly uniform across conditions
+($-0.030$ to $-0.045$ PER) rather than concentrated at long lookahead, which is
+the specific pattern a convergence-rate confound would produce. Absolute PER
+does keep falling with longer training, so the fixed-budget numbers elsewhere
+are a comparison at matched budget rather than converged performance --- but
+the \emph{relative} quantities this paper reports, the ranking and the exchange
+rate, are not artefacts of stopping at 1200 steps. The check is single-seed
+over five budgets and uses validation rather than test PER, so it bounds the
+concern rather than eliminating it.
+
 \subsection{RQ1: an exchange rate and a saturation point, not a knee}
 \label{sec:rq1}
 
@@ -544,6 +600,7 @@ not one exists and an alphabet mismatch that silently bucketed 57\% of
 reference tokens, are documented in the repository.
 
 \section{Limitations}
+\label{sec:remaining}
 
 \textbf{Every quality result here is phone-level, not perceptual}, and this is
 a phone-translation probe rather than an end-to-end FAC system: the
@@ -552,8 +609,10 @@ prosody, speaker similarity or perceived accentedness. We do not conduct a perce
 study because the phone-sequence outputs are not valid FAC stimuli: synthesized
 from bare phone strings, they lack the lexical, prosodic and acoustic structure
 required to judge naturalness or accentedness. This is a property of the
-stimuli rather than of the budget. Training is 1200 steps at fixed
-budget, not to convergence, over a frozen encoder; the dense sweep has two
+stimuli rather than of the budget. Training is 1200 steps at fixed budget
+over a frozen encoder --- a comparison at matched budget rather than at
+convergence, though \S\ref{sec:convergence} shows the ranking and exchange
+rate hold to $5\times$ that budget; the dense sweep has two
 seeds per arm and no repeated cells, so its noise floor is imported from six
 accidental repeats in the other sweep and carries no confidence interval of its
 own. \tbuf{}'s I/O term is unmeasured, and compute is characterised on Apple
