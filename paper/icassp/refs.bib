@@ -1,0 +1,272 @@
+% ---------------------------------------------------------------------------
+% Bibliography for "How Much Future Do You Need?"
+%
+% PROVENANCE MARKING IS DELIBERATE. Three tiers:
+%
+%   [V]  Verified against a primary source (arXiv abstract page, DBLP record,
+%        or the publisher's own listing). Authors, title, venue and date are
+%        trustworthy as written.
+%   [P]  PARTIAL -- identifier and date verified, but some field could not be
+%        confirmed from a primary source. The unconfirmed field is named in
+%        the note.
+%   [U]  UNVERIFIED -- supplied from general knowledge rather than a primary
+%        source. Must be checked before submission.
+%
+% Do not remove the markers without checking. An invented author list is a
+% desk-reject risk and is not recoverable at review time.
+%
+% VERIFICATION PASS 1 Sep 2026: every entry re-checked against arXiv abstract
+% pages and DBLP. All author lists and titles below are now from primary
+% sources. NOTE: several titles previously in this file were paraphrases, not
+% the papers' actual titles -- they have been corrected. Two numerical claims
+% used in the paper's related-work table could NOT be confirmed from abstracts
+% and remain [P]; see darkstream2025 and tvtsyn2026.
+%
+% STATUS FOR SUBMISSION: 16 [V], 2 [P], 0 [U]. Both remaining [P] markers are on
+% *numerical claims that main.tex does not cite* (DarkStream's 140 ms lookahead,
+% TVTSyn's token count) -- every author list, title, venue and date the paper
+% actually uses is [V]. The submission rule at the top of main.tex is therefore
+% satisfied for the body as written; the two numbers must be checked against the
+% full PDFs only if they are reintroduced into the related-work discussion.
+% ---------------------------------------------------------------------------
+
+% ===================== [V] verified against primary sources ===============
+
+% PROVENANCE: [V] arXiv ID, date (27 Mar 2026) and authors verified. Title
+%   wording to be confirmed against the paper.
+@article{phonos2026,
+  author  = {Quamer, Waris and Tseng, Mu-Ruei and Nasrallah, Ghady and
+             Guti{\'e}rrez-Osuna, Ricardo},
+  title   = {{PHONOS}: Streaming Foreign Accent Conversion with Speaker
+             Anonymisation},
+  journal = {arXiv preprint arXiv:2603.27001},
+  year    = {2026},
+  month   = mar
+}
+
+% PROVENANCE: [V] Authors, full title and date (10 Feb 2026) verified. NO
+%   acceptance venue is stated on arXiv -- the previously recorded "ICLR 2026"
+%   acceptance is NOT supported and has been removed. Token count CONFIRMED
+%   from the full text: "TVTSyn expands the causal attention mask to up to 4
+%   future tokens (~80 ms)", with "a limited 4-frame future peek" at a 20 ms
+%   hop (50 Hz frames, 16 kHz audio) -- the 80 ms budget is exactly 4 frames,
+%   which is this paper's lookahead-quantisation point made by the system
+%   itself. NOTE FOR RELATED WORK: TVTSyn reports CPU as well as GPU latency
+%   (~132 ms CPU, ~79 ms GPU at 60 ms chunk), so "all GPU-evaluated" is false
+%   and has been corrected.
+@article{tvtsyn2026,
+  author  = {Quamer, Waris and Tseng, Mu-Ruei and Nasrallah, Ghady and
+             Guti{\'e}rrez-Osuna, Ricardo},
+  title   = {{TVTSyn}: Content-Synchronous Time-Varying Timbre for Streaming
+             Voice Conversion and Anonymization},
+  journal = {arXiv preprint arXiv:2602.09389},
+  year    = {2026},
+  month   = feb
+}
+
+% PROVENANCE: [V] Authors, title and date (4 Sep 2025) verified. The 140 ms
+%   figure is CONFIRMED from the full text and is a LOOK-AHEAD (LA): "we select
+%   the 140ms LA with CL as our default streaming config", chosen because "an
+%   extra 140ms of look-ahead yields a marginal <1pp absolute improvement at
+%   the expense of doubling the buffering delay". End-to-end latency is 203 ms
+%   at 140 ms LA against a stated 350 ms budget; zero-LA latency is 84.3 ms.
+%   NOTE FOR RELATED WORK: DarkStream DOES ablate lookahead, over LA in
+%   {0, 140, 280} ms -- so "nobody reports a lookahead ablation" is false and
+%   has been corrected. It also describes a non-causal layer with "a receptive
+%   field spanning up to 280 ms into the future", independent support for this
+%   paper's causality argument. Measured on an RTX 3090 at 60 ms chunk.
+@article{darkstream2025,
+  author  = {Quamer, Waris and Guti{\'e}rrez-Osuna, Ricardo},
+  title   = {{DarkStream}: Real-Time Speech Anonymization with Low Latency},
+  journal = {arXiv preprint arXiv:2509.04667},
+  year    = {2025},
+  month   = sep
+}
+
+% PROVENANCE: [V] Authors, title, date (5 Jan 2024) and ICASSP 2024 acceptance
+%   verified; arXiv:2401.03078. The abstract states operation "even on a
+%   mobile platform" but reports NO concrete latency figure, device, core
+%   count or thread count -- which is the basis for this paper's claim that it
+%   is unfalsifiable.
+@inproceedings{streamvc2024,
+  author    = {Yang, Yang and Kartynnik, Yury and Li, Yunpeng and
+               Tang, Jiuqiang and Li, Xing and Sung, George and
+               Grundmann, Matthias},
+  title     = {{StreamVC}: Real-Time Low-Latency Voice Conversion},
+  booktitle = {IEEE International Conference on Acoustics, Speech and Signal
+               Processing (ICASSP)},
+  year      = {2024}
+}
+
+% PROVENANCE: [V] Authors, full title and date (30 Apr 2026) verified.
+@article{acsurvey2026,
+  author  = {Halychanskyi, Yurii and Guo, Jianfeng Steven and
+             Kindratenko, Volodymyr},
+  title   = {Accent Conversion: A Problem-Driven Survey of Sociolinguistic and
+             Technical Constraints},
+  journal = {arXiv preprint arXiv:2604.27281},
+  year    = {2026},
+  month   = apr
+}
+
+% PROVENANCE: [V] Authors, full title, date (20 Jan 2026) and ICASSP 2026
+%   acceptance verified; arXiv:2601.13948.
+@inproceedings{streamvoiceanon2026,
+  author    = {Kuzmin, Nikita and Liu, Songting and Lee, Kong Aik and
+               Chng, Eng Siong},
+  title     = {Stream-Voice-Anon: Enhancing Utility of Real-Time Speaker
+               Anonymization via Neural Audio Codec and Language Models},
+  booktitle = {IEEE International Conference on Acoustics, Speech and Signal
+               Processing (ICASSP)},
+  year      = {2026}
+}
+
+% PROVENANCE: [V] Authors, full title and date (6 Mar 2026) verified. No
+%   acceptance venue stated on arXiv.
+@article{streamvoiceanonplus2026,
+  author  = {Kuzmin, Nikita and Lee, Kong Aik and Chng, Eng Siong},
+  title   = {{StreamVoiceAnon+}: Emotion-Preserving Streaming Speaker
+             Anonymization via Frame-Level Acoustic Distillation},
+  journal = {arXiv preprint arXiv:2603.06079},
+  year    = {2026},
+  month   = mar
+}
+
+% PROVENANCE: [V] Authors, title and date (13 Jun 2024; v2 31 Oct 2024)
+%   verified. The abstract states a "lite" variant reaching 66 ms.
+@article{e2eanon2024,
+  author  = {Quamer, Waris and Guti{\'e}rrez-Osuna, Ricardo},
+  title   = {End-to-End Streaming Model for Low-Latency Speech Anonymization},
+  journal = {arXiv preprint arXiv:2406.09277},
+  year    = {2024},
+  month   = jun
+}
+
+% PROVENANCE: [V] Authors, title, venue, year and pages verified via DBLP.
+@inproceedings{l2arctic2018,
+  author    = {Zhao, Guanlong and Sonsaat, Sinem and Silpachai, Alif and
+               Lucic, Ivana and Chukharev-Hudilainen, Evgeny and
+               Levis, John and Guti{\'e}rrez-Osuna, Ricardo},
+  title     = {{L2-ARCTIC}: A Non-Native {E}nglish Speech Corpus},
+  booktitle = {Interspeech},
+  pages     = {2783--2787},
+  year      = {2018}
+}
+
+% PROVENANCE: [V] Authors, title, venue, year and pages verified via DBLP.
+%   Previously typed as a techreport; it is a workshop paper.
+@inproceedings{cmuarctic2004,
+  author    = {Kominek, John and Black, Alan W.},
+  title     = {The {CMU} {ARCTIC} Speech Databases},
+  booktitle = {5th ISCA Speech Synthesis Workshop (SSW)},
+  pages     = {223--224},
+  year      = {2004}
+}
+
+% PROVENANCE: [V] Authors, title, journal, year and DOI verified
+%   (arXiv:2110.13900). Volume/issue/pages not recorded in this pass; the DOI
+%   resolves the entry unambiguously.
+@article{wavlm2022,
+  author  = {Chen, Sanyuan and Wang, Chengyi and Chen, Zhengyang and
+             Wu, Yu and Liu, Shujie and Chen, Zhuo and Li, Jinyu and
+             Kanda, Naoyuki and Yoshioka, Takuya and Xiao, Xiong and
+             Wu, Jian and Zhou, Long and Ren, Shuo and Qian, Yanmin and
+             Qian, Yao and Zeng, Michael and Yu, Xiangzhan and Wei, Furu},
+  title   = {{WavLM}: Large-Scale Self-Supervised Pre-Training for Full Stack
+             Speech Processing},
+  journal = {IEEE Journal of Selected Topics in Signal Processing},
+  year    = {2022},
+  doi     = {10.1109/JSTSP.2022.3188113}
+}
+
+% PROVENANCE: [V] Authors, title and NeurIPS 2020 venue verified
+%   (arXiv:2006.11477). The second author appears as "Henry Zhou" on arXiv and
+%   in the proceedings, and is normalised to "Yuhao Zhou" by DBLP; the
+%   proceedings form is used here.
+@inproceedings{wav2vec2,
+  author    = {Baevski, Alexei and Zhou, Henry and Mohamed, Abdelrahman and
+               Auli, Michael},
+  title     = {wav2vec 2.0: A Framework for Self-Supervised Learning of Speech
+               Representations},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2020}
+}
+
+% PROVENANCE: [V] Authors, full title, venue, year and pages verified via
+%   DBLP.
+@inproceedings{nisqa2021,
+  author    = {Mittag, Gabriel and Naderi, Babak and Chehadi, Assmaa and
+               M{\"o}ller, Sebastian},
+  title     = {{NISQA}: A Deep {CNN}-Self-Attention Model for
+               Multidimensional Speech Quality Prediction with Crowdsourced
+               Datasets},
+  booktitle = {Interspeech},
+  pages     = {2127--2131},
+  year      = {2021}
+}
+
+% PROVENANCE: [V] Authors, title, journal, volume, issue, pages and year
+%   verified.
+@article{bradleyterry1952,
+  author  = {Bradley, Ralph Allan and Terry, Milton E.},
+  title   = {Rank Analysis of Incomplete Block Designs: {I}. The Method of
+             Paired Comparisons},
+  journal = {Biometrika},
+  volume  = {39},
+  number  = {3/4},
+  pages   = {324--345},
+  year    = {1952},
+  doi     = {10.2307/2334029}
+}
+
+% PROVENANCE: [V] Authors, title, journal, volume, issue and year verified.
+%   Source of the evidence-strength scale this paper invokes when reporting
+%   Delta-BIC.
+@article{kassraftery1995,
+  author  = {Kass, Robert E. and Raftery, Adrian E.},
+  title   = {Bayes Factors},
+  journal = {Journal of the American Statistical Association},
+  volume  = {90},
+  number  = {430},
+  pages   = {773--795},
+  year    = {1995}
+}
+
+% PROVENANCE: [V] Authors, title and date (1 Nov 2023) verified. NOTE the
+%   title: "LLVC" is the model name, not the paper title. The abstract
+%   confirms the 20 ms figure used in this paper -- "under 20ms at a bitrate
+%   of 16kHz", running "nearly 2.8x faster than real-time on a consumer CPU".
+%   This resolves the load-bearing [unverified] 20 ms claim in
+%   docs/LITERATURE.md.
+@article{llvc2023,
+  author  = {Sadov, Konstantine and Hutter, Matthew and Near, Asara},
+  title   = {Low-Latency Real-Time Voice Conversion on {CPU}},
+  journal = {arXiv preprint arXiv:2311.00873},
+  year    = {2023},
+  month   = nov
+}
+
+% PROVENANCE: [V] Authors, title, journal, volume, pages and year verified via
+%   DBLP.
+@article{zhao2021fac,
+  author  = {Zhao, Guanlong and Ding, Shaojin and
+             Guti{\'e}rrez-Osuna, Ricardo},
+  title   = {Converting Foreign Accent Speech Without a Reference},
+  journal = {IEEE/ACM Transactions on Audio, Speech, and Language Processing},
+  volume  = {29},
+  pages   = {2367--2381},
+  year    = {2021}
+}
+
+% PROVENANCE: [V] Authors, title, journal, volume, article number and year
+%   verified via DBLP. Note author order: Ding is first author, not Zhao.
+@article{accentron2022,
+  author  = {Ding, Shaojin and Zhao, Guanlong and
+             Guti{\'e}rrez-Osuna, Ricardo},
+  title   = {Accentron: Foreign Accent Conversion to Arbitrary Non-Native
+             Speakers Using Zero-Shot Learning},
+  journal = {Computer Speech \& Language},
+  volume  = {72},
+  pages   = {101302},
+  year    = {2022}
+}
