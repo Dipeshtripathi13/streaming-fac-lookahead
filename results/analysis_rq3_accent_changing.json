@@ -1,0 +1,88 @@
+{
+  "lookaheads_ms": [
+    0.0,
+    20.0,
+    40.0,
+    80.0,
+    160.0,
+    320.0,
+    640.0
+  ],
+  "curve": {
+    "0.0": {
+      "accent_changing": {
+        "error_rate": 0.5899563318777292,
+        "n": 6870
+      },
+      "unchanged": {
+        "error_rate": 0.35376571993782674,
+        "n": 35385
+      }
+    },
+    "20.0": {
+      "accent_changing": {
+        "error_rate": 0.5410480349344978,
+        "n": 6870
+      },
+      "unchanged": {
+        "error_rate": 0.29156422212802036,
+        "n": 35385
+      }
+    },
+    "40.0": {
+      "accent_changing": {
+        "error_rate": 0.48951965065502184,
+        "n": 6870
+      },
+      "unchanged": {
+        "error_rate": 0.2503038010456408,
+        "n": 35385
+      }
+    },
+    "80.0": {
+      "accent_changing": {
+        "error_rate": 0.427802037845706,
+        "n": 6870
+      },
+      "unchanged": {
+        "error_rate": 0.2022891055532005,
+        "n": 35385
+      }
+    },
+    "160.0": {
+      "accent_changing": {
+        "error_rate": 0.36419213973799125,
+        "n": 6870
+      },
+      "unchanged": {
+        "error_rate": 0.15339833262681926,
+        "n": 35385
+      }
+    },
+    "320.0": {
+      "accent_changing": {
+        "error_rate": 0.32343522561863175,
+        "n": 6870
+      },
+      "unchanged": {
+        "error_rate": 0.12502472799208705,
+        "n": 35385
+      }
+    },
+    "640.0": {
+      "accent_changing": {
+        "error_rate": 0.28908296943231443,
+        "n": 6870
+      },
+      "unchanged": {
+        "error_rate": 0.1010032499646743,
+        "n": 35385
+      }
+    }
+  },
+  "relative_reduction": {
+    "accent_changing": 0.5099925980754996,
+    "unchanged": 0.7144911327688129,
+    "ratio": 0.7137843630041484
+  }
+}
