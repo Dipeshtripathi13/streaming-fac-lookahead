@@ -91,6 +91,13 @@ def build(hyp_dir: str, out_dir: str, n_utts: int, seed: int,
         print(f"  WARNING: only {len(chosen)} available")
 
     synth = PiperPhonemeSynth()
+    # Piper defaults to noise_scale=0.667/noise_w=0.8, so the SAME phone string
+    # renders differently every time. In a forced-choice test that is not a bias
+    # -- the variation is independent of condition -- but it is pure added
+    # variance in exactly the comparison raters are asked to make, and it means
+    # an A/B pair is not a minimal pair. Zero the two noise terms; length_scale
+    # is left alone because it is the speaking-rate control, not noise.
+    synth.scales = np.array([0.0, float(synth.scales[1]), 0.0], dtype=np.float32)
     audio_dir = os.path.join(out_dir, "audio")
     os.makedirs(audio_dir, exist_ok=True)
     stimuli: List[Dict[str, object]] = []

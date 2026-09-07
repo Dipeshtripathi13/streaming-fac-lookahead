@@ -73,6 +73,18 @@ ARPA_TO_IPA: Dict[str, str] = {
 }
 
 
+# L2-ARCTIC's g2p column writes the STRESSED r-coloured mid-central vowel as
+# /ɝ/, but eSpeak -- and therefore Piper, and the espeak-IPA wav2vec2 models
+# used for forced alignment -- only carry the unstressed /ɚ/. They are the same
+# vowel; the difference is stress, which Piper takes from its own model rather
+# than from the symbol. Without this, every /ɝ/ falls through `encode()` and is
+# silently DROPPED: 96 of them in the 12-utterance listening-test build alone,
+# each one a vowel missing from the stimulus.
+IPA_NORMALISE: Dict[str, str] = {
+    "ɝ": "ɚ",
+}
+
+
 class PiperPhonemeSynth:
     """Piper VITS driven by explicit phonemes rather than text."""
 
@@ -109,6 +121,7 @@ class PiperPhonemeSynth:
             if q.upper() in ARPA_TO_IPA:
                 out.extend(list(ARPA_TO_IPA[q.upper()]))
             else:
+                q = IPA_NORMALISE.get(q, q)
                 out.extend(list(unicodedata.normalize("NFD", q)))
         return out
 
