@@ -1,0 +1,62 @@
+{
+  "timestamp_utc": "2026-09-01T17:13:24Z",
+  "hostname": "4116eaa2e543",
+  "system": "Linux",
+  "release": "6.6.122+",
+  "machine": "x86_64",
+  "python": "3.13.15",
+  "cpu_model": "Intel(R) Xeon(R) CPU @ 2.00GHz",
+  "cpu_count_logical": 2,
+  "mem_total_gb": 12.67,
+  "pi_model": null,
+  "thermal": {},
+  "libs": {
+    "numpy_build": {
+      "blas": {
+        "name": "scipy-openblas",
+        "found": true,
+        "version": "0.3.27",
+        "detection method": "pkgconfig",
+        "include directory": "/opt/_internal/cpython-3.13.0/lib/python3.13/site-packages/scipy_openblas64/include",
+        "lib directory": "/opt/_internal/cpython-3.13.0/lib/python3.13/site-packages/scipy_openblas64/lib",
+        "openblas configuration": "OpenBLAS 0.3.27  USE64BITINT DYNAMIC_ARCH NO_AFFINITY Haswell MAX_THREADS=64",
+        "pc file directory": "/project/.openblas"
+      }
+    },
+    "threading_env": {
+      "OMP_NUM_THREADS": null,
+      "OPENBLAS_NUM_THREADS": null,
+      "MKL_NUM_THREADS": null,
+      "VECLIB_MAXIMUM_THREADS": null,
+      "NUMEXPR_NUM_THREADS": null
+    },
+    "onnxruntime_version": null,
+    "torch_version": "2.11.0+cu128",
+    "torch_threads": 1,
+    "torch_cuda": true,
+    "gpu_name": "Tesla T4",
+    "gpu_mem_gb": 14.6,
+    "torch_mps": false
+  },
+  "calibration": {
+    "sgemm_512": {
+      "n": 512,
+      "median_ms": 2.3391,
+      "gflops": 114.76
+    },
+    "sgemm_1024": {
+      "n": 1024,
+      "median_ms": 17.2343,
+      "gflops": 124.61
+    },
+    "memcpy_64mb": {
+      "mb": 64,
+      "median_ms": 9.42,
+      "gb_per_s": 6.63
+    },
+    "single_core": {
+      "loop_2m_ms": 116.38
+    }
+  },
+  "hw_class": "gpu"
+}
