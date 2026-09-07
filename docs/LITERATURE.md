@@ -73,20 +73,41 @@ the area well.
 | Work | ID | Date | Task | Streaming | Lookahead | Latency | HW | Status |
 |---|---|---|---|---|---|---|---|---|
 | **PHONOS** | arXiv:2603.27001 | 27 Mar 2026 | FAC + anonymisation | yes | **≤40 ms** | **<241 ms** | **single GPU** | verified |
-| **TVTSyn** | arXiv:2602.09389 | Feb 2026 | streaming VC + anon | yes | **[unverified]** ~80 ms | **<80 ms** | **GPU** | abstract verified; ICLR 2026 acceptance **[unverified]** |
-| **DarkStream** | arXiv:2509.04667 | Sep 2025 | real-time anonymisation | yes | short lookahead buffer, **140 ms [unverified]** | low | not stated in abstract | verified |
+| **TVTSyn** | arXiv:2602.09389 | 10 Feb 2026 | streaming VC + anon | yes | ~80 ms | **<80 ms** (verified) | **GPU** | authors + full title verified 1 Sep 2026. **ICLR 2026 acceptance NOT supported** — no venue stated on arXiv; claim withdrawn. Token count still **[unverified]** (not in abstract) |
+| **DarkStream** | arXiv:2509.04667 | 4 Sep 2025 | real-time anonymisation | yes | short lookahead buffer, **140 ms [unverified]** | low | not stated in abstract | authors verified 1 Sep 2026 (**Quamer & Gutiérrez-Osuna** — confirms same-lab claim). 140 ms **not in the abstract**; needs full text |
 | **StreamVC** | arXiv:2401.03078 | Jan 2024 | streaming VC | yes | causal | low | **"even on a mobile platform"**, device unnamed | verified |
 | Stream-Voice-Anon | arXiv:2601.13948 | Jan 2026 | streaming anon | yes | — | — | — | new to v2 |
 | StreamVoiceAnon+ | arXiv:2603.06079 | Mar 2026 | streaming anon + emotion | yes | — | — | — | new to v2 |
 | E2E streaming anon | arXiv:2406.09277 | Jun 2024 | anonymisation | yes | — | — | — | new to v2 |
 | AC survey | arXiv:2604.27281 | 30 Apr 2026 | survey | — | — | — | — | verified; **read first** |
-| LLVC | Sadov et al. 2023 | 2023 | VC | yes | minimal | 20 ms | — | **[unverified]** |
-| Zhao et al., reference-free FAC | TASLP 29 | 2021 | FAC | no | — | offline | — | **[unverified]** |
-| Accentron | CSL 72 | 2022 | zero-shot FAC | no | — | offline | — | **[unverified]** |
+| LLVC | arXiv:2311.00873 | 1 Nov 2023 | VC | yes | minimal | **20 ms (verified)** | consumer CPU, 2.8× real-time | **verified 1 Sep 2026.** Paper title is *"Low-latency Real-time Voice Conversion on CPU"* — LLVC is the model name. Authors Sadov, Hutter, Near |
+| Zhao et al., reference-free FAC | TASLP 29:2367–2381 | 2021 | FAC | no | — | offline | — | verified 1 Sep 2026 (Zhao, Ding, Gutiérrez-Osuna) |
+| Accentron | CSL 72:101302 | 2022 | zero-shot FAC | no | — | offline | — | verified 1 Sep 2026. **Ding is first author**, not Zhao |
 
 **Every [unverified] row must be checked against the paper, not the abstract,
 before submission.** Three of them (TVTSyn's exact token count, DarkStream's
 140 ms, LLVC's 20 ms) are load-bearing numbers in the argument.
+
+### Verification pass, 1 September 2026
+
+All eighteen bibliography entries were re-checked against arXiv abstract pages
+and DBLP. `paper/refs.bib` went from 9 [P] + 12 [U] to **16 [V], 2 [P], 0 [U]**.
+Four things worth recording, because three of them were wrong rather than merely
+missing:
+
+1. **LLVC's 20 ms is confirmed** — "under 20ms at a bitrate of 16kHz", "nearly
+   2.8x faster than real-time on a consumer CPU". One load-bearing number closed.
+2. **TVTSyn's ICLR 2026 acceptance is not supported.** No venue is stated on
+   arXiv. The claim has been removed rather than carried forward.
+3. **Several titles in `refs.bib` were paraphrases, not real titles** — TVTSyn,
+   Stream-Voice-Anon, StreamVoiceAnon+, E2E-anon and LLVC were all recorded
+   under approximations. All corrected from primary sources.
+4. **StreamVC's "unfalsifiable" characterisation is now positively confirmed**:
+   the abstract really does claim "even on a mobile platform" with no device,
+   core count, thread count or latency figure anywhere in it.
+
+Still open, and neither is cited by `paper/main.tex`: **DarkStream's 140 ms**
+and **TVTSyn's token count**. Both need the full PDFs, not the abstracts.
 
 ---
 
