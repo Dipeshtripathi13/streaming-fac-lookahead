@@ -433,6 +433,12 @@ def main() -> None:
     ap.add_argument("--targets", nargs="+", default=["native", "produced"],
                     choices=["native", "produced"])
     ap.add_argument("--steps", type=int, default=8000)
+    ap.add_argument("--eval-every", type=int, default=1000,
+                    help="validation cadence. The default is fine for a fixed-"
+                         "budget sweep; a convergence study needs it dense "
+                         "enough to show the curve flatten, since a "
+                         "fixed-budget result cannot distinguish a "
+                         "latency-quality curve from an optimization-rate one.")
     ap.add_argument("--seeds", type=int, nargs="+", default=[1337],
                     help="one training run per seed per condition. Multiple "
                          "seeds are what turn a per-condition point into an "
@@ -513,7 +519,8 @@ def main() -> None:
                                     "seed": sd})
             print(f"[{k}/{total}] {c.tag()} seed={sd}  {c.geometry.describe()}")
             r, shared = train_one(c, items, vocab, device, a.steps,
-                                  a.ckpt_dir, unfreeze=a.unfreeze,
+                                  a.ckpt_dir, eval_every=a.eval_every,
+                                  unfreeze=a.unfreeze,
                                   cached=shared, save_hyps=a.save_hyps,
                                   hyp_dir=a.hyp_dir or (
                                       os.path.dirname(a.out) or "."))
