@@ -549,22 +549,25 @@ coverage; do not infer it from the absence of an error.
 
 \textbf{Every number here is phone error rate, not perceived quality.} No
 perceptual evaluation was run, so nothing supports a claim about naturalness or
-audible accentedness: the saturation point says marginal \emph{PER} gain falls
-below the noise floor, not that listeners stop noticing improvement. Stimulus
-generation is implemented and the inputs exist; only the rater study is
-unfunded. This is the limitation a reader should weigh most heavily.
+audible accentedness: saturation means marginal \emph{PER} gain falls below the
+noise floor, not that listeners stop noticing improvement.
+
+``Unfunded'' would be the wrong reason. Stimuli built from the per-condition
+outputs cannot carry the judgement: the phone sequences hold no word or stress
+structure, so even the ground-truth ceiling synthesises as one unsegmented
+stream, and a system at 0.16--0.42 PER emits no recognisable words to compare.
+An informal session confirmed both --- the listener could not identify what was
+said, and scored at chance on the anchors. \textbf{A funded study on these
+stimuli would not have measured accentedness at any budget.} It needs converted
+audio from a synthesis pipeline: future work, not a purchase.
 
 The audio-domain test in \S\ref{sec:rq2} closes the identity-error half of the
-phoneme-class question but not the trajectory half, which a TTS cannot answer
-because it renders canonical trajectories by construction; that needs a trained
-synthesis pipeline aligned against a native rendition. Training is 1200 steps,
-a comparison at fixed budget rather than to convergence, over a frozen encoder.
-The dense sweep uses two seeds per arm with no repeated cells, so its noise
-floor is imported rather than re-measured. \tbuf{}'s I/O term is unmeasured:
-an acoustic loopback is defeated by platform echo cancellation, and a wired
-loopback would close the one term of Eq.~\ref{eq:decomp} still open. Compute is
-characterised on Apple Silicon and ARM64 Linux only; the embedded class is
-projected, not measured.
+phoneme-class question but not the trajectory half, for the same reason.
+Training is 1200 steps at fixed budget, not to convergence, over a frozen
+encoder; the dense sweep has no repeated cells, so its noise floor is imported.
+\tbuf{}'s I/O term is unmeasured, an acoustic loopback being defeated by
+platform echo cancellation, and the embedded class is projected, not
+measured.
 
 \section{Conclusion}
 
