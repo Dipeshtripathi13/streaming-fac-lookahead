@@ -1,0 +1,588 @@
+{
+  "provenance": {
+    "hyp_dir": "results/raw/hyps",
+    "target": "native",
+    "n_files": 21,
+    "lookaheads": [
+      0.0,
+      20.0,
+      40.0,
+      80.0,
+      160.0,
+      320.0,
+      640.0
+    ],
+    "seeds_per_lookahead": {
+      "0.0": [
+        "1337",
+        "7",
+        "99"
+      ],
+      "20.0": [
+        "1337",
+        "7",
+        "99"
+      ],
+      "40.0": [
+        "1337",
+        "7",
+        "99"
+      ],
+      "80.0": [
+        "1337",
+        "7",
+        "99"
+      ],
+      "160.0": [
+        "1337",
+        "7",
+        "99"
+      ],
+      "320.0": [
+        "1337",
+        "7",
+        "99"
+      ],
+      "640.0": [
+        "1337",
+        "7",
+        "99"
+      ]
+    },
+    "utterances_per_lookahead": {
+      "0.0": 1200,
+      "20.0": 1200,
+      "40.0": 1200,
+      "80.0": 1200,
+      "160.0": 1200,
+      "320.0": 1200,
+      "640.0": 1200
+    },
+    "l1s": [
+      "Arabic",
+      "Chinese",
+      "Hindi",
+      "Korean",
+      "Spanish",
+      "Vietnamese"
+    ],
+    "n_utts": 40,
+    "model": "facebook/wav2vec2-lv-60-espeak-cv-ft"
+  },
+  "validation": {
+    "mean_distortion_correct": 50.46336215808884,
+    "mean_distortion_wrong": 86.8101419926975,
+    "ratio": 1.7202607650426356,
+    "min_separation": 1.1,
+    "passed": true
+  },
+  "per_lookahead": {
+    "0.0": {
+      "affricate": {
+        "acoustic_distortion": 70.53250694274902,
+        "error_rate": 0.4318181818181818,
+        "opportunities": 44.0
+      },
+      "approximant": {
+        "acoustic_distortion": 76.03607843436447,
+        "error_rate": 0.37254901960784315,
+        "opportunities": 153.0
+      },
+      "fricative": {
+        "acoustic_distortion": 75.38015036021962,
+        "error_rate": 0.375,
+        "opportunities": 272.0
+      },
+      "nasal": {
+        "acoustic_distortion": 66.58574770390987,
+        "error_rate": 0.2890625,
+        "opportunities": 128.0
+      },
+      "stop": {
+        "acoustic_distortion": 71.07297716140747,
+        "error_rate": 0.35833333333333334,
+        "opportunities": 240.0
+      },
+      "vowel_diph": {
+        "acoustic_distortion": 69.4501819036093,
+        "error_rate": 0.3433734939759036,
+        "opportunities": 166.0
+      },
+      "vowel_mono": {
+        "acoustic_distortion": 70.85778678740773,
+        "error_rate": 0.4263392857142857,
+        "opportunities": 448.0
+      }
+    },
+    "20.0": {
+      "affricate": {
+        "acoustic_distortion": 64.50060705705123,
+        "error_rate": 0.3181818181818182,
+        "opportunities": 44.0
+      },
+      "approximant": {
+        "acoustic_distortion": 69.67353253582723,
+        "error_rate": 0.26143790849673204,
+        "opportunities": 153.0
+      },
+      "fricative": {
+        "acoustic_distortion": 65.17740458600662,
+        "error_rate": 0.3014705882352941,
+        "opportunities": 272.0
+      },
+      "nasal": {
+        "acoustic_distortion": 58.36703957617283,
+        "error_rate": 0.1953125,
+        "opportunities": 128.0
+      },
+      "stop": {
+        "acoustic_distortion": 69.17848065694173,
+        "error_rate": 0.2916666666666667,
+        "opportunities": 240.0
+      },
+      "vowel_diph": {
+        "acoustic_distortion": 63.116837708346814,
+        "error_rate": 0.24096385542168675,
+        "opportunities": 166.0
+      },
+      "vowel_mono": {
+        "acoustic_distortion": 66.01426529458591,
+        "error_rate": 0.33705357142857145,
+        "opportunities": 448.0
+      }
+    },
+    "40.0": {
+      "affricate": {
+        "acoustic_distortion": 61.39780044555664,
+        "error_rate": 0.2727272727272727,
+        "opportunities": 44.0
+      },
+      "approximant": {
+        "acoustic_distortion": 63.559324401656006,
+        "error_rate": 0.20261437908496732,
+        "opportunities": 153.0
+      },
+      "fricative": {
+        "acoustic_distortion": 61.58694462215199,
+        "error_rate": 0.24632352941176472,
+        "opportunities": 272.0
+      },
+      "nasal": {
+        "acoustic_distortion": 53.38956770300865,
+        "error_rate": 0.1484375,
+        "opportunities": 128.0
+      },
+      "stop": {
+        "acoustic_distortion": 66.02238103548686,
+        "error_rate": 0.29583333333333334,
+        "opportunities": 240.0
+      },
+      "vowel_diph": {
+        "acoustic_distortion": 60.29237078471356,
+        "error_rate": 0.2469879518072289,
+        "opportunities": 166.0
+      },
+      "vowel_mono": {
+        "acoustic_distortion": 61.68658259936741,
+        "error_rate": 0.31919642857142855,
+        "opportunities": 448.0
+      }
+    },
+    "80.0": {
+      "affricate": {
+        "acoustic_distortion": 61.04421919042414,
+        "error_rate": 0.3181818181818182,
+        "opportunities": 44.0
+      },
+      "approximant": {
+        "acoustic_distortion": 62.66405932108561,
+        "error_rate": 0.16993464052287582,
+        "opportunities": 153.0
+      },
+      "fricative": {
+        "acoustic_distortion": 60.90026657721575,
+        "error_rate": 0.17647058823529413,
+        "opportunities": 272.0
+      },
+      "nasal": {
+        "acoustic_distortion": 50.769244492053986,
+        "error_rate": 0.1015625,
+        "opportunities": 128.0
+      },
+      "stop": {
+        "acoustic_distortion": 61.90028784275055,
+        "error_rate": 0.20833333333333334,
+        "opportunities": 240.0
+      },
+      "vowel_diph": {
+        "acoustic_distortion": 58.790273022938926,
+        "error_rate": 0.2289156626506024,
+        "opportunities": 166.0
+      },
+      "vowel_mono": {
+        "acoustic_distortion": 58.78574545468603,
+        "error_rate": 0.265625,
+        "opportunities": 448.0
+      }
+    },
+    "160.0": {
+      "affricate": {
+        "acoustic_distortion": 48.94527777758512,
+        "error_rate": 0.1590909090909091,
+        "opportunities": 44.0
+      },
+      "approximant": {
+        "acoustic_distortion": 58.190927505493164,
+        "error_rate": 0.1503267973856209,
+        "opportunities": 153.0
+      },
+      "fricative": {
+        "acoustic_distortion": 53.41756344542784,
+        "error_rate": 0.13602941176470587,
+        "opportunities": 272.0
+      },
+      "nasal": {
+        "acoustic_distortion": 49.57672427594662,
+        "error_rate": 0.1171875,
+        "opportunities": 128.0
+      },
+      "stop": {
+        "acoustic_distortion": 55.99721304575602,
+        "error_rate": 0.1625,
+        "opportunities": 240.0
+      },
+      "vowel_diph": {
+        "acoustic_distortion": 54.51636322435126,
+        "error_rate": 0.1566265060240964,
+        "opportunities": 166.0
+      },
+      "vowel_mono": {
+        "acoustic_distortion": 52.587765680892126,
+        "error_rate": 0.17633928571428573,
+        "opportunities": 448.0
+      }
+    },
+    "320.0": {
+      "affricate": {
+        "acoustic_distortion": 50.377756118774414,
+        "error_rate": 0.25,
+        "opportunities": 44.0
+      },
+      "approximant": {
+        "acoustic_distortion": 53.15227245505339,
+        "error_rate": 0.10457516339869281,
+        "opportunities": 153.0
+      },
+      "fricative": {
+        "acoustic_distortion": 50.74352978958803,
+        "error_rate": 0.11029411764705882,
+        "opportunities": 272.0
+      },
+      "nasal": {
+        "acoustic_distortion": 44.88928705453873,
+        "error_rate": 0.046875,
+        "opportunities": 128.0
+      },
+      "stop": {
+        "acoustic_distortion": 54.30630908807119,
+        "error_rate": 0.14166666666666666,
+        "opportunities": 240.0
+      },
+      "vowel_diph": {
+        "acoustic_distortion": 49.520878412637366,
+        "error_rate": 0.13253012048192772,
+        "opportunities": 166.0
+      },
+      "vowel_mono": {
+        "acoustic_distortion": 49.23647028207779,
+        "error_rate": 0.13839285714285715,
+        "opportunities": 448.0
+      }
+    },
+    "640.0": {
+      "affricate": {
+        "acoustic_distortion": 52.427415717731826,
+        "error_rate": 0.20454545454545456,
+        "opportunities": 44.0
+      },
+      "approximant": {
+        "acoustic_distortion": 46.657686595044105,
+        "error_rate": 0.06535947712418301,
+        "opportunities": 153.0
+      },
+      "fricative": {
+        "acoustic_distortion": 47.30235446200651,
+        "error_rate": 0.09558823529411764,
+        "opportunities": 272.0
+      },
+      "nasal": {
+        "acoustic_distortion": 41.5215102955699,
+        "error_rate": 0.0625,
+        "opportunities": 128.0
+      },
+      "stop": {
+        "acoustic_distortion": 49.416279045740765,
+        "error_rate": 0.12083333333333333,
+        "opportunities": 240.0
+      },
+      "vowel_diph": {
+        "acoustic_distortion": 47.15376412150371,
+        "error_rate": 0.1144578313253012,
+        "opportunities": 166.0
+      },
+      "vowel_mono": {
+        "acoustic_distortion": 44.031108047280995,
+        "error_rate": 0.12276785714285714,
+        "opportunities": 448.0
+      }
+    }
+  },
+  "verdict_acoustic": {
+    "direction_only": true,
+    "effect_size_between_over_pooled_sd": 0.7557040464970493,
+    "between_group_difference": 0.034428736645270075,
+    "within_group_range_breaks_first": 0.06533247740107695,
+    "within_group_range_survives": 0.11972900802082742,
+    "ordering_violations": [
+      "fricative > vowel_diph",
+      "nasal > vowel_diph"
+    ],
+    "n_ordering_violations": 2,
+    "n_ordering_pairs": 12,
+    "observed_rank_by_gain": [
+      "approximant",
+      "vowel_mono",
+      "nasal",
+      "fricative",
+      "vowel_diph",
+      "stop",
+      "affricate"
+    ],
+    "metric": "acoustic_distortion",
+    "x_axis": "log2(lookahead_ms), L=0 at 10 ms",
+    "lookaheads_ms": [
+      0.0,
+      20.0,
+      40.0,
+      80.0,
+      160.0,
+      320.0,
+      640.0
+    ],
+    "per_class_fit": {
+      "affricate": {
+        "slope_per_doubling": -3.393339222127741,
+        "r2": 0.8271499374581336,
+        "rate_at_Lmin": 70.53250694274902,
+        "rate_at_Lmax": 52.427415717731826,
+        "absolute_gain": 18.105091225017198,
+        "relative_gain": 0.2566914463952491,
+        "opportunities": 44.0,
+        "resolvable": true
+      },
+      "approximant": {
+        "slope_per_doubling": -4.519503306273987,
+        "r2": 0.9783476851657629,
+        "rate_at_Lmin": 76.03607843436447,
+        "rate_at_Lmax": 46.657686595044105,
+        "absolute_gain": 29.378391839320365,
+        "relative_gain": 0.3863743691710804,
+        "opportunities": 153.0,
+        "resolvable": true
+      },
+      "fricative": {
+        "slope_per_doubling": -4.3310899451500235,
+        "r2": 0.9504497038231889,
+        "rate_at_Lmin": 75.38015036021962,
+        "rate_at_Lmax": 47.30235446200651,
+        "absolute_gain": 28.077795898213104,
+        "relative_gain": 0.37248261994752674,
+        "opportunities": 272.0,
+        "resolvable": true
+      },
+      "nasal": {
+        "slope_per_doubling": -3.7843235962625066,
+        "r2": 0.9484409837529602,
+        "rate_at_Lmin": 66.58574770390987,
+        "rate_at_Lmax": 41.5215102955699,
+        "absolute_gain": 25.064237408339977,
+        "relative_gain": 0.3764204544160765,
+        "opportunities": 128.0,
+        "resolvable": true
+      },
+      "stop": {
+        "slope_per_doubling": -3.7407001955168586,
+        "r2": 0.9837063312991319,
+        "rate_at_Lmin": 71.07297716140747,
+        "rate_at_Lmax": 49.416279045740765,
+        "absolute_gain": 21.6566981156667,
+        "relative_gain": 0.30471072101685165,
+        "opportunities": 240.0,
+        "resolvable": true
+      },
+      "vowel_diph": {
+        "slope_per_doubling": -3.5663278392177853,
+        "r2": 0.9799377744031964,
+        "rate_at_Lmin": 69.4501819036093,
+        "rate_at_Lmax": 47.15376412150371,
+        "absolute_gain": 22.296417782105593,
+        "relative_gain": 0.3210418917700035,
+        "opportunities": 166.0,
+        "resolvable": true
+      },
+      "vowel_mono": {
+        "slope_per_doubling": -4.397658684423992,
+        "r2": 0.9956650342201371,
+        "rate_at_Lmin": 70.85778678740773,
+        "rate_at_Lmax": 44.031108047280995,
+        "absolute_gain": 26.826678740126738,
+        "relative_gain": 0.3785988803265043,
+        "opportunities": 448.0,
+        "resolvable": true
+      }
+    },
+    "breaks_first_classes": [
+      "vowel_diph",
+      "vowel_mono",
+      "approximant"
+    ],
+    "survives_classes": [
+      "stop",
+      "fricative",
+      "affricate",
+      "nasal"
+    ],
+    "mean_relative_gain_breaks_first": 0.36200504708919606,
+    "mean_relative_gain_survives": 0.327576310443926,
+    "mean_slope_breaks_first": -4.161163276638589,
+    "mean_slope_survives": -3.8123632397642826,
+    "H2_supported": false,
+    "H2_direction_supported": true,
+    "gain_ratio": 1.1051014238441506
+  },
+  "verdict_sequence_same_subset": {
+    "direction_only": true,
+    "effect_size_between_over_pooled_sd": 0.6070275567588026,
+    "between_group_difference": 0.05492624079383768,
+    "within_group_range_breaks_first": 0.1578947368421052,
+    "within_group_range_survives": 0.2574679943100996,
+    "ordering_violations": [
+      "fricative > vowel_diph",
+      "nasal > vowel_diph",
+      "fricative > vowel_mono",
+      "nasal > vowel_mono"
+    ],
+    "n_ordering_violations": 4,
+    "n_ordering_pairs": 12,
+    "observed_rank_by_gain": [
+      "approximant",
+      "nasal",
+      "fricative",
+      "vowel_mono",
+      "vowel_diph",
+      "stop",
+      "affricate"
+    ],
+    "metric": "error_rate",
+    "x_axis": "log2(lookahead_ms), L=0 at 10 ms",
+    "lookaheads_ms": [
+      0.0,
+      20.0,
+      40.0,
+      80.0,
+      160.0,
+      320.0,
+      640.0
+    ],
+    "per_class_fit": {
+      "affricate": {
+        "slope_per_doubling": -0.03327922077922078,
+        "r2": 0.6566406249999999,
+        "rate_at_Lmin": 0.4318181818181818,
+        "rate_at_Lmax": 0.20454545454545456,
+        "absolute_gain": 0.22727272727272727,
+        "relative_gain": 0.5263157894736842,
+        "opportunities": 44.0,
+        "resolvable": true
+      },
+      "approximant": {
+        "slope_per_doubling": -0.045985060690943054,
+        "r2": 0.9339863303812092,
+        "rate_at_Lmin": 0.37254901960784315,
+        "rate_at_Lmax": 0.06535947712418301,
+        "absolute_gain": 0.30718954248366015,
+        "relative_gain": 0.8245614035087719,
+        "opportunities": 153.0,
+        "resolvable": true
+      },
+      "fricative": {
+        "slope_per_doubling": -0.04753151260504203,
+        "r2": 0.9524100238385954,
+        "rate_at_Lmin": 0.375,
+        "rate_at_Lmax": 0.09558823529411764,
+        "absolute_gain": 0.27941176470588236,
+        "relative_gain": 0.7450980392156863,
+        "opportunities": 272.0,
+        "resolvable": true
+      },
+      "nasal": {
+        "slope_per_doubling": -0.03599330357142858,
+        "r2": 0.8641981719983383,
+        "rate_at_Lmin": 0.2890625,
+        "rate_at_Lmax": 0.0625,
+        "absolute_gain": 0.2265625,
+        "relative_gain": 0.7837837837837838,
+        "opportunities": 128.0,
+        "resolvable": true
+      },
+      "stop": {
+        "slope_per_doubling": -0.040922619047619055,
+        "r2": 0.9527439024390244,
+        "rate_at_Lmin": 0.35833333333333334,
+        "rate_at_Lmax": 0.12083333333333333,
+        "absolute_gain": 0.2375,
+        "relative_gain": 0.6627906976744186,
+        "opportunities": 240.0,
+        "resolvable": true
+      },
+      "vowel_diph": {
+        "slope_per_doubling": -0.035499139414802074,
+        "r2": 0.9177791262135924,
+        "rate_at_Lmin": 0.3433734939759036,
+        "rate_at_Lmax": 0.1144578313253012,
+        "absolute_gain": 0.22891566265060243,
+        "relative_gain": 0.6666666666666667,
+        "opportunities": 166.0,
+        "resolvable": true
+      },
+      "vowel_mono": {
+        "slope_per_doubling": -0.051817602040816334,
+        "r2": 0.9689122498027777,
+        "rate_at_Lmin": 0.4263392857142857,
+        "rate_at_Lmax": 0.12276785714285714,
+        "absolute_gain": 0.30357142857142855,
+        "relative_gain": 0.7120418848167539,
+        "opportunities": 448.0,
+        "resolvable": true
+      }
+    },
+    "breaks_first_classes": [
+      "vowel_diph",
+      "vowel_mono",
+      "approximant"
+    ],
+    "survives_classes": [
+      "stop",
+      "fricative",
+      "affricate",
+      "nasal"
+    ],
+    "mean_relative_gain_breaks_first": 0.7344233183307308,
+    "mean_relative_gain_survives": 0.6794970775368931,
+    "mean_slope_breaks_first": -0.04443393404885382,
+    "mean_slope_survives": -0.039431664000827614,
+    "H2_supported": false,
+    "H2_direction_supported": true,
+    "gain_ratio": 1.0808336674426027
+  }
+}
