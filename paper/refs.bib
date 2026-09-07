@@ -44,11 +44,16 @@
   month   = mar
 }
 
-% PROVENANCE: [P] Authors, full title and date (10 Feb 2026) verified from the
-%   arXiv abstract page, which also states the <80 ms GPU latency. NO
+% PROVENANCE: [V] Authors, full title and date (10 Feb 2026) verified. NO
 %   acceptance venue is stated on arXiv -- the previously recorded "ICLR 2026"
-%   acceptance is NOT supported and has been removed. The token count cited in
-%   docs/LITERATURE.md is not in the abstract and remains unverified.
+%   acceptance is NOT supported and has been removed. Token count CONFIRMED
+%   from the full text: "TVTSyn expands the causal attention mask to up to 4
+%   future tokens (~80 ms)", with "a limited 4-frame future peek" at a 20 ms
+%   hop (50 Hz frames, 16 kHz audio) -- the 80 ms budget is exactly 4 frames,
+%   which is this paper's lookahead-quantisation point made by the system
+%   itself. NOTE FOR RELATED WORK: TVTSyn reports CPU as well as GPU latency
+%   (~132 ms CPU, ~79 ms GPU at 60 ms chunk), so "all GPU-evaluated" is false
+%   and has been corrected.
 @article{tvtsyn2026,
   author  = {Quamer, Waris and Tseng, Mu-Ruei and Nasrallah, Ghady and
              Guti{\'e}rrez-Osuna, Ricardo},
@@ -59,10 +64,17 @@
   month   = feb
 }
 
-% PROVENANCE: [P] Authors, title and date (4 Sep 2025) verified. The 140 ms
-%   lookahead figure used in the related-work table is NOT stated in the
-%   abstract and could not be confirmed; it must be checked against the full
-%   text or dropped from the table.
+% PROVENANCE: [V] Authors, title and date (4 Sep 2025) verified. The 140 ms
+%   figure is CONFIRMED from the full text and is a LOOK-AHEAD (LA): "we select
+%   the 140ms LA with CL as our default streaming config", chosen because "an
+%   extra 140ms of look-ahead yields a marginal <1pp absolute improvement at
+%   the expense of doubling the buffering delay". End-to-end latency is 203 ms
+%   at 140 ms LA against a stated 350 ms budget; zero-LA latency is 84.3 ms.
+%   NOTE FOR RELATED WORK: DarkStream DOES ablate lookahead, over LA in
+%   {0, 140, 280} ms -- so "nobody reports a lookahead ablation" is false and
+%   has been corrected. It also describes a non-causal layer with "a receptive
+%   field spanning up to 280 ms into the future", independent support for this
+%   paper's causality argument. Measured on an RTX 3090 at 60 ms chunk.
 @article{darkstream2025,
   author  = {Quamer, Waris and Guti{\'e}rrez-Osuna, Ricardo},
   title   = {{DarkStream}: Real-Time Speech Anonymization with Low Latency},

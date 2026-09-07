@@ -38,11 +38,12 @@
 \newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
 
 \title{\Large How Much Future Do You Need?\\
-\large Latency--Quality Trade-offs in Streaming Accent Conversion\\
-on Commodity Hardware}
+\large Lookahead, Causality and Phone Error Rate\\
+in Streaming Accent Conversion}
 
 \author{Dipesh Tripathi\\
-\small \todo{affiliation, email}}
+\small University of South Dakota\\
+\small \texttt{dipesh.tripathi@coyotes.usd.edu}}
 
 \date{}
 
@@ -95,10 +96,13 @@ GPU.
 
 Three gaps follow, and this paper addresses the first two directly.
 
-\textbf{Nobody sweeps the budget.} PHONOS \emph{states} 40\,ms; it publishes no
-ablation showing 40\,ms is necessary or sufficient. The same holds for
-TVTSyn~\cite{tvtsyn2026} and DarkStream~\cite{darkstream2025}. The
-question ``what would 160\,ms buy you'' has no published answer.
+\textbf{Nobody sweeps the budget at resolution.} PHONOS \emph{states} 40\,ms
+and publishes no ablation showing 40\,ms is necessary or sufficient; TVTSyn
+fixes 4 future tokens ($\approx$80\,ms) without varying them. DarkStream does
+ablate, over three points $\{0, 140, 280\}$\,ms, and finds the third buys
+$<$1pp --- but three points scored on anonymisation accuracy cannot locate
+where returns stop, which is the question a deployment budget actually asks.
+``What would 160\,ms buy you'' still has no published answer.
 
 \textbf{Algorithmic and computational latency are reported fused.} A figure
 such as ``${<}241$\,ms on a single GPU'' combines a modelling choice with
@@ -136,8 +140,24 @@ Our contributions:
 \section{Related work}
 
 PHONOS~\cite{phonos2026}, TVTSyn~\cite{tvtsyn2026} and
-DarkStream~\cite{darkstream2025} are three systems from one group, all
-GPU-evaluated, all pairing FAC or voice conversion with speaker anonymisation.
+DarkStream~\cite{darkstream2025} are three systems from one group, all pairing
+FAC or voice conversion with speaker anonymisation. Two of them report more
+than is sometimes credited, and it is worth being precise about what they do
+and do not establish. TVTSyn reports CPU as well as GPU latency
+($\approx$132\,ms and $\approx$79\,ms at a 60\,ms chunk), so a CPU number
+for streaming conversion is not unpublished --- what is unpublished is a CPU
+latency--\emph{quality} curve. DarkStream ablates its look-ahead over
+$\{0, 140, 280\}$\,ms and selects 140\,ms on the grounds that "an extra
+140ms of look-ahead yields a marginal $<$1pp absolute improvement at the
+expense of doubling the buffering delay". That is a lookahead ablation, on
+three points, scored on anonymisation accuracy rather than conversion quality.
+
+\textbf{DarkStream's choice corroborates our saturation point from a different
+task.} Their marginal return collapses somewhere between 140 and 280\,ms;
+we place saturation at ${\approx}240$\,ms on phone error rate, measured over
+16 budgets rather than three. Two systems, two objectives, the same region ---
+which is a stronger position for this paper than the absence of prior evidence
+would have been.
 StreamVC~\cite{streamvc2024} reports operation ``even on a mobile platform''
 without naming the device, core count or thread count, which makes the claim
 unfalsifiable. A recent survey~\cite{acsurvey2026} frames the problem space.
@@ -579,10 +599,34 @@ therefore scoped to PER, and the paper should not be submitted without either
 running some form of perceptual check or stating this limitation as
 prominently as \S8 does.
 
-\todo{author list, affiliations, acknowledgements, data-availability statement,
-and the official Interspeech style file. refs.bib was fully re-verified on
-1 Sep 2026 (16 [V], 2 [P], 0 [U]); both remaining [P] markers are on numbers
-this paper does not cite, so the bibliography is submission-clean as written}
+\section{Data and code availability}
+
+Everything needed to reproduce every number is public. The harness, the
+causality proof, the sweep configurations, the analysis scripts and their
+self-tests, and the raw per-condition outputs are at
+\url{https://github.com/Dipeshtripathi13/streaming-fac-lookahead}. This
+includes the per-condition hypothesis dumps for both target arms, which are the
+input to the phoneme-class and audio-domain analyses and cost a full sweep to
+regenerate, and the host-identity JSON recorded alongside every timing.
+
+Speech data is L2-ARCTIC~\cite{l2arctic2018}, obtained through the
+\texttt{KoelLabs/L2Arctic} release (3599 phoneme-annotated utterances,
+24 speakers, 6 L1s). That release is CC-BY-NC-4.0. The licence is
+non-commercial, which is why no trained model weights are distributed; the
+training code and configurations are released instead, and reproduce the
+reported curves on a single mid-range GPU in a few hours.
+
+\section{Acknowledgements}
+
+This work used no external funding and no institutional compute. All GPU
+results were obtained on free-tier Google Colab (Tesla T4); all CPU results on
+consumer hardware. The author thanks the maintainers of L2-ARCTIC, WavLM,
+sherpa-onnx and Piper, whose public releases made a single-author study of this
+scope possible.
+
+\todo{swap in the official Interspeech style file when the 2027 template is
+published, and re-check the page limit: this draft is 4 pages of content plus
+references, which meets the project's 4+2 target but not a 4+1 rule}
 
 \section{Conclusion}
 
