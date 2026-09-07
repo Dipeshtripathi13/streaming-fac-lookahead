@@ -129,6 +129,46 @@ Option 2 is probably the better use of effort than hunting for a cable: it
 serves the paper's actual claim rather than just closing a hole on hardware the
 paper does not centre.
 
+## 4b. The virtual-device route was tried too, and it also fails
+
+**Attempted 7 Sep 2026, rejected.** Option 1 above suggests a wired loopback so
+the signal never goes acoustic. A virtual audio device is the same idea without
+the cable: BlackHole 2ch is installed on this machine, exposes 2 in / 2 out, and
+a duplex stream on it returns the signal digitally, where echo cancellation
+cannot reach. `bench_tbuffer.py` gained a `--device` option for this.
+
+The path works mechanically -- a 1 kHz tone written to BlackHole comes back at
+peak 0.057 -- but it does not yield a usable number, for two reasons, and the
+second is the disqualifying one.
+
+**The detections are not trustworthy.** At the tool's default `--min-peak 0.2`
+every rep is rejected: the returned signal peaks around 0.014. Lowering the
+threshold to 0.01 makes 33 of 40 reps "pass", and the resulting distribution is
+not a latency distribution at all:
+
+| statistic | value |
+|---|---:|
+| p50 | 206.0 ms |
+| p90 | 491.1 ms |
+| p99 | 573.5 ms |
+| stdev | **117.4 ms** |
+
+p90 is 2.4x p50. With detection peaks sitting barely above the noise floor, the
+cross-correlation is locking onto spurious lags. The honest description of what
+happened is that a threshold was lowered until the tool produced output, which
+is the same failure this repository already documents three times.
+
+**And it would measure the wrong thing even if it were clean.** BlackHole is a
+software device with its own buffering and no converter. A number from it
+characterises BlackHole, not the ADC/DAC path that `t_buffer`'s I/O term is
+supposed to cover. It could at best corroborate the queueing interpretation in
+section 2 -- and the p50 of 206 ms is indeed close to the driver-reported
+201.69 ms excess -- but corroboration from an untrustworthy estimator is worth
+nothing.
+
+**Conclusion unchanged: the I/O term remains unmeasured.** A wired loopback
+through real converters, or a platform without AEC, is still what it takes.
+
 ## 5. What the paper should say now
 
 - t_buffer's **jitter component is measured at ~0.1 ms on Apple Silicon** and is

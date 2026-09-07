@@ -1,0 +1,56 @@
+{
+  "schema": "tbuffer/1",
+  "timestamp": "2026-09-07T13:48:50",
+  "platform": {
+    "system": "Darwin",
+    "machine": "arm64",
+    "release": "25.5.0",
+    "python": "3.11.15"
+  },
+  "config": {
+    "samplerate": 48000,
+    "blocksize_ms": 40.0,
+    "chunk_ms": 40.0
+  },
+  "loopback": {
+    "reps": 40,
+    "accepted": 33,
+    "rejected_low_correlation": 7,
+    "min_peak_threshold": 0.01,
+    "peak_p50": 0.014,
+    "air_propagation_ms": 0.0,
+    "distance_m": 0.0,
+    "input_rms_p50": 0.001896,
+    "input_peak_p50": 0.007794,
+    "input_silent": false,
+    "input_clipped": false,
+    "roundtrip_raw": {
+      "n": 33.0,
+      "mean": 234.296,
+      "p50": 206.0,
+      "p90": 491.146,
+      "p95": 498.0,
+      "p99": 573.458,
+      "max": 573.458,
+      "stdev": 117.435
+    },
+    "roundtrip_minus_air": {
+      "n": 33.0,
+      "mean": 234.296,
+      "p50": 206.0,
+      "p90": 491.146,
+      "p95": 498.0,
+      "p99": 573.458,
+      "max": 573.458,
+      "stdev": 117.435
+    },
+    "note": "Round-trip covers output + input. It includes one block of capture accumulation, which t_algorithmic already counts -- subtract blocksize_ms before adding to the budget."
+  },
+  "verdict": {
+    "source": "loopback (measured)",
+    "io_ms": 166.0,
+    "jitter_buffer_ms": 0.0,
+    "t_buffer_ms": 166.0,
+    "excludes": "block accumulation (40.0 ms), already counted in t_algorithmic as chunk_ms"
+  }
+}

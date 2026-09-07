@@ -221,7 +221,7 @@ def mode_probe(blocksize_ms: float, sr: int) -> Dict[str, object]:
     # PortAudio only fills in latency once a stream exists.
     for latency_hint in ("low", "high"):
         try:
-            with sd.Stream(
+            with sd.Stream(device=_DEVICE,
                 samplerate=sr, blocksize=block, channels=1,
                 dtype="float32", latency=latency_hint,
             ) as s:
@@ -243,7 +243,7 @@ def mode_probe(blocksize_ms: float, sr: int) -> Dict[str, object]:
     scaling = {}
     for bms in (10.0, 20.0, 40.0, 80.0):
         try:
-            with sd.Stream(samplerate=sr, blocksize=int(round(sr * bms / 1000.0)),
+            with sd.Stream(device=_DEVICE,samplerate=sr, blocksize=int(round(sr * bms / 1000.0)),
                            channels=1, dtype="float32", latency="low") as s2:
                 scaling[f"{bms:g}ms_block"] = {
                     "input_ms": round(float(s2.latency[0]) * 1000.0, 2),
@@ -287,7 +287,7 @@ def mode_jitter(
         outdata[:] = 0.0
 
     try:
-        with sd.Stream(
+        with sd.Stream(device=_DEVICE,
             samplerate=sr, blocksize=block, channels=1,
             dtype="float32", latency="low", callback=cb,
         ):
@@ -548,6 +548,22 @@ def self_test() -> int:
 
 # ==========================================================================
 
+# Selected audio device, as (input, output) or a single index. The acoustic
+# loopback is defeated by platform echo cancellation (see docs/TBUFFER_M4.md),
+# but a VIRTUAL device such as BlackHole gives a purely digital path: the
+# signal never becomes sound, so there is no echo for the OS to cancel. That
+# measures the software I/O path -- output buffer, driver, virtual device,
+# input buffer -- which the driver-reported numbers suggested is the dominant
+# term. It does NOT include ADC/DAC converter delay, because no converter is
+# in the path, and must be reported as the software path rather than as the
+# whole of t_buffer.
+_DEVICE = None
+
+
+def set_device(spec):
+    global _DEVICE
+    _DEVICE = spec
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", default="all",
@@ -571,7 +587,16 @@ def main() -> None:
     ap.add_argument("--min-peak", type=float, default=0.2)
     ap.add_argument("--target-underrun", type=float, default=1e-3)
     ap.add_argument("--out", default=None)
+    ap.add_argument("--device", default=None,
+                    help="audio device for the duplex stream: an index, or "
+                         "IN,OUT. Use a virtual device (e.g. BlackHole) for a "
+                         "digital loopback that echo cancellation cannot touch.")
     a = ap.parse_args()
+    if a.device:
+        parts = [int(x) for x in str(a.device).split(",")]
+        set_device(tuple(parts) if len(parts) > 1 else parts[0])
+        import sounddevice as _sd
+        print(f"device: {a.device} -> {_sd.query_devices(parts[0])['name']}")
 
     if a.self_test:
         sys.exit(self_test())
