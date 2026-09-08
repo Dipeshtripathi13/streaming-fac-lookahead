@@ -459,7 +459,17 @@ def main() -> None:
     ap.add_argument("--out", default="results/raw/translator_sweep")
     ap.add_argument("--smoke", action="store_true",
                     help="60 steps, 3 lookaheads, 120 utts -- proves the pipeline runs")
-    ap.add_argument("--verify-causality", action="store_true", default=True)
+    # store_true with default=True could never be switched off. The proof is a
+    # property of the encoder, not of the layer or the lookahead, so a sweep
+    # that re-runs it per condition pays for it repeatedly with no new
+    # information -- but it must stay ON by default, since a silently
+    # non-causal encoder invalidates every lookahead label.
+    ap.add_argument("--verify-causality", action=argparse.BooleanOptionalAction,
+                    default=True,
+                    help="Re-run the truncation proof and the padding-mask "
+                         "check before training. Disable ONLY when an "
+                         "identical encoder has already been verified in the "
+                         "same session.")
     ap.add_argument("--encoder-name", default="microsoft/wavlm-base-plus",
                     help="SSL encoder checkpoint. The causality proof is re-run "
                          "for whichever encoder is named, because the leaks "
