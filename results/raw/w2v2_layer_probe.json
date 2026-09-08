@@ -4,7 +4,16 @@
   "steps": 1200,
   "seed": 1337,
   "target": "native",
-  "note": "Layer chosen by INDEX to match WavLM is not the same as matching by function. Test PER by tap layer, all else identical.",
+  "note": "Layer chosen by INDEX to match WavLM is not the same as matching by function. Test PER by tap layer, all else identical. Decodability falls monotonically with depth across the whole probed range, so wav2vec2-base carries phones low in the stack where WavLM base+ carries them at 9.",
   "wavlm_layer9_reference_per": 0.22056,
-  "test_per_by_layer": {"4": 0.43726, "6": 0.58646, "8": 0.88008, "9": 0.92830, "10": 0.97135}
+  "test_per_by_layer": {
+    "4": 0.43726,
+    "6": 0.58646,
+    "8": 0.88008,
+    "9": 0.9283,
+    "10": 0.97135,
+    "2": 0.40185,
+    "3": 0.41069
+  },
+  "best_layer": 2
 }
