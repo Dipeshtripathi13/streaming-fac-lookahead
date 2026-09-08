@@ -1,0 +1,10 @@
+{
+  "encoder": "facebook/wav2vec2-base",
+  "lookahead_ms": 160,
+  "steps": 1200,
+  "seed": 1337,
+  "target": "native",
+  "note": "Layer chosen by INDEX to match WavLM is not the same as matching by function. Test PER by tap layer, all else identical.",
+  "wavlm_layer9_reference_per": 0.22056,
+  "test_per_by_layer": {"4": 0.43726, "6": 0.58646, "8": 0.88008, "9": 0.92830, "10": 0.97135}
+}
