@@ -1,0 +1,14 @@
+{
+  "encoder": "facebook/wav2vec2-base",
+  "steps": 1200, "seed": 1337, "target": "native",
+  "chunk_ms": 40, "lookback_ms": 2000,
+  "question": "Does lookahead sensitivity rise with depth, so that layer 2's small benefit is an artefact of tapping before contextual mixing?",
+  "answer": "No. Relative gain is flat at 3.9-5.4% for layers 2, 4 and 6, then negative at 8. It never approaches WavLM layer 9's 63.3%.",
+  "by_layer": {
+    "2": {"per_L0": 0.4359, "per_L640": 0.4189, "relative_gain": 0.0390},
+    "4": {"per_L0": 0.4590, "per_L640": 0.4343, "relative_gain": 0.0539},
+    "6": {"per_L0": 0.5735, "per_L640": 0.5438, "relative_gain": 0.0517},
+    "8": {"per_L0": 0.6940, "per_L640": 0.7920, "relative_gain": -0.1412}
+  },
+  "wavlm_reference": {"layer": 9, "per_L0": 0.4256, "per_L640": 0.1561, "relative_gain": 0.6333}
+}

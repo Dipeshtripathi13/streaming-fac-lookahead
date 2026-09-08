@@ -57,7 +57,13 @@ equally. Third, canonical-phone conversion benefits more from future context tha
 accent-faithful transcription at matched capacity ($-0.045$ against $-0.029$
 PER per doubling, $1.55\times$), and within the conversion arm the benefit is
 $1.32\times$ larger at positions where the speaker actually deviated from
-canonical. Fourth, per-chunk compute depends only weakly on
+canonical. Fourth, repeating the sweep on a second causalised encoder (wav2vec 2.0 base)
+changes the answer quantitatively: tapped at its own best phonetic layer it
+starts within $0.01$ PER of WavLM at $L{=}0$ yet gains only $3.9\%$ relative
+from $640$\,ms of lookahead, against $63.3\%$ --- so the exchange rate is a
+property of the encoder rather than of speech, while the qualitative shape
+(positive, smooth, diminishing, no knee) survives the swap. Fifth, per-chunk
+compute depends only weakly on
 lookahead --- at most $1.9\%$ on an Apple M4 and $7.6\%$ on an ARM64 Linux
 host across a $17\times$ change in algorithmic latency --- empirically
 decoupling lookahead from per-chunk compute over the tested range, subject to
@@ -442,6 +448,71 @@ attainable reduction and leaves 43\% unclaimed.
 diminishing-returns geometry with a measurable saturation point --- not as a
 knee.
 
+\subsection{The exchange rate is a property of the encoder, not of speech}
+\label{sec:encoder}
+
+Every number above is measured over one frozen backbone, so the obvious
+question is whether the exchange rate describes speech or describes WavLM. We
+repeated the sweep on a second causalised encoder, wav2vec 2.0
+base~\cite{wav2vec2}, holding the corpus, split, head, optimiser, step budget,
+seed, chunk, lookback and grid fixed and changing only the checkpoint. Both
+encoders are causalised by the same two patches and both pass the same
+truncation proof.
+
+\textbf{The layer must be matched by function, not by index.} Tapping
+wav2vec 2.0 at layer 9 --- WavLM's phonetic layer --- produces a degenerate
+run: PER rises from $0.772$ at $L{=}0$ to $0.928$ and the training loss is
+still falling steeply at step 1200. Probing the stack at $L{=}160$\,ms with
+everything else fixed shows why (PER by layer: $0.402$ at 2, $0.411$ at 3,
+$0.437$ at 4, $0.586$ at 6, $0.880$ at 8, $0.928$ at 9, $0.971$ at 10).
+Decodability falls monotonically with depth: this encoder carries phones low
+in the stack, and layer 9 is seven layers past its usable representation.
+Matching two encoders by layer index is not matching them.
+
+\begin{table}[t]
+\centering\small
+\caption{Same sweep, second encoder, each tapped at its own best phonetic
+layer. The two agree at $L{=}0$ and diverge entirely thereafter.}
+\label{tab:encoder}
+\begin{tabular}{lrrrr}
+\toprule
+& \multicolumn{1}{c}{$L{=}0$} & \multicolumn{1}{c}{$L{=}640$}
+& \multicolumn{1}{c}{rel.\ gain} & \multicolumn{1}{c}{PER/doubling} \\
+\midrule
+WavLM base+ (layer 9)      & 0.4256 & 0.1561 & $+63.3\%$ & $-0.0446$ \\
+wav2vec 2.0 base (layer 2) & 0.4359 & 0.4189 & $+3.9\%$  & $-0.0015$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Direction replicates; magnitude does not.} At its own best layer
+wav2vec 2.0 starts within $0.01$ PER of WavLM ($0.4359$ against $0.4256$) and
+then barely moves: $3.9\%$ relative gain against $63.3\%$, and $-0.0015$ PER
+per doubling against $-0.0446$. The log-linear fit that gives $R^2=0.989$ on
+WavLM gives $R^2=0.099$ here, and the curve bottoms out at $L{=}160$\,ms
+before rising again. The gain is nonetheless real rather than noise: $0.017$
+PER absolute is $5.9\times$ the $2\sigma$ repeatability floor.
+
+\textbf{This is not an artefact of tapping a shallow layer.} Layer 2 has had
+almost no contextual mixing, so the natural objection is that there was little
+context to withhold and that sensitivity would recover deeper in the stack. It
+does not. Relative gain from $L{=}0$ to $640$\,ms is $+3.9\%$ at layer 2,
+$+5.4\%$ at 4, $+5.2\%$ at 6 and $-14.1\%$ at 8 --- flat across every layer
+where the encoder can still decode phones, then negative. We looked for the
+trade-off and did not find it.
+
+Two encoders that are equally good with no future context therefore differ by
+a factor of $16$ in what they do with $640$\,ms of it. \textbf{The exchange
+rate of $-0.045$ PER per doubling is a property of WavLM base+, and should be
+read as one encoder's operating curve rather than as a fact about how much
+future context English phones require.} The qualitative claims survive the
+swap --- returns are positive, smooth and diminishing, with no knee --- and
+the quantitative ones, including the saturation point and the cost attributed
+to a 40\,ms budget, should be re-measured on whatever backbone a system
+actually deploys. Whether the gap traces to pretraining scale (960\,h against
+94\,k\,h), to WavLM's denoising and speaker-conditioned objectives, or to
+something else is not something a two-encoder comparison can decide.
+
 \subsection{RQ2: the preregistered manner grouping does not predict lookahead benefit}
 \label{sec:rq2}
 
@@ -796,7 +867,12 @@ rate hold to $5\times$ that budget; the dense sweep has two
 seeds per arm and no repeated cells, so its noise floor is imported from six
 accidental repeats in the other sweep and carries no confidence interval of its
 own. \tbuf{}'s I/O term is unmeasured, and compute is characterised on Apple
-Silicon and ARM64 Linux only.
+Silicon and ARM64 Linux only. The encoder comparison in
+\S\ref{sec:encoder} is two checkpoints at one seed, which is enough to show
+that the exchange rate does not transfer but not to attribute the gap to
+pretraining scale, objective or architecture; and each encoder is tapped at a
+single layer chosen by a probe at one lookahead, so the layer and the
+lookahead sensitivity are selected on partly overlapping evidence.
 
 \section{Conclusion}
 
@@ -804,9 +880,14 @@ For causal phone translation, future context buys accuracy at an approximately
 log-linear average rate of ${\approx}0.045$ PER per doubling, with no
 identifiable knee and measurable returns to saturation at
 ${\approx}340$\,ms --- well beyond PHONOS's 40\,ms translator budget, relative to
-which a further 39.8\% reduction is available. Lookahead changes algorithmic
-latency rather than per-chunk cost, though throughput must still satisfy
-$\tcmp<c$ (Eq.~\ref{eq:rtf}) to run at all.
+which a further 39.8\% reduction is available. That rate, however, is measured
+over one backbone: a second causalised encoder that matches WavLM at $L{=}0$
+recovers only $3.9\%$ of it from $640$\,ms of future context
+(\S\ref{sec:encoder}). The shape of the curve is the transferable finding; its
+slope, its saturation point and the cost it assigns to any particular budget
+must be re-measured per encoder. Lookahead changes algorithmic latency rather
+than per-chunk cost, though throughput must still satisfy $\tcmp<c$
+(Eq.~\ref{eq:rtf}) to run at all.
 
 \section{Acknowledgements}
 
