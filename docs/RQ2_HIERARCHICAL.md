@@ -39,6 +39,12 @@ The estimator is not simply too blunt for six speakers: the *same* procedure
 applied to RQ3 gives [−0.0211, −0.0069], which **excludes** zero. So the null
 here is a property of the manner grouping, not of the method.
 
+**Leave-one-speaker-out**, the non-asymptotic companion (six clusters do not
+supply the asymptotics a cluster bootstrap assumes): dropping each talker in
+turn gives **+0.0217 to +0.0592** against a pooled +0.0401. No single speaker
+drives the estimate, and the entire range sits inside an interval containing
+zero.
+
 **H2's verdict is unchanged. Its support is now weaker, not stronger.**
 
 ## The by-L1 table cannot carry weight

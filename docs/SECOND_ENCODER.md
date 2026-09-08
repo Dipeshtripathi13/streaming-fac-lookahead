@@ -22,6 +22,15 @@ same two patches and both pass the same truncation proof.
 |---|---:|---:|---:|---:|---:|
 | WavLM base+ (layer 9) | 0.4256 | 0.1561 | **+63.3%** | −0.0446 | 0.989 |
 | wav2vec 2.0 base (layer 2) | 0.4359 | 0.4189 | **+3.9%** | −0.0015 | 0.099 |
+| wav2vec 2.0 base, seed 7 | 0.4376 | 0.4265 | **+2.5%** | — | — |
+
+**Replicated at a second seed.** Seed 7 lands within 0.008 PER of seed 1337 at
+every shared budget (0.4376/0.4359 at L=0, 0.4219/0.4169 at 40, 0.4043/0.4004
+at 160, 0.4265/0.4189 at 640; seed 7 adds 0.4155 at 340). Both curves reach
+their minimum at **the same L=160 ms** and both rise again by 640 ms, so the
+non-monotonicity is a reproducible property of this encoder rather than one
+seed's noise — which matters, because that shape is the evidence that the
+curve shape does not transfer.
 
 The two are **equally good with no future context** — 0.4359 against 0.4256,
 within 0.01 PER — and then differ by a factor of 16 in what they do with
