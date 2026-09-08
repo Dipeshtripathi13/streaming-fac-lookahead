@@ -49,6 +49,15 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 NOISE_SIGMA = 0.00218          # measured, fixed-seed repeats (PADDING_FIX_RESOLVED §5)
 NOISE_2SIGMA = 2 * NOISE_SIGMA
+
+# The floor above came from six ACCIDENTAL repeats. It is now measured directly
+# from deliberate ones (results/analysis_noise_floor.json), so allow it to be
+# overridden rather than editing a constant: every "resolvable" decision in this
+# file is gated on it, and the saturation point moves with it.
+def set_noise_floor(two_sigma: float) -> None:
+    global NOISE_2SIGMA, NOISE_SIGMA
+    NOISE_2SIGMA = float(two_sigma)
+    NOISE_SIGMA = NOISE_2SIGMA / 2.0
 FRAME_MS = 20.0                # lookahead quantises to ceil(L / FRAME_MS) frames
 
 
@@ -415,8 +424,14 @@ def main() -> None:
                     help="which arm to analyse; required if the file has more "
                          "than one (pooling arms is refused)")
     ap.add_argument("--out", default="results/analysis_dense_knee.json")
+    ap.add_argument("--noise-2sigma", type=float, default=None,
+                    help="override the repeatability floor (default: the "
+                         "accidental-repeat estimate baked in above)")
     ap.add_argument("--self-test", action="store_true")
     a = ap.parse_args()
+    if getattr(a, "noise_2sigma", None):
+        set_noise_floor(a.noise_2sigma)
+        print(f"noise floor overridden: 2sigma = {a.noise_2sigma:.4f}")
 
     if a.self_test:
         sys.exit(self_test())

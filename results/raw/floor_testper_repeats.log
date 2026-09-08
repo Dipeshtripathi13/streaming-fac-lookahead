@@ -1,0 +1,18 @@
+RESULT  1/16  L=   40  test_per=0.32468  wall=189s
+RESULT  2/16  L=   40  test_per=0.32739  wall=189s
+RESULT  3/16  L=   40  test_per=0.32345  wall=189s
+RESULT  4/16  L=   40  test_per=0.32501  wall=189s
+RESULT  5/16  L=  160  test_per=0.22106  wall=189s
+RESULT  6/16  L=  160  test_per=0.22151  wall=189s
+RESULT  7/16  L=  160  test_per=0.21988  wall=189s
+RESULT  8/16  L=  160  test_per=0.22075  wall=189s
+RESULT  9/16  L=  240  test_per=0.19551  wall=189s
+RESULT 10/16  L=  240  test_per=0.19613  wall=189s
+RESULT 11/16  L=  240  test_per=0.19674  wall=189s
+RESULT 12/16  L=  240  test_per=0.19691  wall=189s
+RESULT 13/16  L=  320  test_per=0.17910  wall=189s
+RESULT 14/16  L=  320  test_per=0.18132  wall=189s
+RESULT 15/16  L=  320  test_per=0.18409  wall=189s
+RESULT 16/16  L=  320  test_per=0.17973  wall=189s
+returncode: 0
+

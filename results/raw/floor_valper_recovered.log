@@ -1,0 +1,257 @@
+/content
+device: cuda
+gpu   : Tesla T4
+{
+  "encoder": "microsoft/wavlm-base-plus",
+  "tolerance": 0.0001,
+  "mask_only": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.05146753787994385,
+    "relative_l2_delta": 0.01143796369433403,
+    "causal": false
+  },
+  "mask_posconv": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.005361229181289673,
+    "relative_l2_delta": 0.005996575113385916,
+    "causal": false
+  },
+  "mask_groupnorm": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.3265492916107178,
+    "relative_l2_delta": 0.025982631370425224,
+    "causal": false
+  },
+  "mask_both": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.0,
+    "relative_l2_delta": 0.0,
+    "causal": true
+  },
+  "verdict": "PASS. Masking attention alone does NOT make microsoft/wavlm-base-plus causal. The positional convolution (kernel 128) and the feature-encoder GroupNorm each leak future context; with both patched the truncation proof passes and the lookahead labels are valid.",
+  "with_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": true,
+    "group_norm_causal": true,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.0,
+    "relative_l2_delta": 0.0,
+    "causal": true
+  },
+  "without_fix": {
+    "mask_injection_strategy": "position_bias",
+    "pos_conv_causal": false,
+    "group_norm_causal": false,
+    "pos_conv_kernel": 128,
+    "pos_conv_leak_ms_if_unpatched": 1280.0,
+    "has_group_norm": true,
+    "max_abs_delta": 0.05146753787994385,
+    "relative_l2_delta": 0.01143796369433403,
+    "causal": false
+  }
+}
+{
+  "n_items": 3599,
+  "n_train": 1800,
+  "n_val": 899,
+  "n_test": 900,
+  "val_speakers": [
+    "ASI",
+    "BWC",
+    "HKK",
+    "MBMPS",
+    "TLV",
+    "YBAA"
+  ],
+  "test_speakers": [
+    "ABA",
+    "EBVS",
+    "HJK",
+    "LXC",
+    "PNV",
+    "SVBI"
+  ],
+  "vocab_size": 37,
+  "per_l1": {
+    "Arabic": 599,
+    "Chinese": 600,
+    "Hindi": 600,
+    "Korean": 600,
+    "Spanish": 600,
+    "Vietnamese": 600
+  },
+  "mean_dur_s": 3.66,
+  "mean_per_g2p_vs_ipa": 0.1748
+}
+corpus loaded in 72s
+4 conditions x 1200 steps
+[1/16] L40_native_s1337 seed=1337  chunk=40ms(2f) L=40ms(2f) lookback=100f t_algo=80ms (+5ms frontend)
+    caching frozen-encoder features (1800+200+400 utts)...
+/usr/local/lib/python3.13/dist-packages/torch/nn/functional.py:6409: UserWarning: Support for mismatched key_padding_mask and attn_mask is deprecated. Use same type for both instead.
+  key_padding_mask = _canonical_mask(
+      cached 400/1800 (17s)
+      cached 800/1800 (34s)
+      cached 1200/1800 (52s)
+      cached 1600/1800 (69s)
+    cached in 107s (reused for every seed of this condition)
+/usr/local/lib/python3.13/dist-packages/torch/nn/modules/activation.py:1336: UserWarning: Support for mismatched key_padding_mask and attn_mask is deprecated. Use same type for both instead.
+  key_padding_mask = F._canonical_mask(
+    L40_native_s1337 step 200/1200 loss 2.2890 (0.15s/step)
+    L40_native_s1337 step 400/1200 loss 1.2385 (0.15s/step)
+    L40_native_s1337 step 600/1200 loss 1.0854 (0.15s/step)
+    L40_native_s1337 step 800/1200 loss 0.3672 (0.15s/step)
+    L40_native_s1337 step 1000/1200 loss 0.3155 (0.15s/step)
+    L40_native_s1337 step 1000  val PER 0.3211  cross-PER 0.3663
+    L40_native_s1337 step 1200/1200 loss 0.2981 (0.15s/step)
+    L40_native_s1337 step 1200  val PER 0.3141  cross-PER 0.3612
+[2/16] L40_native_s1337 seed=1337  chunk=40ms(2f) L=40ms(2f) lookback=100f t_algo=80ms (+5ms frontend)
+    L40_native_s1337 step 200/1200 loss 2.2892 (0.15s/step)
+    L40_native_s1337 step 400/1200 loss 1.2383 (0.15s/step)
+    L40_native_s1337 step 600/1200 loss 1.0927 (0.15s/step)
+    L40_native_s1337 step 800/1200 loss 0.3842 (0.15s/step)
+    L40_native_s1337 step 1000/1200 loss 0.3230 (0.15s/step)
+    L40_native_s1337 step 1000  val PER 0.3225  cross-PER 0.3673
+    L40_native_s1337 step 1200/1200 loss 0.2894 (0.15s/step)
+    L40_native_s1337 step 1200  val PER 0.3217  cross-PER 0.3677
+[3/16] L40_native_s1337 seed=1337  chunk=40ms(2f) L=40ms(2f) lookback=100f t_algo=80ms (+5ms frontend)
+    L40_native_s1337 step 200/1200 loss 2.2887 (0.15s/step)
+    L40_native_s1337 step 400/1200 loss 1.2453 (0.15s/step)
+    L40_native_s1337 step 600/1200 loss 1.0554 (0.15s/step)
+    L40_native_s1337 step 800/1200 loss 0.3776 (0.15s/step)
+    L40_native_s1337 step 1000/1200 loss 0.3452 (0.15s/step)
+    L40_native_s1337 step 1000  val PER 0.3183  cross-PER 0.3635
+    L40_native_s1337 step 1200/1200 loss 0.3014 (0.15s/step)
+    L40_native_s1337 step 1200  val PER 0.3143  cross-PER 0.3581
+[4/16] L40_native_s1337 seed=1337  chunk=40ms(2f) L=40ms(2f) lookback=100f t_algo=80ms (+5ms frontend)
+    L40_native_s1337 step 200/1200 loss 2.2889 (0.15s/step)
+    L40_native_s1337 step 400/1200 loss 1.2405 (0.15s/step)
+    L40_native_s1337 step 600/1200 loss 1.0793 (0.15s/step)
+    L40_native_s1337 step 800/1200 loss 0.3864 (0.15s/step)
+    L40_native_s1337 step 1000/1200 loss 0.3238 (0.15s/step)
+    L40_native_s1337 step 1000  val PER 0.3199  cross-PER 0.3640
+    L40_native_s1337 step 1200/1200 loss 0.2875 (0.15s/step)
+    L40_native_s1337 step 1200  val PER 0.3115  cross-PER 0.3596
+[5/16] L160_native_s1337 seed=1337  chunk=40ms(2f) L=160ms(8f) lookback=100f t_algo=200ms (+5ms frontend)
+    caching frozen-encoder features (1800+200+400 utts)...
+      cached 400/1800 (19s)
+      cached 800/1800 (38s)
+      cached 1200/1800 (57s)
+      cached 1600/1800 (76s)
+    cached in 116s (reused for every seed of this condition)
+    L160_native_s1337 step 200/1200 loss 2.1729 (0.15s/step)
+    L160_native_s1337 step 400/1200 loss 1.0193 (0.15s/step)
+    L160_native_s1337 step 600/1200 loss 0.6441 (0.15s/step)
+    L160_native_s1337 step 800/1200 loss 0.3366 (0.15s/step)
+    L160_native_s1337 step 1000/1200 loss 0.1341 (0.15s/step)
+    L160_native_s1337 step 1000  val PER 0.2222  cross-PER 0.2987
+    L160_native_s1337 step 1200/1200 loss 0.0999 (0.15s/step)
+    L160_native_s1337 step 1200  val PER 0.2143  cross-PER 0.2902
+[6/16] L160_native_s1337 seed=1337  chunk=40ms(2f) L=160ms(8f) lookback=100f t_algo=200ms (+5ms frontend)
+    L160_native_s1337 step 200/1200 loss 2.1735 (0.15s/step)
+    L160_native_s1337 step 400/1200 loss 1.0216 (0.15s/step)
+    L160_native_s1337 step 600/1200 loss 0.6433 (0.15s/step)
+    L160_native_s1337 step 800/1200 loss 0.3530 (0.15s/step)
+    L160_native_s1337 step 1000/1200 loss 0.1306 (0.15s/step)
+    L160_native_s1337 step 1000  val PER 0.2216  cross-PER 0.2982
+    L160_native_s1337 step 1200/1200 loss 0.0981 (0.15s/step)
+    L160_native_s1337 step 1200  val PER 0.2152  cross-PER 0.2943
+[7/16] L160_native_s1337 seed=1337  chunk=40ms(2f) L=160ms(8f) lookback=100f t_algo=200ms (+5ms frontend)
+    L160_native_s1337 step 200/1200 loss 2.1733 (0.15s/step)
+    L160_native_s1337 step 400/1200 loss 1.0209 (0.15s/step)
+    L160_native_s1337 step 600/1200 loss 0.6446 (0.15s/step)
+    L160_native_s1337 step 800/1200 loss 0.3445 (0.15s/step)
+    L160_native_s1337 step 1000/1200 loss 0.1333 (0.15s/step)
+    L160_native_s1337 step 1000  val PER 0.2215  cross-PER 0.2981
+    L160_native_s1337 step 1200/1200 loss 0.0993 (0.15s/step)
+    L160_native_s1337 step 1200  val PER 0.2155  cross-PER 0.2940
+[8/16] L160_native_s1337 seed=1337  chunk=40ms(2f) L=160ms(8f) lookback=100f t_algo=200ms (+5ms frontend)
+    L160_native_s1337 step 200/1200 loss 2.1724 (0.15s/step)
+    L160_native_s1337 step 400/1200 loss 1.0168 (0.15s/step)
+    L160_native_s1337 step 600/1200 loss 0.6446 (0.15s/step)
+    L160_native_s1337 step 800/1200 loss 0.3309 (0.15s/step)
+    L160_native_s1337 step 1000/1200 loss 0.1236 (0.15s/step)
+    L160_native_s1337 step 1000  val PER 0.2200  cross-PER 0.2956
+    L160_native_s1337 step 1200/1200 loss 0.0987 (0.15s/step)
+    L160_native_s1337 step 1200  val PER 0.2153  cross-PER 0.2920
+[9/16] L240_native_s1337 seed=1337  chunk=40ms(2f) L=240ms(12f) lookback=100f t_algo=280ms (+5ms frontend)
+    caching frozen-encoder features (1800+200+400 utts)...
+      cached 400/1800 (19s)
+      cached 800/1800 (38s)
+      cached 1200/1800 (57s)
+      cached 1600/1800 (76s)
+    cached in 116s (reused for every seed of this condition)
+    L240_native_s1337 step 200/1200 loss 2.0602 (0.15s/step)
+    L240_native_s1337 step 400/1200 loss 0.8775 (0.15s/step)
+    L240_native_s1337 step 600/1200 loss 0.4758 (0.15s/step)
+    L240_native_s1337 step 800/1200 loss 0.1824 (0.15s/step)
+    L240_native_s1337 step 1000/1200 loss 0.1137 (0.15s/step)
+    L240_native_s1337 step 1000  val PER 0.1990  cross-PER 0.2877
+    L240_native_s1337 step 1200/1200 loss 0.0505 (0.15s/step)
+    L240_native_s1337 step 1200  val PER 0.1899  cross-PER 0.2778
+[10/16] L240_native_s1337 seed=1337  chunk=40ms(2f) L=240ms(12f) lookback=100f t_algo=280ms (+5ms frontend)
+    L240_native_s1337 step 200/1200 loss 2.0630 (0.15s/step)
+    L240_native_s1337 step 400/1200 loss 0.8849 (0.15s/step)
+    L240_native_s1337 step 600/1200 loss 0.4811 (0.15s/step)
+    L240_native_s1337 step 800/1200 loss 0.1827 (0.15s/step)
+    L240_native_s1337 step 1000/1200 loss 0.0958 (0.15s/step)
+    L240_native_s1337 step 1000  val PER 0.1974  cross-PER 0.2833
+    L240_native_s1337 step 1200/1200 loss 0.0485 (0.15s/step)
+    L240_native_s1337 step 1200  val PER 0.1887  cross-PER 0.2754
+[11/16] L240_native_s1337 seed=1337  chunk=40ms(2f) L=240ms(12f) lookback=100f t_algo=280ms (+5ms frontend)
+    L240_native_s1337 step 200/1200 loss 2.0637 (0.15s/step)
+    L240_native_s1337 step 400/1200 loss 0.8865 (0.15s/step)
+    L240_native_s1337 step 600/1200 loss 0.4842 (0.15s/step)
+    L240_native_s1337 step 800/1200 loss 0.1885 (0.15s/step)
+    L240_native_s1337 step 1000/1200 loss 0.0989 (0.15s/step)
+    L240_native_s1337 step 1000  val PER 0.1931  cross-PER 0.2782
+    L240_native_s1337 step 1200/1200 loss 0.0529 (0.15s/step)
+    L240_native_s1337 step 1200  val PER 0.1863  cross-PER 0.2736
+[12/16] L240_native_s1337 seed=1337  chunk=40ms(2f) L=240ms(12f) lookback=100f t_algo=280ms (+5ms frontend)
+    L240_native_s1337 step 200/1200 loss 2.0548 (0.15s/step)
+    L240_native_s1337 step 400/1200 loss 0.8723 (0.15s/step)
+    L240_native_s1337 step 600/1200 loss 0.4788 (0.15s/step)
+    L240_native_s1337 step 800/1200 loss 0.1693 (0.15s/step)
+    L240_native_s1337 step 1000/1200 loss 0.1042 (0.15s/step)
+    L240_native_s1337 step 1000  val PER 0.1993  cross-PER 0.2833
+    L240_native_s1337 step 1200/1200 loss 0.0604 (0.15s/step)
+    L240_native_s1337 step 1200  val PER 0.1923  cross-PER 0.2797
+[13/16] L320_native_s1337 seed=1337  chunk=40ms(2f) L=320ms(16f) lookback=100f t_algo=360ms (+5ms frontend)
+    caching frozen-encoder features (1800+200+400 utts)...
+      cached 400/1800 (19s)
+      cached 800/1800 (38s)
+      cached 1200/1800 (57s)
+      cached 1600/1800 (76s)
+    cached in 116s (reused for every seed of this condition)
+    L320_native_s1337 step 200/1200 loss 2.2138 (0.15s/step)
+    L320_native_s1337 step 400/1200 loss 0.7524 (0.15s/step)
+    L320_native_s1337 step 600/1200 loss 0.5042 (0.15s/step)
+    L320_native_s1337 step 800/1200 loss 0.1541 (0.15s/step)
+    L320_native_s1337 step 1000/1200 loss 0.0949 (0.15s/step)
+    L320_native_s1337 step 1000  val PER 0.1903  cross-PER 0.2759
+    L320_native_s1337 step 1200/1200 loss 0.0629 (0.15s/step)
+    L320_native_s1337 step 1200  val PER 0.1811  cross-PER 0.2676
+[14/16] L320_native_s1337 seed=1337  chunk=40ms(2f) L=320ms(16f) lookback=100f t_algo=360ms (+5ms frontend)
+    L320_native_s1337 step 200/1200 loss 2.1717 (0.15s/step)
+

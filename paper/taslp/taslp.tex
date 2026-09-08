@@ -39,10 +39,11 @@ improves smoothly with lookahead at $-0.045$ phone error rate (PER) per
 doubling ($R^2=0.98$) with \emph{no locatable knee}: a piecewise fit is
 preferred under every axis treatment we tried, yet the breakpoint moves between
 40 and 180\,ms and no bootstrap interval is narrower than three octaves.
-Instead of a knee we identify \emph{saturation} at ${\approx}240$\,ms: with the
-grid completed to 20\,ms spacing over 200--360\,ms, every one of the eight
-consecutive observed 20\,ms steps beyond 240\,ms buys less than the measured
-$2\sigma$ repeatability floor. At the 40\,ms lookahead used by PHONOS's translator, our
+Instead of a knee we identify \emph{saturation} at ${\approx}340$\,ms: with the
+grid completed to 20\,ms spacing over 200--360\,ms, and against a repeatability
+floor measured from deliberate fixed-seed repeats ($2\sigma=0.0029$), every
+observed 20\,ms step beyond 340\,ms buys less than that floor. The figure
+ranges 300--480\,ms across the floor's confidence interval. At the 40\,ms lookahead used by PHONOS's translator, our
 probe retains a further 39.8\% relative PER reduction between 40 and
 240\,ms.
 Second, a pre-registered hypothesis that vowels and approximants degrade faster
@@ -226,14 +227,26 @@ and a 16-lookahead $\times$ 2-seed dense sweep, run on \emph{both} target arms
 Linux host, CUDA-event or \texttt{perf\_counter\_ns} timed, 28--50 repetitions
 with three warm-up iterations discarded.
 
-\noindent\textbf{Noise floor.} Two sweep processes briefly ran concurrently by
-operator error, repeating six conditions at \emph{identical seed and
-configuration}. Those repeats are the only direct measurement of fixed-seed
-run-to-run noise available, and a multi-seed design cannot produce it: pairing
-within seed cancels seed effects but not this residual. Differences ranged
-$1.5\times10^{-4}$ to $6.5\times10^{-3}$ PER, giving $\sigma=0.0022$ and a
-$2\sigma$ resolvable threshold of $\mathbf{0.0044}$ PER. Every effect below is
-gated on it.
+\noindent\textbf{Repeatability floor.} A conventional multi-seed design does
+not isolate fixed-seed run-to-run nondeterminism: pairing within seed cancels
+seed effects but leaves this residual, which arises from nondeterministic GPU
+kernels. We measure it directly, repeating four conditions
+($L\in\{40,160,240,320\}$\,ms) four times each at \emph{identical seed and
+configuration}, giving 12 degrees of freedom on test PER:
+\begin{equation}
+\sigma = 0.00146, \qquad 2\sigma = \mathbf{0.0029}\ \text{PER},
+\label{eq:floor}
+\end{equation}
+with a bootstrap 95\% interval of $[0.0013, 0.0034]$ on $2\sigma$.
+
+This supersedes an earlier estimate of $2\sigma=0.0044$ taken from six
+\emph{accidental} repeats, which the present interval excludes; that estimate
+was inflated by a single outlying pair. The correction matters because the
+saturation point in \S\ref{sec:rq1} is defined against this floor, and a
+smaller floor makes smaller gains measurable. We also note the floor is not
+constant across conditions --- per-condition $\sigma$ spans $0.00064$ to
+$0.00223$, a factor of $3.5$ --- so a single global threshold is an
+approximation, and marginal decisions near it should be read as such.
 
 \section{Results}
 
@@ -296,9 +309,12 @@ step & $L{=}0$ & $40$ & $160$ & $240$ & $640$ \\
 \end{tabular}
 \end{table}
 
-Three results. \textbf{Training does flatten}: over the final 1500 steps every
-condition moves by $0.0005$--$0.0045$ PER, at or below the $0.0044$
-repeatability floor. \textbf{The ranking never reorders}: the ordering
+Three results. \textbf{Training largely flattens}: over the final 1500 steps
+the conditions move by $0.0005$--$0.0045$ PER. Against the measured $0.0029$
+floor (Eq.~\ref{eq:floor}) three of the five ($L{=}40$, $160$, $240$) have
+settled below it, while $L{=}0$ ($0.0041$) and $L{=}640$ ($0.0045$) are still
+drifting slightly above --- so 6000 steps is near, but not fully at,
+convergence for the two extremes. \textbf{The ranking never reorders}: the ordering
 $L{=}0 > 40 > 160 > 240 > 640$ holds at \textbf{12 of 12} checkpoints,
 including the earliest at step 500. \textbf{The exchange rate is stable}:
 fitted over $L\geq40$ it stays within $-0.0396$ to $-0.0461$ PER per doubling
@@ -356,57 +372,65 @@ The quantity below is therefore a per-\emph{observed}-step gain, not an average
 over wider sampled intervals.
 
 Gains run $+0.056$ (0$\rightarrow$20\,ms), $+0.021$ (60$\rightarrow$80) and
-$+0.0045$ (180$\rightarrow$200). Beyond 240\,ms, \textbf{every one of the eight
-consecutive observed steps falls below the $0.0044$ floor}: $0.9\times$
-(240$\rightarrow$260), $1.0$, $0.8$, $0.7$, $0.8$, $0.5$ out to 360\,ms, and
-$0.5$ and $0.3$ for the two longer intervals to 640\,ms. We therefore place
-\textbf{saturation at ${\approx}240$\,ms}, meaning the point beyond which no
-observed 20\,ms increment buys a measurable gain. Unlike a knee, this depends
-on the floor rather than on an axis choice.
+$+0.0045$ (180$\rightarrow$200). Against the measured floor of $0.0029$
+(Eq.~\ref{eq:floor}), every observed 20\,ms step remains above it out to
+340\,ms --- $1.1\times$ (200$\rightarrow$220), $2.0$, $1.3$, $1.5$, $1.2$,
+$1.1$, $1.1$ --- and every step beyond falls below: $0.7\times$
+(340$\rightarrow$360), and $0.7$ and $0.4$ for the two longer intervals to
+640\,ms. We therefore place \textbf{saturation at ${\approx}340$\,ms}: the
+point beyond which no observed 20\,ms increment buys a measurable gain.
 
-Two caveats keep this approximate rather than sharp. The 200$\rightarrow$220
-step is itself below the floor ($0.7\times$) while 220$\rightarrow$240 is above
-it ($1.3\times$), and the 220\,ms condition has the largest seed spread of any
-point on the curve ($0.0069$, larger than the floor itself) --- so the ordering
-around 220\,ms is not resolved, and returns are already marginal from about
-200\,ms. The floor is also estimated from six accidental repeats and carries no
-interval of its own. Read the result as saturation setting in over roughly
-200--240\,ms.
+\textbf{This figure moves with the floor, and we report the sensitivity rather
+than a single number.} Across the floor's bootstrap interval the saturation
+point ranges from 300\,ms (at $2\sigma=0.0034$) to 480\,ms (at $0.0013$). Under
+the superseded $0.0044$ estimate it would have been 240\,ms --- so the earlier
+figure was an artefact of an over-conservative floor, not of the curve. The
+gains between 200 and 340\,ms sit at only $1.1$--$2.0\times$ the floor, so this
+is a region where returns become marginal rather than a sharp cutoff. Unlike a
+knee, though, the quantity depends on the floor rather than on an axis
+choice, and the floor is now measured with 12 degrees of freedom.
 
 \begin{table}[t]
 \centering\small
 \caption{Conversion-arm PER against lookahead (mean of 2 seeds) and marginal
-return per added 20\,ms frame, in units of the measured $2\sigma{=}0.0044$
-floor. Below $1.0\times$ an additional frame is not measurably useful.}
+return per added 20\,ms frame, in units of the measured $2\sigma{=}0.0029$
+floor (Eq.~\ref{eq:floor}). Below $1.0\times$ an additional frame is not
+measurably useful. The grid is 20\,ms-spaced to 360\,ms; the final two rows
+average over wider intervals.}
 \label{tab:dense}
 \begin{tabular}{rrrr}
 \toprule
 $L$ (ms) & PER & gain/frame & $\times$ floor \\
 \midrule
 0   & 0.4256 & ---     & --- \\
-20  & 0.3701 & 0.0556  & 12.7 \\
-40  & 0.3275 & 0.0426  & 9.8 \\
-60  & 0.2963 & 0.0312  & 7.2 \\
-80  & 0.2754 & 0.0209  & 4.8 \\
-100 & 0.2564 & 0.0190  & 4.4 \\
-120 & 0.2446 & 0.0118  & 2.7 \\
-140 & 0.2269 & 0.0176  & 4.0 \\
-160 & 0.2206 & 0.0064  & 1.5 \\
-180 & 0.2106 & 0.0099  & 2.3 \\
-200 & 0.2062 & 0.0045  & 1.0 \\
-240 & 0.1973 & 0.0044  & 1.0 \\
-280 & 0.1891 & 0.0041  & \textbf{0.9} \\
-320 & 0.1823 & 0.0034  & \textbf{0.8} \\
-480 & 0.1649 & 0.0022  & \textbf{0.5} \\
-640 & 0.1561 & 0.0011  & \textbf{0.3} \\
+20  & 0.3700 & 0.0556  & 19.2 \\
+40  & 0.3275 & 0.0426  & 14.7 \\
+60  & 0.2963 & 0.0312  & 10.8 \\
+80  & 0.2754 & 0.0209  & 7.2 \\
+100 & 0.2564 & 0.0190  & 6.6 \\
+120 & 0.2446 & 0.0118  & 4.1 \\
+140 & 0.2269 & 0.0176  & 6.1 \\
+160 & 0.2206 & 0.0064  & 2.2 \\
+180 & 0.2106 & 0.0099  & 3.4 \\
+200 & 0.2062 & 0.0045  & 1.5 \\
+220 & 0.2030 & 0.0031  & 1.1 \\
+240 & 0.1973 & 0.0057  & 2.0 \\
+260 & 0.1934 & 0.0039  & 1.3 \\
+280 & 0.1891 & 0.0043  & 1.5 \\
+300 & 0.1855 & 0.0036  & 1.2 \\
+320 & 0.1823 & 0.0032  & 1.1 \\
+340 & 0.1790 & 0.0033  & 1.1 \\
+360 & 0.1770 & 0.0020  & \textbf{0.7} \\
+480 & 0.1649 & 0.0020  & \textbf{0.7} \\
+640 & 0.1561 & 0.0011  & \textbf{0.4} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \textbf{The cost of a 40\,ms budget.} PER at $L{=}40$\,ms is $0.3275$; at
-240\,ms it is $0.1973$. \textbf{Relative to the 40\,ms condition, increasing
-lookahead to 240\,ms reduces PER by a further 39.8\%}, and to 640\,ms by
-52.3\%. Measured instead against the full range available here
+340\,ms it is $0.1790$. \textbf{Relative to the 40\,ms condition, increasing
+lookahead to the saturation point reduces PER by a further 45.3\%}, and to
+640\,ms by 52.3\%. Measured instead against the full range available here
 ($L{=}0\rightarrow240$\,ms), a 40\,ms budget has already captured 57\% of the
 attainable reduction and leaves 43\% unclaimed.
 ``Current budgets are under-provisioned'' is thus supportable as
@@ -513,7 +537,7 @@ $L{=}0$ the two arms have similar PER ($0.4256$ vs $0.4427$, a gap of
 $0.0171$); by
 $L{=}640$\,ms the gap is $0.0939$, \textbf{5.5$\times$ wider}. It widens in
 13 of 15 adjacent steps, and the transcription arm is worse at 16 of 16
-lookaheads, every one by more than the $0.0044$ floor.
+lookaheads, every one by more than the $0.0029$ floor.
 
 The arms differ in their target tensor, which carries more than the task: label
 entropy, sequence length and annotation noise move with it. We therefore repeat
@@ -634,7 +658,7 @@ Silicon and ARM64 Linux only.
 For causal phone translation, future context buys accuracy at an approximately
 log-linear average rate of ${\approx}0.045$ PER per doubling, with no
 identifiable knee and measurable returns to saturation at
-${\approx}240$\,ms --- well beyond PHONOS's 40\,ms translator budget, relative to
+${\approx}340$\,ms --- well beyond PHONOS's 40\,ms translator budget, relative to
 which a further 39.8\% reduction is available. Lookahead changes algorithmic
 latency rather than per-chunk cost, though throughput must still satisfy
 $\tcmp<c$ (Eq.~\ref{eq:rtf}) to run at all.
