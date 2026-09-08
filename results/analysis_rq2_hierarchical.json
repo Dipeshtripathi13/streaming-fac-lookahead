@@ -4,6 +4,36 @@
     0.0,
     640.0
   ],
+  "leave_one_speaker_out": [
+    {
+      "dropped": "(none)",
+      "difference": 0.04006227232884574
+    },
+    {
+      "dropped": "ABA",
+      "difference": 0.03793764358919194
+    },
+    {
+      "dropped": "EBVS",
+      "difference": 0.046444272282093024
+    },
+    {
+      "dropped": "HJK",
+      "difference": 0.023941921955811907
+    },
+    {
+      "dropped": "LXC",
+      "difference": 0.059231242436653675
+    },
+    {
+      "dropped": "PNV",
+      "difference": 0.0216709223304824
+    },
+    {
+      "dropped": "SVBI",
+      "difference": 0.05329696051847699
+    }
+  ],
   "per_class": {
     "nasal": {
       "gain": 0.7155737704918033,

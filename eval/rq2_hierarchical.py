@@ -66,6 +66,27 @@ def rel_gain(lo: Dict[str, float], hi: Dict[str, float]) -> Dict[str, float]:
     return {c: (lo[c] - hi[c]) / lo[c] for c in lo if c in hi and lo[c] > 0}
 
 
+def leave_one_speaker_out(by_L, lo_L, hi_L, speakers, brk, srv):
+    """Recompute the between-group difference with each speaker removed.
+
+    A cluster bootstrap over six clusters leans on asymptotics that six does
+    not supply. Leave-one-out is the cheap non-asymptotic companion: if the
+    sign or the verdict flips when any single talker is dropped, the pooled
+    estimate is one speaker's result wearing a group's clothes.
+    """
+    out = []
+    for s_ in [None] + list(speakers):
+        keep = (lambda r: True) if s_ is None else (lambda r, x=s_: r["speaker"] != x)
+        g = rel_gain(class_rates(by_L[lo_L], keep), class_rates(by_L[hi_L], keep))
+        b = [g[c] for c in brk if c in g]
+        v = [g[c] for c in srv if c in g]
+        if not b or not v:
+            continue
+        out.append({"dropped": s_ or "(none)",
+                    "difference": sum(b) / len(b) - sum(v) / len(v)})
+    return out
+
+
 def _self_test() -> None:
     print("rq2_hierarchical self-test")
     ok = True
@@ -145,7 +166,16 @@ def main() -> None:
     print(f"    point {d_pt:+.4f}   95% CI [{d_lo:+.4f}, {d_hi:+.4f}]"
           f"   -> {'excludes' if (d_lo>0 or d_hi<0) else 'INCLUDES'} zero")
 
+    loo = leave_one_speaker_out(by_L, lo_L, hi_L, speakers, brk, srv)
+    print("\n  leave-one-speaker-out on the between-group difference")
+    for r in loo:
+        print(f"    drop {r['dropped']:<8s} {r['difference']:+.4f}")
+    span = [r["difference"] for r in loo[1:]]
+    print(f"    range across drops [{min(span):+.4f}, {max(span):+.4f}]"
+          f"  -> sign {'STABLE' if min(span) * max(span) > 0 else 'FLIPS'}")
+
     json.dump({"n_speakers": len(speakers), "lookaheads_ms": [lo_L, hi_L],
+               "leave_one_speaker_out": loo,
                "per_class": out_cls,
                "between_group": {"point": d_pt, "ci95": [d_lo, d_hi],
                                  "excludes_zero": bool(d_lo > 0 or d_hi < 0)},

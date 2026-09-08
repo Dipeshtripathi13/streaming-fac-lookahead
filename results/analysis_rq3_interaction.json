@@ -3,6 +3,32 @@
   "slope_unchanged": -0.039358081511536344,
   "difference": -0.012690161366400839,
   "ratio": 1.3224283521716167,
+  "leave_one_speaker_out": [
+    {
+      "dropped": "ABA",
+      "slope_difference": -0.013150520553347048
+    },
+    {
+      "dropped": "EBVS",
+      "slope_difference": -0.015221452251020388
+    },
+    {
+      "dropped": "HJK",
+      "slope_difference": -0.01172104670417521
+    },
+    {
+      "dropped": "LXC",
+      "slope_difference": -0.014629108195349481
+    },
+    {
+      "dropped": "PNV",
+      "slope_difference": -0.009520750050293014
+    },
+    {
+      "dropped": "SVBI",
+      "slope_difference": -0.012377939883655265
+    }
+  ],
   "speaker_bootstrap": {
     "n": 2000,
     "ci95": [

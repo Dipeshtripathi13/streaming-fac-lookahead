@@ -155,6 +155,23 @@ def main() -> None:
     print(f"  fraction of resamples with deviation steeper: {frac:.3f}")
     print(f"  -> {'EXCLUDES zero' if hi < 0 else 'INCLUDES zero (not resolved)'}")
 
+    # --- 1b. leave-one-speaker-out: the non-asymptotic companion ---
+    # A cluster bootstrap over six clusters relies on asymptotics six clusters
+    # do not supply. If dropping any single talker flips the sign, the pooled
+    # slope difference is one speaker's result wearing a group's clothes.
+    loo = []
+    for s_ in speakers:
+        rs = {L: [r for r in by_L[L] if r["speaker"] != s_] for L in by_L}
+        d_, u_ = slopes_by_group(rs)
+        if not (np.isnan(d_) or np.isnan(u_)):
+            loo.append({"dropped": s_, "slope_difference": d_ - u_})
+    print("\nleave-one-speaker-out on the slope difference")
+    for r in loo:
+        print(f"  drop {r['dropped']:<8s} {r['slope_difference']:+.4f}")
+    sp = [r["slope_difference"] for r in loo]
+    print(f"  range [{min(sp):+.4f}, {max(sp):+.4f}]"
+          f"  -> sign {'STABLE' if min(sp) * max(sp) > 0 else 'FLIPS'}")
+
     # --- 2. phone-matched: same phone type on both sides ---
     phones = [p for p, n in
               sorted(((p, sum(1 for r in by_L[Ls[0]] if r["phone"] == p))
@@ -174,6 +191,7 @@ def main() -> None:
 
     json.dump({"slope_deviation": sd, "slope_unchanged": su,
                "difference": point, "ratio": sd/su if su else None,
+               "leave_one_speaker_out": loo,
                "speaker_bootstrap": {"n": len(diffs), "ci95": [lo, hi],
                                      "frac_deviation_steeper": frac,
                                      "excludes_zero": bool(hi < 0)},
