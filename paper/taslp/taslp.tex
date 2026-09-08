@@ -49,7 +49,9 @@ probe retains a further 39.8\% relative PER reduction between 40 and
 Second, a pre-registered hypothesis that vowels and approximants degrade faster
 than obstruents is \emph{not supported}: all seven manner classes improve by
 52--72\% relative, and the between-group difference is smaller than the
-dispersion among classes within the groups. It still fails when errors are reweighted by
+dispersion among classes within the groups. Bootstrapping over the six test
+speakers rather than over phone tokens, that difference is $+0.040$ with a 95\%
+interval of $[-0.010, +0.101]$. It still fails when errors are reweighted by
 measured acoustic cost, so this is not an artefact of PER charging every error
 equally. Third, canonical-phone conversion benefits more from future context than
 accent-faithful transcription at matched capacity ($-0.045$ against $-0.029$
@@ -457,36 +459,63 @@ substitution or deletion charged to the class of the \emph{reference} phone:
 \begin{table}[t]
 \centering\small
 \caption{Relative error-rate reduction, $L{=}0\rightarrow640$\,ms. B =
-pre-registered as breaking first, S = as surviving. The predicted grouping does
-not order the data.}
+pre-registered as breaking first, S = as surviving. Intervals are
+percentile bootstrap over the six test speakers, not over phone
+tokens. The predicted grouping does not order the data.}
 \label{tab:h2}
-\begin{tabular}{llrr}
+\begin{tabular}{llrcr}
 \toprule
-& class & rel.\ gain & ref.\ phones \\
+& class & rel.\ gain & 95\% CI & ref.\ phones \\
 \midrule
-S & nasal        & 0.716 & 4\,020 \\
-B & approximant  & 0.700 & 4\,575 \\
-S & fricative    & 0.687 & 7\,659 \\
-B & vowel (mono) & 0.673 & 13\,008 \\
-B & vowel (diph) & 0.654 & 4\,824 \\
-S & stop         & 0.615 & 7\,071 \\
-S & affricate    & 0.525 & 1\,098 \\
+S & nasal        & 0.716 & [0.668, 0.779] & 4\,020 \\
+B & approximant  & 0.700 & [0.628, 0.774] & 4\,575 \\
+S & fricative    & 0.687 & [0.608, 0.774] & 7\,659 \\
+B & vowel (mono) & 0.673 & [0.595, 0.767] & 13\,008 \\
+B & vowel (diph) & 0.654 & [0.577, 0.758] & 4\,824 \\
+S & stop         & 0.615 & [0.550, 0.689] & 7\,071 \\
+S & affricate    & 0.525 & [0.397, 0.633] & 1\,098 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Group means differ in the predicted direction ($0.676$ vs $0.636$), but that is
-the weakest available reading and three stronger checks fail. The effect size
+the weakest available reading and four stronger checks fail. The effect size
 is $0.66$: the between-group difference ($0.040$) is smaller than the pooled SD
 across classes ($0.060$). The surviving group's \emph{internal} spread is
 $0.190$ --- $4.7\times$ the between-group difference. And 5 of 12 pairwise
 orderings are violated, with nasals out-gaining all three breaks-first classes.
-\textbf{The pattern does not hold within L1 either.} Splitting by native
-language, the predicted direction appears in only 3 of 6 L1s and the ratio of
-group gains straddles unity: Vietnamese $1.23$, Korean $1.19$, Arabic $1.08$,
-Spanish $1.02$, Hindi $0.99$, Chinese $0.92$. A grouping that reverses across
-half the languages in the corpus is not capturing a property of manner class.
-These are six speakers, so the by-L1 split is descriptive rather than powered.
+
+\textbf{At the right level of clustering the difference is not distinguishable
+from zero.} The 42{,}255 tokens per condition are not independent: they are
+nested in six speakers, and the claim at issue is about accented speech, for
+which the independent replicate is a talker rather than a phone. Resampling
+speakers rather than tokens (2000 draws, Table~\ref{tab:h2}) puts the
+between-group difference at $+0.040$ with a 95\% interval of
+$[-0.010, +0.101]$, which \textbf{includes zero}. Every individual class gain
+remains large and clearly non-zero --- the intervals in Table~\ref{tab:h2} sit
+between $0.40$ and $0.78$ --- so lookahead unambiguously helps every class;
+what fails to separate from zero is the \emph{grouping}. Token-level intervals
+would have been roughly an order of magnitude narrower and would have declared
+this difference significant, which is the error the clustering avoids. The same
+procedure applied to RQ3 (Sec.~\ref{sec:rq3}) \emph{does} exclude zero, so the
+null here is a property of this grouping rather than of an estimator too
+conservative to resolve anything at six speakers.
+
+\textbf{The pattern does not hold within L1 either, but that split cannot carry
+weight.} Splitting by native language, the ratio of group gains straddles
+unity: Vietnamese $1.23$, Korean $1.19$, Arabic $1.08$, Spanish $1.02$,
+Hindi $0.99$, Chinese $0.92$; requiring both the gain ratio and the mean slope
+to move in the predicted direction, only 3 of 6 qualify (Spanish clears the
+gain criterion but not the slope one). A grouping that reverses across a third
+of the languages in the corpus is not capturing a property of manner class.
+The deeper limitation is that in the speaker-disjoint test split \emph{each L1
+is represented by exactly one speaker} (ABA, LXC, SVBI, HJK, EBVS, PNV), so L1
+and talker are perfectly confounded: this table cannot separate a language
+effect from an individual one, and every ``by-L1'' row is equally readable as a
+single speaker's idiosyncrasy. We report it as a consistency check on the
+pooled result --- the reversals are informative because they show the pooled
+direction is not robust to \emph{any} disaggregation --- and not as evidence
+about native language.
 
 \textbf{H2 is not supported.} The finding is not that lookahead fails to help
 vowels --- every class improves 52--72\% relative, all above the floor. The

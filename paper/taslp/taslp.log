@@ -256,118 +256,50 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 38.
  (umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-
-LaTeX Warning: Citation `l2arctic2018' on page 1 undefined on input line 69.
-
-LaTeX Font Info:    Trying to load font information for T1+pcr on input line 69
+LaTeX Font Info:    Trying to load font information for T1+pcr on input line 70
 .
-(t1pcr.fd
+ (t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 69--69
+Underfull \hbox (badness 10000) in paragraph at lines 70--70
 \T1/ptm/m/n/8 self-tests and per-condition hy-poth-e-sis dumps: $https : / / gi
 thub . com /
  []
 
 
-Underfull \hbox (badness 3229) in paragraph at lines 69--69
+Underfull \hbox (badness 3229) in paragraph at lines 70--70
 \T1/ptm/m/n/8 Dipeshtripathi13 / streaming-[]fac-[]lookahead$. Data is L2-ARCTI
 C [[]] via
  []
-
-
-LaTeX Warning: Citation `phonos2026' on page 1 undefined on input line 77.
-
-
-LaTeX Warning: Citation `nguyen2025streaming' on page 1 undefined on input line
- 129.
-
-
-LaTeX Warning: Citation `phonos2026' on page 1 undefined on input line 131.
-
-
-LaTeX Warning: Citation `tvtsyn2026' on page 1 undefined on input line 134.
-
-
-LaTeX Warning: Citation `darkstream2025' on page 1 undefined on input line 134.
-
 
 [1
 
 
 ]
-
-LaTeX Warning: Citation `streamvc2024' on page 2 undefined on input line 146.
-
-
-LaTeX Warning: Citation `acsurvey2026' on page 2 undefined on input line 148.
-
-
-LaTeX Warning: Citation `streamvoiceanon2026' on page 2 undefined on input line
- 149.
-
-
-LaTeX Warning: Citation `streamvoiceanonplus2026' on page 2 undefined on input 
-line 149.
-
-
-LaTeX Warning: Citation `e2eanon2024' on page 2 undefined on input line 149.
-
-
-LaTeX Warning: Citation `zhao2021fac' on page 2 undefined on input line 151.
-
-
-LaTeX Warning: Citation `accentron2022' on page 2 undefined on input line 151.
-
-
-LaTeX Warning: Citation `llvc2023' on page 2 undefined on input line 151.
-
-
-LaTeX Warning: Citation `l2arctic2018' on page 2 undefined on input line 163.
-
-
-Underfull \hbox (badness 1675) in paragraph at lines 161--166
+Underfull \hbox (badness 1675) in paragraph at lines 165--170
 \T1/ptm/m/n/10 phone se-quence (\T1/pcr/m/n/10 ipa\T1/ptm/m/n/10 ). We op-er-a-
 tional-ize the phonetic-
  []
 
-
-LaTeX Warning: Citation `wavlm2022' on page 2 undefined on input line 179.
-
-
-LaTeX Warning: Citation `wav2vec2' on page 2 undefined on input line 179.
-
 [2]
 File: fig_dense_no_knee.png Graphic file (type bmp)
 <fig_dense_no_knee.png>
-
-
-LaTeX Warning: Citation `kassraftery1995' on page 3 undefined on input line 287
-.
-
-[3]
-
-LaTeX Warning: Reference `sec:remaining' on page 4 undefined on input line 419.
-
-
-
-Underfull \hbox (badness 2189) in paragraph at lines 423--423
- \T1/ptm/m/it/10 D. RQ3: canonical-phone pre-dic-tion ben-e-fits more from
+ [3]
+Underfull \hbox (badness 2042) in paragraph at lines 377--385
+[]\T1/ptm/m/n/10 Gains run $\OT1/cmr/m/n/10 +0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10
+ 056$ \T1/ptm/m/n/10 (0$\OMS/cmsy/m/n/10 !$\T1/ptm/m/n/10 20ms), $\OT1/cmr/m/n/
+10 +0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 021$ \T1/ptm/m/n/10 (60$\OMS/cmsy/m/n/10
+ !$\T1/ptm/m/n/10 80) and
  []
 
-
-Underfull \hbox (badness 1484) in paragraph at lines 522--530
-\T1/ptm/m/n/10 a re-quired jit-ter buffer of $\OT1/cmr/m/n/10 0\OML/cmm/m/it/10
- :\OT1/cmr/m/n/10 14$ \T1/ptm/m/n/10 and $\OT1/cmr/m/n/10 0\OML/cmm/m/it/10 :\O
-T1/cmr/m/n/10 08$\T1/ptm/m/n/10 ms with zero
- []
-
-[4] (taslp.bbl) [5] (taslp.aux)
+[4] [5]
+LaTeX Font Info:    Trying to load font information for T3+ptm on input line 73
+3.
+ (t3ptm.fd
+File: t3ptm.fd 2001/12/31 TIPA font definitions
+) [6] (taslp.bbl) [7] (taslp.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
-
-LaTeX Warning: There were undefined references.
-
  )
-Output written on taslp.xdv (5 pages, 39952 bytes).
+Output written on taslp.xdv (7 pages, 58388 bytes).
