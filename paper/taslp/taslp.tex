@@ -450,9 +450,20 @@ approximants would break first. The prediction is fixed in the public
 repository at commit \texttt{c5066dc} (2 Aug 2026), seven days before the
 hypothesis dumps it is tested on were committed (\texttt{b66d0a5}, 9 Aug
 2026), so the ordering is verifiable rather than asserted. The prediction was
-that vowels and approximants break first (formant trajectories over 80--250\,ms) while
-stops, fricatives, affricates and nasals would survive short lookahead (locally
-determined gestures). Testing this on 42{,}255 unique reference-phone tokens evaluated across seven
+that vowels and approximants break first while stops, fricatives, affricates
+and nasals would survive short lookahead. The reasoning was that vocalic
+identity is carried by formant movement across a syllable nucleus that is tens
+to hundreds of milliseconds long --- Peterson and Lehiste measured English
+syllable nuclei at roughly $80$--$250$\,ms \cite{petersonlehiste1960}, a range
+consistent with the vowel durations later reported over 139
+talkers \cite{hillenbrand1995} --- and that this movement is criterial rather
+than incidental, since even nominal monophthongs are identified better from a
+trajectory than from a steady-state slice \cite{nearey1986}, with glides and
+diphthongs differing from vowels in rate of formant change rather than in
+kind \cite{lehistepeterson1961}. Obstruents were placed on the other side
+because stop place is signalled by brief formant transitions to a
+locus \cite{delattre1955} and is recoverable from a short-time spectrum at the
+release \cite{stevensblumstein1978}, so a narrow window should suffice. Testing this on 42{,}255 unique reference-phone tokens evaluated across seven
 lookahead conditions (295{,}785 phone--condition observations), with each
 substitution or deletion charged to the class of the \emph{reference} phone:
 
