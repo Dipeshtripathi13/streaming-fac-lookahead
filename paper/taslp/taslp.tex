@@ -65,7 +65,8 @@ from $640$\,ms of lookahead, against $63.3\%$ --- so the exchange rate is a
 future-context sensitivity encoder-dependent rather than a universal property
 of the task. Nor does the detailed response transfer: where WavLM is smooth and
 log-linear ($R^2=0.99$), wav2vec 2.0 is weak and non-monotonic ($R^2=0.10$),
-bottoming out at $160$\,ms. What survives the swap is the absence of evidence
+bottoming out at $160$\,ms and rising again --- a shape reproduced at a second
+training seed. What survives the swap is the absence of evidence
 for a sharp knee in either. Fifth, per-chunk
 compute depends only weakly on
 lookahead --- at most $1.9\%$ on an Apple M4 and $7.6\%$ on an ARM64 Linux
@@ -207,8 +208,9 @@ making every output frame depend on every input frame.
 
 We verify causality by truncation: delete audio after frame $t$ and check
 whether any earlier frame moved (Table~\ref{tab:causal}). Note the third row:
-patching GroupNorm alone makes matters \emph{worse}. A partial causality fix is
-not a partial improvement.
+patching GroupNorm alone makes matters \emph{worse}. Removing one leakage path
+does not monotonically reduce truncation sensitivity, because the remaining
+mechanisms interact; a partial causality fix is not a partial improvement.
 
 \begin{table}[t]
 \centering\small
@@ -525,6 +527,7 @@ thereafter.}
 \midrule
 WavLM base+ (layer 9)      & 0.4256 & 0.1561 & $+63.3\%$ & $-0.0446$ \\
 wav2vec 2.0 base (layer 2) & 0.4359 & 0.4189 & $+3.9\%$  & $-0.0015$ \\
+\quad \emph{seed 7}        & 0.4376 & 0.4265 & $+2.5\%$  & --- \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -536,6 +539,17 @@ per doubling against $-0.0446$. The log-linear fit that gives $R^2=0.989$ on
 WavLM gives $R^2=0.099$ here, and the curve bottoms out at $L{=}160$\,ms
 before rising again. The gain is nonetheless real rather than noise: $0.017$
 PER absolute is $5.9\times$ the $2\sigma$ repeatability floor.
+
+\textbf{A second seed reproduces the weak, non-monotonic response.} The
+comparison carries a headline claim, so we replicated it at a second training
+seed on five budgets, including the 340\,ms onset that the first grid did not
+sample. Seed 7 lands within $0.008$ PER of seed 1337 at every shared budget
+($0.4376$/$0.4359$ at $L{=}0$, $0.4219$/$0.4169$ at 40, $0.4043$/$0.4004$ at
+160, $0.4265$/$0.4189$ at 640). Both curves reach their minimum at the same
+$L{=}160$\,ms and both rise again by 640\,ms, so the non-monotonicity is a
+reproducible feature of this encoder rather than one seed's noise. The endpoint
+gain is $+2.5\%$ against $+3.9\%$: the effect is small in both, and small in
+the same shape.
 
 \textbf{This is not an artefact of tapping a shallow layer.} Layer 2 has had
 almost no contextual mixing, so the natural objection is that there was little
@@ -648,8 +662,8 @@ is represented by exactly one speaker} (ABA, LXC, SVBI, HJK, EBVS, PNV), so L1
 and talker are perfectly confounded: this table cannot separate a language
 effect from an individual one, and every ``by-L1'' row is equally readable as a
 single speaker's idiosyncrasy. We report it as a consistency check on the
-pooled result --- the reversals are informative because they show the pooled
-direction is not robust to \emph{any} disaggregation --- and not as evidence
+pooled result --- the reversals show that the pooled ordering is not
+consistent across the six held-out speakers --- and not as evidence
 about native language.
 
 \textbf{H2 is not supported.} The finding is not that lookahead fails to help
@@ -886,8 +900,10 @@ sound, so echo cancellation cannot reach it --- also fails, for a different and
 more interesting reason. The path works mechanically, but the returned signal
 peaks near $0.014$; lowering the detection threshold until repetitions pass
 yields p50 $206$\,ms, p90 $491$\,ms, $\sigma=117$\,ms. A distribution whose p90
-is $2.4\times$ its p50 is not a latency distribution, and the honest
-description is that a threshold was lowered until the tool produced output.
+is $2.4\times$ its p50 is not a latency distribution. We therefore reject
+these measurements as threshold-dependent and not representative of converter
+latency: what the procedure records is that a detection threshold was lowered
+until the tool produced output.
 Such a device would also measure its own buffering rather than a converter.
 Closing this term needs a wired loopback through real converters, or a platform
 without echo cancellation in the path.
@@ -950,9 +966,10 @@ that threshold is global while the per-condition $\sigma$ it pools varies by a
 factor of $3.5$, so marginal decisions near the threshold should be treated as
 approximate. \tbuf{}'s I/O term is unmeasured, and compute is characterised on Apple
 Silicon and ARM64 Linux only. The encoder comparison in
-\S\ref{sec:encoder} is two checkpoints at one seed, which is enough to show
-that the exchange rate does not transfer but not to attribute the gap to
-pretraining scale, objective or architecture; and each encoder is tapped at a
+\S\ref{sec:encoder} is two checkpoints, with the wav2vec 2.0 result replicated
+at a second training seed but the WavLM curve resting on the seeds of the main
+sweep; that is enough to show the exchange rate does not transfer, but not to
+attribute the gap to pretraining scale, objective or architecture; and each encoder is tapped at a
 single layer chosen by a probe at one lookahead, so the layer and the
 lookahead sensitivity are selected on partly overlapping evidence.
 
