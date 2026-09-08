@@ -212,10 +212,18 @@ configuration & relative $L_2$ & causal? \\
 attention mask only        & $1.14\times10^{-2}$ & no \\
 \quad + causal positional conv & $6.00\times10^{-3}$ & no \\
 \quad + cumulative GroupNorm   & $2.60\times10^{-2}$ & no \\
-\textbf{both patches}      & $\mathbf{6.14\times10^{-6}}$ & \textbf{yes} \\
+\textbf{both patches}      & $\mathbf{4.58\times10^{-6}}$ & \textbf{yes} \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+The three leak magnitudes are stable across library versions and reproduce
+exactly. The patched row is not: at $10^{-6}$ it sits at float32 accumulation
+noise, and moves with the \texttt{transformers} release (an earlier version
+gave $6.14\times10^{-6}$). Both values are four orders of magnitude below the
+$10^{-4}$ threshold, so the verdict is unaffected --- but the row should be
+read as ``indistinguishable from causal at float32 precision'' rather than as
+a reproducible constant.
 
 \subsection{Lookahead is quantised}
 

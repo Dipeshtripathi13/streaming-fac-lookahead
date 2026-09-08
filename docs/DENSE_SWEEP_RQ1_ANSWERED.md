@@ -1,4 +1,21 @@
-# RQ1, answered: there is no knee to publish — there is a saturation point at ~240 ms
+# RQ1, answered: there is no knee to publish — there is a saturation point
+
+> **PARTIALLY SUPERSEDED (numbers, not conclusion).** This document was written
+> against an *imported* noise floor of 2σ = 0.0044, taken from six accidental
+> repeats in another sweep. That floor was later measured directly, from
+> deliberate fixed-seed repeats: **2σ = 0.0029** (df = 12), whose confidence
+> interval [0.0013, 0.0034] *excludes* 0.0044. A smaller floor keeps steps
+> "measurable" for longer, so **saturation moved 240 ms → 340 ms**, and the
+> grid was completed to 20 ms spacing over 200–360 ms to support it.
+>
+> The two headline conclusions are unchanged and were, if anything,
+> strengthened: **there is no locatable knee**, and **the exchange rate
+> (−0.045 PER per doubling) is the citable result.** Everything below about
+> breakpoint unidentifiability still stands. Read "240 ms" as "340 ms" and
+> "0.0044" as "0.0029"; the paper (§RQ1) is authoritative.
+>
+> A further caveat added later: the exchange rate is **encoder-specific** —
+> see [`SECOND_ENCODER.md`](SECOND_ENCODER.md).
 
 **Status: RQ1 answered on the trained curve.** Supersedes the provisional
 answers in `PROPOSAL_v2.md` §3 (encoder-level F8) and the knee claim in
