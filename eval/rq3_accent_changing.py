@@ -32,14 +32,14 @@ sys.path.insert(0, os.path.dirname(__file__))
 from analyse_h2_sequences import align
 
 
-def changed_mask(g2p: Sequence[str], ipa: Sequence[str]) -> List[bool]:
+def changed_mask(g2p: Sequence[str], ipa: Sequence[str], tie: str = "sdi") -> List[bool]:
     """Per g2p position: did the speaker deviate from canonical here?
 
     Insertions in the ipa stream consume no g2p position, matching how
     analyse_h2_sequences charges errors to the reference phone.
     """
     out: List[bool] = []
-    for op, _rp, _hp in align(list(g2p), list(ipa)):
+    for op, _rp, _hp in align(list(g2p), list(ipa), tie=tie):
         if op == "ins":
             continue
         out.append(op != "ok")

@@ -40,12 +40,12 @@ from analyse_h2_sequences import align
 from rq3_accent_changing import changed_mask, correct_mask
 
 
-def positions(hyps: Sequence[dict]) -> List[dict]:
+def positions(hyps: Sequence[dict], tie: str = "sdi") -> List[dict]:
     """One record per reference position: speaker, phone, deviation, error."""
     out = []
     for h in hyps:
         g, i, p = list(h["g2p"]), list(h["ipa"]), list(h["pred"])
-        ch, ok = changed_mask(g, i), correct_mask(g, p)
+        ch, ok = changed_mask(g, i, tie=tie), correct_mask(g, p)
         n = min(len(ch), len(ok), len(g))
         for k in range(n):
             out.append({"speaker": h.get("speaker"), "phone": g[k],
@@ -119,13 +119,18 @@ def main() -> None:
     ap.add_argument("--boot", type=int, default=2000)
     ap.add_argument("--out", default="results/analysis_rq3_interaction.json")
     ap.add_argument("--self-test", action="store_true")
+    ap.add_argument("--tie", default="sdi", choices=["sdi", "dsi"],
+                    help="Levenshtein backtrace preference: sdi = substitution "
+                         "> deletion > insertion (default), dsi = deletion "
+                         "first. Used to show the interaction does not depend "
+                         "on how ambiguous alignments are broken.")
     a = ap.parse_args()
     if a.self_test: _self_test(); return
 
     by_L: Dict[float, List[dict]] = {}
     for f in sorted(glob.glob(os.path.join(a.hyp_dir, f"hyps_L*_{a.target}_s*.json"))):
         d = json.load(open(f))
-        by_L.setdefault(float(d["lookahead_ms"]), []).extend(positions(d["hyps"]))
+        by_L.setdefault(float(d["lookahead_ms"]), []).extend(positions(d["hyps"], tie=a.tie))
     Ls = sorted(by_L)
     speakers = sorted({r["speaker"] for r in by_L[Ls[0]]})
     print(f"{len(Ls)} lookaheads, {len(speakers)} speakers, "

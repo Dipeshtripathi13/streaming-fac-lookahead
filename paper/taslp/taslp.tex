@@ -47,8 +47,9 @@ less than that floor, and the average per-20\,ms gain stays below it
 thereafter. Propagating the floor's bootstrap interval moves the onset over
 300--480\,ms. At the 40\,ms lookahead used by PHONOS's translator, our probe
 retains a further 45.3\% relative PER reduction between 40 and 340\,ms.
-Second, a pre-registered hypothesis that vowels and approximants degrade faster
-than obstruents is \emph{not supported}: all seven manner classes improve by
+Second, a pre-registered hypothesis that vowels and approximants would benefit
+more from future context than stops, fricatives, affricates and nasals is
+\emph{not supported}: all seven manner classes improve by
 52--72\% relative, and the between-group difference is smaller than the
 dispersion among classes within the groups. Bootstrapping over the six test
 speakers rather than over phone tokens, that difference is $+0.040$ with a 95\%
@@ -58,16 +59,16 @@ equally. Third, canonical-phone prediction benefits more from future context tha
 realized-phone transcription at matched capacity ($-0.045$ against $-0.029$
 PER per doubling, $1.55\times$), and within the conversion arm the benefit is
 $1.32\times$ larger in absolute PER slope at canonical-deviation positions
-($\mathrm{g2p}\neq\mathrm{ipa}$). Fourth, repeating the sweep on a second causalised encoder (wav2vec 2.0 base)
+(substitutions and deletions in the g2p--IPA alignment). Fourth, repeating the sweep on a second causalised encoder (wav2vec 2.0 base)
 changes the answer quantitatively: tapped at its own selected phonetic layer it
 starts within $0.01$ PER of WavLM at $L{=}0$ yet gains only $3.9\%$ relative
 from $640$\,ms of lookahead, against $63.3\%$ --- so the exchange rate is a
-future-context sensitivity encoder-dependent rather than a universal property
-of the task. Nor does the detailed response transfer: where WavLM is smooth and
+the measured exchange rate is encoder-dependent rather than a universal
+property of the task. Nor does the detailed response transfer: where WavLM is smooth and
 log-linear ($R^2=0.99$), wav2vec 2.0 is weak and non-monotonic ($R^2=0.10$),
 bottoming out at $160$\,ms and rising again --- a shape reproduced at a second
-training seed. What survives the swap is the absence of evidence
-for a sharp knee in either. Fifth, per-chunk
+training seed: its response is weak and non-monotonic rather than knee-like.
+Fifth, per-chunk
 compute depends only weakly on
 lookahead --- at most $1.9\%$ on an Apple M4 and $7.6\%$ on an ARM64 Linux
 host across a $17\times$ change in algorithmic latency --- a weak empirical
@@ -140,11 +141,13 @@ Our contributions:
       speaker-level resampling, leave-one-speaker-out and within-phone
       stratification for
       phone identity (\S\ref{sec:rq3}).
+\item A cross-encoder test showing that neither the exchange rate nor the
+      detailed curve shape transfers from WavLM base+ to wav2vec 2.0 base,
+      replicated at a second seed (\S\ref{sec:encoder}).
 \item Two patches that make a masked SSL encoder causal, with
       truncation-based causality verification (\S\ref{sec:causal}).
 \item Three documented measurement failures, each of which produced plausible
-      output before being caught, and a measured repeatability floor that
-      supersedes an earlier over-conservative estimate (\S\ref{sec:lessons}).
+      output before being caught (\S\ref{sec:lessons}).
 \end{enumerate}
 
 \section{Related work}
@@ -343,18 +346,20 @@ step & $L{=}0$ & $40$ & $160$ & $240$ & $640$ \\
 \end{table}
 
 Three results. \textbf{Training largely flattens}: over the final 1500 steps
-the conditions move by $0.0005$--$0.0045$ PER. Against the measured $0.0029$
-floor (Eq.~\ref{eq:floor}) three of the five ($L{=}40$, $160$, $240$) have
-settled below it, while $L{=}0$ ($0.0041$) and $L{=}640$ ($0.0045$) are still
-drifting slightly above --- so 6000 steps is near, but not fully at,
-convergence for the two extremes. \textbf{The ranking never reorders}: the ordering
+validation PER moves by only $0.0005$--$0.0045$ across the five conditions, the
+two extremes ($L{=}0$ at $0.0041$, $L{=}640$ at $0.0045$) still drifting
+slightly more than the middle three, so 6000 steps is near but not fully at
+convergence. We deliberately do not test these against the repeatability floor
+of Eq.~\ref{eq:floor}: that floor estimates fixed-seed variation of \emph{test}
+PER under complete reruns, which is not the same object as a validation
+checkpoint trajectory within a single run. \textbf{The ranking never reorders}: the ordering
 $L{=}0 > 40 > 160 > 240 > 640$ holds at \textbf{12 of 12} checkpoints,
 including the earliest at step 500. \textbf{The exchange rate is stable}:
 fitted over $L\geq40$ it stays within $-0.0396$ to $-0.0461$ PER per doubling
 at every checkpoint. Validation runs every 500 steps, so this run has no
 checkpoint at the 1200-step budget used elsewhere; the nearest is step 1000,
 whose fitted slope ($-0.0405$) agrees with the 6000-step value ($-0.0414$) to
-within $0.001$, far inside the noise floor. The bracketing checkpoints agree
+within $0.0009$\,PER per doubling. The bracketing checkpoints agree
 too ($-0.0461$ at 500, $-0.0397$ at 1500), so the budget used elsewhere sits in
 a flat region of this curve rather than at a favourable point on it.
 
@@ -479,7 +484,7 @@ diminishing-return region.} We stop at that scoped statement rather than the
 general claim that current budgets are under-provisioned: \S\ref{sec:encoder}
 exhibits a backbone on which the same extra context buys almost nothing.
 
-\subsection{The exchange rate is a property of the encoder, not of speech}
+\subsection{The exchange rate does not transfer across encoders}
 \label{sec:encoder}
 
 Every number above is measured over one frozen backbone, so the obvious
@@ -517,8 +522,8 @@ would be cleaner still to fix both layers by a pre-registered rule.
 \begin{table}[t]
 \centering\small
 \caption{Same sweep, second encoder, each tapped at its selected phonetic
-layer (\S\ref{sec:encoder}). The two agree at $L{=}0$ and diverge entirely
-thereafter.}
+layer (\S\ref{sec:encoder}). The two start with similar PER at $L{=}0$ but
+exhibit markedly different lookahead responses.}
 \label{tab:encoder}
 \begin{tabular}{lrrrr}
 \toprule
@@ -537,15 +542,16 @@ wav2vec 2.0 starts within $0.01$ PER of WavLM ($0.4359$ against $0.4256$) and
 then barely moves: $3.9\%$ relative gain against $63.3\%$, and $-0.0015$ PER
 per doubling against $-0.0446$. The log-linear fit that gives $R^2=0.989$ on
 WavLM gives $R^2=0.099$ here, and the curve bottoms out at $L{=}160$\,ms
-before rising again. The gain is nonetheless real rather than noise: $0.017$
-PER absolute is $5.9\times$ the $2\sigma$ repeatability floor.
+before rising again. The endpoint gain nonetheless exceeds the fixed-seed repeatability floor and
+is reproduced at a second training seed.
 
 \textbf{A second seed reproduces the weak, non-monotonic response.} The
 comparison carries a headline claim, so we replicated it at a second training
 seed on five budgets, including the 340\,ms onset that the first grid did not
 sample. Seed 7 lands within $0.008$ PER of seed 1337 at every shared budget
 ($0.4376$/$0.4359$ at $L{=}0$, $0.4219$/$0.4169$ at 40, $0.4043$/$0.4004$ at
-160, $0.4265$/$0.4189$ at 640). Both curves reach their minimum at the same
+160, $0.4265$/$0.4189$ at 640; seed 7 gives $0.4155$ at 340, where seed 1337
+sampled 320 and gave $0.4028$). Both curves reach their minimum at the same
 $L{=}160$\,ms and both rise again by 640\,ms, so the non-monotonicity is a
 reproducible feature of this encoder rather than one seed's noise. The endpoint
 gain is $+2.5\%$ against $+3.9\%$: the effect is small in both, and small in
@@ -559,15 +565,17 @@ $+5.4\%$ at 4, $+5.2\%$ at 6 and $-14.1\%$ at 8 --- flat across every layer
 where the encoder can still decode phones, then negative. We looked for the
 trade-off and did not find it.
 
-Two encoders that are equally good with no future context therefore differ by
-a factor of $16$ in what they do with $640$\,ms of it. \textbf{The exchange
+Two encoders with similar zero-lookahead PER therefore differ by more than an
+order of magnitude in endpoint relative gain --- a statement that holds for
+both wav2vec 2.0 seeds ($+2.5\%$ and $+3.9\%$ against $+63.3\%$). \textbf{The exchange
 rate of $-0.045$ PER per doubling is a property of WavLM base+, and should be
 read as one encoder's operating curve rather than as a fact about how much
 future context English phones require.} The swap falsifies any
 backbone-independent quantitative law, and it also shows that the detailed
 shape need not carry over: WavLM's smooth diminishing-return curve has no
-counterpart in wav2vec 2.0's weak, non-monotonic one. The only feature common
-to both is the negative one --- neither shows a sharp knee. Every positive
+counterpart in wav2vec 2.0's weak, non-monotonic one. We do not run the
+breakpoint and axis-perturbation analysis of \S\ref{sec:rq1} on a curve that
+is not monotone, so we make no knee claim about it either way. Every positive
 quantity here, the exchange rate, the saturation onset and the cost attributed
 to a 40\,ms budget, should therefore be re-measured on whatever backbone a
 system actually deploys. Whether the gap traces to pretraining scale (960\,h against
@@ -640,9 +648,10 @@ between $0.40$ and $0.78$ --- so every class shows a substantial positive gain;
 what fails to separate from zero is the \emph{grouping}. Token-level intervals
 would have been roughly an order of magnitude narrower and would have declared
 this difference significant, which is the error the clustering avoids. The same
-procedure applied to RQ3 (Sec.~\ref{sec:rq3}) \emph{does} exclude zero, so the
-null here is a property of this grouping rather than of an estimator too
-conservative to resolve anything at six speakers.
+procedure applied to RQ3 (Sec.~\ref{sec:rq3}) resolves the larger interaction
+there, showing that the estimator is not uniformly uninformative at six
+speakers --- though that does not by itself establish power for an effect this
+small.
 A cluster bootstrap over six clusters leans on asymptotics that six clusters do
 not supply, so we add the non-asymptotic companion: recomputing the difference
 with each speaker removed in turn gives $+0.0217$ to $+0.0592$ (pooled
@@ -655,8 +664,9 @@ weight.} Splitting by native language, the ratio of group gains straddles
 unity: Vietnamese $1.23$, Korean $1.19$, Arabic $1.08$, Spanish $1.02$,
 Hindi $0.99$, Chinese $0.92$; requiring both the gain ratio and the mean slope
 to move in the predicted direction, only 3 of 6 qualify (Spanish clears the
-gain criterion but not the slope one). A grouping that reverses across a third
-of the languages in the corpus is not capturing a property of manner class.
+gain criterion but not the slope one). The reversals show that the pooled
+ordering is not consistent across the six held-out speakers, each of whom
+carries a distinct L1 label.
 The deeper limitation is that in the speaker-disjoint test split \emph{each L1
 is represented by exactly one speaker} (ABA, LXC, SVBI, HJK, EBVS, PNV), so L1
 and talker are perfectly confounded: this table cannot separate a language
@@ -795,7 +805,11 @@ aligned operation is a substitution or a deletion; an insertion in the
 are charged to canonical positions by the same rule, aligning \texttt{g2p}
 against the CTC hypothesis, so that deviation status and error status index the
 same sequence. Where ties occur the backtrace prefers substitution over
-deletion over insertion, making the mapping deterministic. This is the
+deletion over insertion, making the mapping deterministic. One consequence
+belongs with the result: because everything is indexed to canonical positions,
+realized-phone insertions are excluded from this analysis, so it covers the
+substitution and deletion deviations rather than every way the two strings can
+differ. This is the
 convention used throughout the paper, including the manner-class analysis of
 \S\ref{sec:rq2}.
 
@@ -816,7 +830,12 @@ speakers as independent would manufacture significance, so we bootstrap over
 $[-0.0211, -0.0069]$, excluding zero, and deviation positions are steeper in
 2000 of 2000 resamples. Leave-one-speaker-out agrees and is not asymptotic:
 dropping each talker in turn gives $-0.0152$ to $-0.0095$, negative in all six
-cases and never approaching zero. Recomputing the difference \emph{within each reference
+cases and never approaching zero. The result is also insensitive to how
+ambiguous alignments are resolved: re-running with the backtrace preferring
+deletion over substitution moves the slope difference from $-0.0127$ to
+$-0.0131$ (ratio $1.32$ to $1.33$, CI $[-0.0218, -0.0071]$, still 26 of 35
+phones in the same direction), so a deterministic tie rule is not doing the
+work. Recomputing the difference \emph{within each reference
 phone} and pooling gives $-0.0098$, steeper in 26 of 35 phones --- so phone
 composition accounts for roughly a quarter of the raw gap but not the effect.
 We report this as an association under matched conditions, not as evidence
@@ -837,7 +856,7 @@ transcription arm's own curve is just as log-linear, with a shallower slope.
 \centering\small
 \caption{Both arms on the dense grid, mean of 2 seeds. The gap is the
 transcription arm's PER minus the conversion arm's: near zero at $L{=}0$ and
-near zero at $L{=}0$ and substantially wider at large lookahead; the full
+substantially wider at large lookahead; the full
 16-point curve widens in 13 of 15 adjacent steps rather than monotonically.}
 \label{tab:h3dense}
 \begin{tabular}{rrrr}
@@ -900,7 +919,9 @@ sound, so echo cancellation cannot reach it --- also fails, for a different and
 more interesting reason. The path works mechanically, but the returned signal
 peaks near $0.014$; lowering the detection threshold until repetitions pass
 yields p50 $206$\,ms, p90 $491$\,ms, $\sigma=117$\,ms. A distribution whose p90
-is $2.4\times$ its p50 is not a latency distribution. We therefore reject
+is $2.4\times$ its p50, on a signal this weak and with this much threshold
+dependence, is not consistent with a stable measurement of converter latency.
+We therefore reject
 these measurements as threshold-dependent and not representative of converter
 latency: what the procedure records is that a detection threshold was lowered
 until the tool produced output.
@@ -969,14 +990,15 @@ Silicon and ARM64 Linux only. The encoder comparison in
 \S\ref{sec:encoder} is two checkpoints, with the wav2vec 2.0 result replicated
 at a second training seed but the WavLM curve resting on the seeds of the main
 sweep; that is enough to show the exchange rate does not transfer, but not to
-attribute the gap to pretraining scale, objective or architecture; and each encoder is tapped at a
-single layer chosen by a probe at one lookahead, so the layer and the
-lookahead sensitivity are selected on partly overlapping evidence.
+attribute the gap to pretraining scale, objective or architecture; and the layer-selection protocols are not
+fully symmetric: WavLM's layer 9 was fixed a priori from prior practice,
+whereas wav2vec 2.0's was selected by a phonetic probe at one lookahead, though
+re-selection at $L{=}0$ returns the same layer.
 
 \section{Conclusion}
 
-For causal phone translation, future context buys accuracy at an approximately
-log-linear average rate of ${\approx}0.045$ PER per doubling, with no
+For the causal WavLM phone-translation probe, future context reduces PER at an
+approximately log-linear average rate of ${\approx}0.045$ per doubling, with no
 identifiable knee and measurable returns out to a saturation onset near
 ${\approx}340$\,ms --- well beyond PHONOS's 40\,ms translator budget, relative
 to which a further 45.3\% reduction is available. That rate, however, is measured
@@ -987,8 +1009,9 @@ lookahead response transfers unchanged across the two encoders tested: WavLM
 exhibits a strong smooth diminishing-return curve, whereas wav2vec 2.0 shows a
 weak, non-monotonic one. Future-context budgets should therefore be
 characterised for the deployed representation rather than inherited from
-another backbone. Lookahead changes algorithmic latency rather
-than per-chunk cost, though throughput must still satisfy $\tcmp<c$
+another backbone. Increasing lookahead strongly changes algorithmic latency
+while only weakly affecting measured per-chunk compute over the tested range,
+though throughput must still satisfy $\tcmp<c$
 (Eq.~\ref{eq:rtf}) to run at all.
 
 \section{Acknowledgements}

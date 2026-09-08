@@ -147,12 +147,22 @@ def ipa_classes(seq: Sequence[str]) -> List[str]:
 # Alignment
 # ==========================================================================
 
-def align(ref: Sequence[str], hyp: Sequence[str]) -> List[Tuple[str, Optional[str], Optional[str]]]:
+def align(ref: Sequence[str], hyp: Sequence[str], tie: str = "sdi"
+          ) -> List[Tuple[str, Optional[str], Optional[str]]]:
     """Levenshtein alignment with backtrace.
 
     Returns a list of (op, ref_phone, hyp_phone) where op is one of
     "ok" / "sub" / "del" / "ins". ref_phone is None only for insertions.
+
+    `tie` fixes the backtrace preference when several edit paths share the
+    minimum cost: "sdi" prefers substitution, then deletion, then insertion;
+    "dsi" prefers deletion first. The alignment is deterministic either way,
+    but deterministic is not the same as linguistically unique -- an ambiguous
+    region can put the deviation on a different canonical phone under a
+    different rule. Exposing the order lets the downstream analyses show that
+    their conclusions do not depend on it.
     """
+    assert tie in ("sdi", "dsi"), tie
     n, m = len(ref), len(hyp)
     # d[i][j] = cost of aligning ref[:i] with hyp[:j]
     d = [[0] * (m + 1) for _ in range(n + 1)]
@@ -168,19 +178,33 @@ def align(ref: Sequence[str], hyp: Sequence[str]) -> List[Tuple[str, Optional[st
                           d[i][j - 1] + 1)          # insertion
     out: List[Tuple[str, Optional[str], Optional[str]]] = []
     i, j = n, m
-    while i > 0 or j > 0:
+
+    def take_diag():
         if i > 0 and j > 0:
             cost = 0 if ref[i - 1] == hyp[j - 1] else 1
             if d[i][j] == d[i - 1][j - 1] + cost:
-                out.append(("ok" if cost == 0 else "sub", ref[i - 1], hyp[j - 1]))
-                i, j = i - 1, j - 1
-                continue
+                return ("ok" if cost == 0 else "sub", ref[i - 1], hyp[j - 1])
+        return None
+
+    def take_del():
         if i > 0 and d[i][j] == d[i - 1][j] + 1:
-            out.append(("del", ref[i - 1], None))
-            i -= 1
-            continue
-        out.append(("ins", None, hyp[j - 1]))
-        j -= 1
+            return ("del", ref[i - 1], None)
+        return None
+
+    order = (take_diag, take_del) if tie == "sdi" else (take_del, take_diag)
+    while i > 0 or j > 0:
+        for step in order:
+            got = step()
+            if got is not None:
+                out.append(got)
+                if got[0] == "del":
+                    i -= 1
+                else:
+                    i, j = i - 1, j - 1
+                break
+        else:
+            out.append(("ins", None, hyp[j - 1]))
+            j -= 1
     out.reverse()
     return out
 
