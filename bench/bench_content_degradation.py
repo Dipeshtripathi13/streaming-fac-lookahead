@@ -266,10 +266,38 @@ class MaskInjector:
         return mha
 
     def _wrap_layer(self, orig):
+        """Non-WavLM path: add the lookahead mask to the layer's own mask.
+
+        This must ADD, not replace. `Wav2Vec2Encoder.forward` builds a padding
+        mask with `create_bidirectional_mask` and hands it to every layer; the
+        eager attention kernel consumes it additively
+        (`attn_weights + attention_mask`), so a lookahead mask in the same
+        additive convention composes by summation. Replacing it -- which this
+        wrapper used to do -- silently discards the padding mask and lets the
+        encoder attend into the zero-padded tail of the batch. That is the
+        exact bug the padding fix removed from the WavLM path, and it would
+        have come back unnoticed on any second encoder, because the truncation
+        proof runs on a single unpadded utterance and cannot see it.
+
+        A boolean mask would need `masked_fill` instead of addition, so we
+        assert the convention rather than assume it: a silently mis-composed
+        mask produces plausible numbers with invalid lookahead labels.
+        """
+        import torch
+
         def fwd(hidden_states, attention_mask=None, *a, **kw):
             m = self._mask2d(hidden_states.shape[1], hidden_states.dtype,
                              hidden_states.device)[None, None]
-            return orig(hidden_states, m, *a, **kw)
+            if attention_mask is None:
+                combined = m
+            elif attention_mask.dtype == torch.bool:
+                raise TypeError(
+                    "layer attention_mask is boolean; this wrapper composes "
+                    "additive masks. Convert or extend the injector before "
+                    "trusting the lookahead labels.")
+            else:
+                combined = attention_mask + m
+            return orig(hidden_states, combined, *a, **kw)
         return fwd
 
     def restore(self):
@@ -336,6 +364,76 @@ def features(model, wav: np.ndarray, geom: Optional[StreamGeometry],
 # ==========================================================================
 # Causality self-test — the part that proves the numbers mean anything
 # ==========================================================================
+
+def padding_mask_selftest(tol: float = 1e-9) -> Dict[str, object]:
+    """The lookahead mask must COMPOSE with the model's padding mask.
+
+    Runs entirely offline on a randomly initialised wav2vec2: the property
+    under test is structural, so trained weights add nothing.
+
+    Why this test exists. `MaskInjector` has two strategies. WavLM takes the
+    `position_bias` path, which adds to an existing tensor and leaves the
+    model's padding mask alone. Every other encoder takes the
+    `layer_attention_mask` path, which used to *replace* the layer's
+    attention_mask -- discarding the padding mask that
+    `Wav2Vec2Encoder.forward` builds, so frames near the end of a short
+    utterance attended into the zero-padded tail of the batch.
+
+    That failure is invisible to the truncation proof, which runs one unpadded
+    utterance, and it is worse than a constant bias: the corruption GROWS with
+    lookahead (a strictly causal mask cannot reach the trailing pad at all,
+    while a wide one can), so it rides directly on the swept variable. On a
+    3-layer probe the discarded-mask error goes from 3.6e-4 at L=0 to 1.8e-2
+    at L=640 -- a 50x range that would have bent the very curve being measured.
+
+    Asserts the padded-batch output equals the unpadded output for the same
+    utterance, at every lookahead in the sweep.
+    """
+    import torch
+    from transformers import Wav2Vec2Config, Wav2Vec2Model
+
+    cfg = Wav2Vec2Config(hidden_size=192, num_hidden_layers=3,
+                         num_attention_heads=3, intermediate_size=384,
+                         feat_extract_norm="group", num_conv_pos_embeddings=128,
+                         num_conv_pos_embedding_groups=16,
+                         do_stable_layer_norm=False, attn_implementation="eager")
+    torch.manual_seed(0)
+    model = Wav2Vec2Model(cfg).eval()
+    for prm in model.parameters():
+        prm.requires_grad_(False)
+    make_pos_conv_causal(model)
+    make_group_norm_causal(model)
+
+    rng = np.random.default_rng(1)
+    short = (rng.standard_normal(16_000) * 0.1).astype(np.float32)
+    long_ = (rng.standard_normal(16_000 * 3) * 0.1).astype(np.float32)
+
+    def padded(geom):
+        T = len(long_)
+        x = torch.zeros(2, T)
+        am = torch.zeros(2, T, dtype=torch.long)
+        for i, w in enumerate((short, long_)):
+            x[i, :len(w)] = torch.from_numpy(w)
+            am[i, :len(w)] = 1
+        with MaskInjector(model, geom):
+            return model(x, attention_mask=am,
+                         output_hidden_states=True).hidden_states[2][0]
+
+    out: Dict[str, object] = {"encoder": "wav2vec2 (random init)", "tolerance": tol}
+    worst = 0.0
+    for L in (0, 40, 80, 160, 320, 640):
+        geom = StreamGeometry(chunk_ms=40, lookahead_ms=L, lookback_ms=2000)
+        with MaskInjector(model, geom):
+            ref = model(torch.from_numpy(short)[None],
+                        output_hidden_states=True).hidden_states[2][0]
+        n = ref.shape[0]
+        rel = float((ref - padded(geom)[:n]).norm() / ref.norm())
+        out[f"L{L}"] = {"relative_l2_delta": rel, "ok": bool(rel <= tol)}
+        worst = max(worst, rel)
+    out["worst_relative_l2_delta"] = worst
+    out["padding_mask_preserved"] = bool(worst <= tol)
+    return out
+
 
 def causality_selftest(device: str = "cpu", tol: float = 1e-4,
                        encoder: str = "microsoft/wavlm-base-plus") -> Dict[str, object]:
@@ -670,7 +768,7 @@ def main() -> None:
     print("=" * 68)
     print("CAUSALITY SELF-TEST  (does attention masking alone make WavLM causal?)")
     print("=" * 68)
-    st = causality_selftest(device="cpu")
+    st = causality_selftest(device="cpu", encoder=a.encoder)
     print(json.dumps(st, indent=2))
     with open(os.path.join(outdir, f"causality_selftest_{a.tag}.json"), "w") as f:
         json.dump(st, f, indent=2)

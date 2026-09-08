@@ -460,6 +460,15 @@ def main() -> None:
     ap.add_argument("--smoke", action="store_true",
                     help="60 steps, 3 lookaheads, 120 utts -- proves the pipeline runs")
     ap.add_argument("--verify-causality", action="store_true", default=True)
+    ap.add_argument("--encoder-name", default="microsoft/wavlm-base-plus",
+                    help="SSL encoder checkpoint. The causality proof is re-run "
+                         "for whichever encoder is named, because the leaks "
+                         "(pos_conv kernel, feat_extract_norm) are per-checkpoint "
+                         "properties and a different backbone can fail where "
+                         "WavLM passes.")
+    ap.add_argument("--encoder-layer", type=int, default=9,
+                    help="Hidden-state index to tap. 9 is the usual phonetic "
+                         "layer for base-size models.")
     a = ap.parse_args()
 
     import torch
@@ -475,11 +484,31 @@ def main() -> None:
     # ---- causality proof before anything expensive ----
     if a.verify_causality:
         from bench_content_degradation import causality_selftest
-        st = causality_selftest(device="cpu")
+        st = causality_selftest(device="cpu", encoder=a.encoder_name)
         print(json.dumps(st, indent=2))
         if not st["with_fix"]["causal"]:
-            sys.exit("ABORT: the causal pos_conv patch did not produce a causal "
-                     "encoder. Every lookahead label would be wrong. Fix first.")
+            sys.exit(f"ABORT: {a.encoder_name} is still not causal with both "
+                     "patches applied. Every lookahead label would be wrong. "
+                     "Fix first.")
+        # The truncation proof runs one unpadded utterance, so it cannot see a
+        # discarded padding mask. Non-WavLM encoders take MaskInjector's
+        # `layer_attention_mask` path, where that is a live failure mode whose
+        # size grows with lookahead -- i.e. it would ride on the swept variable.
+        from bench_content_degradation import padding_mask_selftest
+        pad = padding_mask_selftest()
+        print(json.dumps(pad, indent=2))
+        if not pad["padding_mask_preserved"]:
+            sys.exit("ABORT: the lookahead mask is not composing with the "
+                     "padding mask (worst relative L2 "
+                     f"{pad['worst_relative_l2_delta']:.2e}). Padded batches "
+                     "would be corrupted by an amount that grows with "
+                     "lookahead. Fix before sweeping.")
+
+        if st["without_fix"]["causal"]:
+            sys.exit(f"ABORT: {a.encoder_name} passes the truncation proof "
+                     "UNPATCHED, which means the proof is not exercising the "
+                     "leak on this checkpoint. A vacuous proof is worse than "
+                     "none. Fix the test before trusting the sweep.")
 
     # ---- data ----
     t0 = time.time()
@@ -498,7 +527,8 @@ def main() -> None:
         targets=tuple(Target(t) for t in a.targets),
         chunk_ms=a.chunk_ms, lookback_ms=a.lookback_ms,
         batch_size=a.batch_size, train_steps=a.steps,
-        freeze_encoder=not a.unfreeze)
+        freeze_encoder=not a.unfreeze,
+        encoder_name=a.encoder_name, encoder_layer=a.encoder_layer)
     for t in a.targets:
         assert_only_L_varies([c for c in cfgs if c.target.value == t])
     print(f"\n{len(cfgs)} conditions x {a.steps} steps\n")
