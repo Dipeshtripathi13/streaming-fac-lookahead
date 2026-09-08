@@ -1,0 +1,3 @@
+# arXiv package build artefacts -- regenerate with ./make_arxiv_package.sh
+arxiv_build/
+arxiv_taslp.tar.gz
