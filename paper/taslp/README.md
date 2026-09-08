@@ -29,15 +29,25 @@ DONE (this pass):
     the abstract
   * the phrase-level substitutions from the reviewer's table
 
+DONE (experiments, 7-8 Sep):
+  * convergence check -- 5 budgets to 6000 steps, ranking stable 12/12
+    checkpoints, exchange rate -0.0405 (step 1200) vs -0.0414 (step 6000)
+  * saturation fill-in -- 220/260/300/340/360 ms, grid now 20 ms-spaced to
+    360 ms, 21 lookaheads
+  * repeatability floor MEASURED -- 4 conditions x 4 repeats at fixed seed,
+    df=12: 2 sigma = 0.0029, 95% CI [0.0013, 0.0034]. This EXCLUDES the earlier
+    0.0044 and moved saturation from 240 to 340 ms.
+  * sqrt(2) question resolved from existing data: the correction was already
+    applied (RMS(d)/sqrt2 = 0.00218 = published 0.0022)
+  * restored t_buffer in full, all three measurement failures, the by-L1
+    breakdown, the acoustic-weighting method and Table h2audio
+
 STILL REQUIRED, needs GPU:
-  1. **Convergence check.** Everything is 1200 steps. If lookahead conditions
      converge at different rates the exchange rate is partly an optimization
      curve. Train 0/40/160/240/640 ms to convergence, or show ranking and
      slopes stable across checkpoints. The reviewer rates this the largest
      remaining threat and it is not on the earlier schedule.
-  2. **Extra saturation conditions** at 220/260/300/360 ms so "per 20 ms
      equivalent" can become "per observed 20 ms step".
-  3. **More seeds** in 160-320 ms, and a noise-floor estimator with a CI --
      including whether a sqrt(2) correction applies to sigma from paired
      differences.
   4. **Second encoder** (e.g. causalized wav2vec 2.0 base) over 5-7 points, to
