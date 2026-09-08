@@ -39,10 +39,10 @@ improves smoothly with lookahead at $-0.045$ phone error rate (PER) per
 doubling ($R^2=0.98$) with \emph{no locatable knee}: a piecewise fit is
 preferred under every axis treatment we tried, yet the breakpoint moves between
 40 and 180\,ms and no bootstrap interval is narrower than three octaves.
-Instead of a knee we identify a provisional \emph{saturation region} around
-200--280\,ms, beyond which the average return per 20\,ms equivalent of added
-lookahead over each sampled interval falls below the measured $2\sigma$
-repeatability floor. At the 40\,ms lookahead used by PHONOS's translator, our
+Instead of a knee we identify \emph{saturation} at ${\approx}240$\,ms: with the
+grid completed to 20\,ms spacing over 200--360\,ms, every one of the eight
+consecutive observed 20\,ms steps beyond 240\,ms buys less than the measured
+$2\sigma$ repeatability floor. At the 40\,ms lookahead used by PHONOS's translator, our
 probe retains a further 39.8\% relative PER reduction between 40 and
 240\,ms.
 Second, a pre-registered hypothesis that vowels and approximants degrade faster
@@ -348,19 +348,30 @@ mechanical and worth stating: on a $\log_2(L{+}1)$ axis the $L{=}0
 so a piecewise fit places a breakpoint just past that gap whatever the data
 does.
 
-\textbf{What we report instead} is the region beyond which marginal return
-falls below the measured floor. The grid is 20\,ms up to 200\,ms and coarser
-above it, so past that point we report the \emph{average} PER reduction per
-20\,ms equivalent of added lookahead over each sampled interval, not per
-individually observed 20\,ms step. On that basis gains run $+0.056$
-(0$\rightarrow$20\,ms), $+0.021$ (60$\rightarrow$80), $+0.0045$
-(180$\rightarrow$200), and fall below the $0.0044$ floor for every sampled
-interval beyond 240\,ms. We therefore report a \textbf{saturation region of
-200--280\,ms} rather than a point: the 140$\rightarrow$160 and
-180$\rightarrow$200\,ms steps are already only 1.0--1.5$\times$ the floor, the
-floor itself is estimated from six repeats, and the intervals above 320\,ms
-average over 160\,ms of lookahead. Unlike a knee, this quantity depends on the
-floor rather than on an axis choice.
+\textbf{What we report instead} is the lookahead beyond which marginal return
+falls below the measured floor. Because the original grid was 20\,ms-spaced
+only to 200\,ms, we added the five budgets 220, 260, 300, 340 and 360\,ms
+under identical settings, making the range 200--360\,ms fully 20\,ms-spaced.
+The quantity below is therefore a per-\emph{observed}-step gain, not an average
+over wider sampled intervals.
+
+Gains run $+0.056$ (0$\rightarrow$20\,ms), $+0.021$ (60$\rightarrow$80) and
+$+0.0045$ (180$\rightarrow$200). Beyond 240\,ms, \textbf{every one of the eight
+consecutive observed steps falls below the $0.0044$ floor}: $0.9\times$
+(240$\rightarrow$260), $1.0$, $0.8$, $0.7$, $0.8$, $0.5$ out to 360\,ms, and
+$0.5$ and $0.3$ for the two longer intervals to 640\,ms. We therefore place
+\textbf{saturation at ${\approx}240$\,ms}, meaning the point beyond which no
+observed 20\,ms increment buys a measurable gain. Unlike a knee, this depends
+on the floor rather than on an axis choice.
+
+Two caveats keep this approximate rather than sharp. The 200$\rightarrow$220
+step is itself below the floor ($0.7\times$) while 220$\rightarrow$240 is above
+it ($1.3\times$), and the 220\,ms condition has the largest seed spread of any
+point on the curve ($0.0069$, larger than the floor itself) --- so the ordering
+around 220\,ms is not resolved, and returns are already marginal from about
+200\,ms. The floor is also estimated from six accidental repeats and carries no
+interval of its own. Read the result as saturation setting in over roughly
+200--240\,ms.
 
 \begin{table}[t]
 \centering\small
@@ -622,8 +633,8 @@ Silicon and ARM64 Linux only.
 
 For causal phone translation, future context buys accuracy at an approximately
 log-linear average rate of ${\approx}0.045$ PER per doubling, with no
-identifiable knee and measurable returns to a saturation region of
-200--280\,ms --- well beyond PHONOS's 40\,ms translator budget, relative to
+identifiable knee and measurable returns to saturation at
+${\approx}240$\,ms --- well beyond PHONOS's 40\,ms translator budget, relative to
 which a further 39.8\% reduction is available. Lookahead changes algorithmic
 latency rather than per-chunk cost, though throughput must still satisfy
 $\tcmp<c$ (Eq.~\ref{eq:rtf}) to run at all.
