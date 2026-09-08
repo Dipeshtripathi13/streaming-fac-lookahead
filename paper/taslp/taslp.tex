@@ -59,17 +59,14 @@ equally. Third, canonical-phone prediction benefits more from future context tha
 realized-phone transcription at matched capacity ($-0.045$ against $-0.029$
 PER per doubling, $1.55\times$), and within the conversion arm the benefit is
 $1.32\times$ larger in absolute PER slope at canonical-deviation positions
-(substitutions and deletions in the g2p--IPA alignment). Fourth, repeating the sweep on a second causalised encoder (wav2vec 2.0 base)
-changes the answer quantitatively: tapped at its own selected phonetic layer it
-starts within $0.01$ PER of WavLM at $L{=}0$ yet gains only $3.9\%$ relative
-from $640$\,ms of lookahead, against $63.3\%$ --- so the exchange rate is a
-the measured exchange rate is encoder-dependent rather than a universal
-property of the task. Nor does the detailed response transfer: where WavLM is smooth and
-log-linear ($R^2=0.99$), wav2vec 2.0 is weak and non-monotonic ($R^2=0.10$),
+(substitutions and deletions in the g2p--IPA alignment). Fourth, repeating the sweep on a second causalised encoder (wav2vec 2.0 base),
+tapped at its own selected phonetic layer, changes the answer: it starts within
+$0.01$ PER of WavLM at $L{=}0$ yet gains only $3.9\%$ relative from $640$\,ms
+of lookahead against WavLM's $63.3\%$, and where WavLM is smooth and
+log-linear ($R^2=0.99$) its response is weak and non-monotonic ($R^2=0.10$),
 bottoming out at $160$\,ms and rising again --- a shape reproduced at a second
-training seed: its response is weak and non-monotonic rather than knee-like.
-Fifth, per-chunk
-compute depends only weakly on
+seed. Neither the measured exchange rate nor the detailed curve shape is a
+universal property of the task. Fifth, per-chunk compute depends only weakly on
 lookahead --- at most $1.9\%$ on an Apple M4 and $7.6\%$ on an ARM64 Linux
 host across a $17\times$ change in algorithmic latency --- a weak empirical
 dependence between lookahead and per-chunk compute over the tested range,
