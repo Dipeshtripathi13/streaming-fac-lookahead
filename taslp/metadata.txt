@@ -241,3 +241,17 @@ THREE MOST CLOSELY RELATED PAPERS
   StreamVC (Proc. IEEE ICASSP 2024, pp. 11016-11020,
   DOI 10.1109/ICASSP48485.2024.10446863) is the obvious fourth if a fully
   published third entry is preferred to the preprint.
+
+WHAT IS DISTINCTIVE RELATIVE TO THOSE THREE WORKS (500 characters)
+  Those works build streaming systems and each fixes a lookahead budget; only DarkStream ablates it, over three points scored on anonymisation accuracy. None characterises the axis itself. This paper measures it: 21 budgets under otherwise identical conditions, algorithmic and computational latency reported separately, a repeatability floor measured rather than assumed, and the finding that the curve does not transfer to a second encoder, so a budget cannot be inherited from another system.
+
+  [493 characters.]
+
+  The distinction that carries the answer is category, not degree: those three
+  are systems that each pick a budget, this is a measurement of the axis they
+  all parameterise. DarkStream is named explicitly because it is the only one
+  that ablates lookahead at all, so claiming nobody has looked would be false;
+  the honest contrast is three points on a different objective against 21
+  budgets on this one. The encoder non-transfer result is included because it
+  is the finding none of the three could have produced, each having used a
+  single backbone.
