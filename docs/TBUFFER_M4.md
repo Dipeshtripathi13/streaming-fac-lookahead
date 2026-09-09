@@ -30,7 +30,7 @@ placeholder that can now be retired.
 
 ## 2. NOT measured: the I/O term. Do not cite 640 ms.
 
-The acoustic loopback failed on both runs — 20/20 reps rejected, correlation
+The acoustic loopback failed on both runs, 20/20 reps rejected, correlation
 peak 0.042–0.046 against a threshold of 0.20 (pure noise scores 0.029 in the
 self-test). With no loopback, the tool falls back to device-reported latency and
 labels it `LOWER BOUND -- not measured`. That fallback figure is
@@ -43,7 +43,7 @@ labels it `LOWER BOUND -- not measured`. That fallback figure is
 | 40 ms | 412.35 ms | 10.3× | 372.35 |
 | 80 ms | 793.69 ms | 9.9× | 713.69 |
 
-At 10 and 20 ms the excess over the block is **identically 201.69 ms** — a fixed
+At 10 and 20 ms the excess over the block is **identically 201.69 ms**, a fixed
 constant, then roughly doubling and quadrupling. That is PortAudio/CoreAudio
 queueing, not ADC/DAC delay. The `low` and `high` latency hints also return
 identical values, i.e. the hint is ignored. Real macOS audio applications
@@ -63,7 +63,7 @@ input_rms_p50   0.001213      input_silent   false
 input_peak_p50  0.005046      input_clipped  false
 ```
 
-The microphone is capturing — that level is ambient room noise, about −46 dBFS —
+The microphone is capturing, that level is ambient room noise, about −46 dBFS,
 but the chirp specifically is absent. Signal present, target absent.
 
 **Then a third run settled it: the captured level is invariant to output
@@ -75,13 +75,13 @@ amplitude.**
 | 0.95 | 0.00468 | 0.001128 | 0.029 |
 | 0.95 (repeat) | 0.00446 | 0.000956 | 0.033 |
 
-Nearly doubling the output changed the captured signal by **nothing** — it
+Nearly doubling the output changed the captured signal by **nothing**, it
 drifted slightly *down*, consistent with room-noise variation. If the chirp were
 reaching the microphone at all, even heavily attenuated, doubling amplitude would
 roughly double the captured peak. It does not. **The speaker contributes zero
 measurable energy to the microphone input.**
 
-That leaves exactly two causes, distinguished by one free observation — whether
+That leaves exactly two causes, distinguished by one free observation, whether
 the chirps are audible:
 
 - **Audible** → output works, so the OS is cancelling it. macOS applies echo
@@ -102,7 +102,7 @@ one.
 
 *Methodological note worth keeping:* without the RMS/peak diagnostics, "silent
 input" and "chirp captured but decorrelated" are indistinguishable, and they
-need opposite fixes — permissions versus disabling audio processing. Raising
+need opposite fixes, permissions versus disabling audio processing. Raising
 `--amplitude` would have been the wrong response to the wrong diagnosis, and we
 would have concluded "mic permission" and been wrong.
 

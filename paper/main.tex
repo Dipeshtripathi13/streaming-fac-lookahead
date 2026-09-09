@@ -100,7 +100,7 @@ Three gaps follow, and this paper addresses the first two directly.
 and publishes no ablation showing 40\,ms is necessary or sufficient; TVTSyn
 fixes 4 future tokens ($\approx$80\,ms) without varying them. DarkStream does
 ablate, over three points $\{0, 140, 280\}$\,ms, and finds the third buys
-$<$1pp --- but three points scored on anonymisation accuracy cannot locate
+$<$1pp, but three points scored on anonymisation accuracy cannot locate
 where returns stop, which is the question a deployment budget actually asks.
 ``What would 160\,ms buy you'' still has no published answer.
 
@@ -115,7 +115,7 @@ t_{\mathrm{e2e}} = \underbrace{c + L}_{t_{\mathrm{alg}}} + t_{\mathrm{cmp}} + t_
 where $c$ is chunk size, $L$ is lookahead, \tcmp{} is per-chunk compute and
 \tbuf{} is I/O and jitter buffering. \talg{} is inherent: it is the delay on an
 infinitely fast machine, because the model refuses to emit frame $n$ until it
-has seen frame $n{+}L$. \tcmp{} is contingent --- quantise, prune, buy a faster
+has seen frame $n{+}L$. \tcmp{} is contingent, quantise, prune, buy a faster
 chip.
 
 \textbf{Degradation is reported in aggregate.} Existing results are
@@ -145,7 +145,7 @@ FAC or voice conversion with speaker anonymisation. Two of them report more
 than is sometimes credited, and it is worth being precise about what they do
 and do not establish. TVTSyn reports CPU as well as GPU latency
 ($\approx$132\,ms and $\approx$79\,ms at a 60\,ms chunk), so a CPU number
-for streaming conversion is not unpublished --- what is unpublished is a CPU
+for streaming conversion is not unpublished, what is unpublished is a CPU
 latency--\emph{quality} curve. DarkStream ablates its look-ahead over
 $\{0, 140, 280\}$\,ms and selects 140\,ms on the grounds that "an extra
 140ms of look-ahead yields a marginal $<$1pp absolute improvement at the
@@ -155,7 +155,7 @@ three points, scored on anonymisation accuracy rather than conversion quality.
 \textbf{DarkStream's choice corroborates our saturation point from a different
 task.} Their marginal return collapses somewhere between 140 and 280\,ms;
 we place saturation at ${\approx}240$\,ms on phone error rate, measured over
-16 budgets rather than three. Two systems, two objectives, the same region ---
+16 budgets rather than three. Two systems, two objectives, the same region,
 which is a stronger position for this paper than the absence of prior evidence
 would have been.
 StreamVC~\cite{streamvc2024} reports operation ``even on a mobile platform''
@@ -185,7 +185,7 @@ produced (\texttt{ipa}). Accent conversion is then directly trainable as
 a CTC head over a frozen causal encoder. This is the supervised core of the
 task, it costs a GPU-day rather than 200 GPU-hours, and swapping the target
 tensor from \texttt{g2p} to \texttt{ipa} yields a matched-capacity control that
-differs in \emph{one tensor} --- a tighter control than AC-versus-VC.
+differs in \emph{one tensor}, a tighter control than AC-versus-VC.
 
 \subsection{Making the encoder causal}
 \label{sec:causal}
@@ -254,7 +254,7 @@ gated on it.
 
 Across $L\in[0,640]$\,ms at chunk 40\,ms on the M4, \talg{} spans 40--680\,ms
 ($17\times$) while median per-chunk compute moves from 43.23\,ms to at most
-44.06\,ms --- a range of $-0.3\%$ to $+1.9\%$. On ARM64 the span is $0$ to
+44.06\,ms, a range of $-0.3\%$ to $+1.9\%$. On ARM64 the span is $0$ to
 $+7.6\%$. The two terms of Eq.~\ref{eq:decomp} are therefore independently
 actionable, which is the practical justification for reporting them
 separately.
@@ -310,7 +310,7 @@ floor. Below $1.0\times$ an additional frame is not measurably useful.}
 \toprule
 $L$ (ms) & PER & gain/frame & $\times$ floor \\
 \midrule
-0   & 0.4256 & ---     & --- \\
+0   & 0.4256 & --     & -- \\
 20  & 0.3701 & 0.0556  & 12.7 \\
 40  & 0.3275 & 0.0426  & 9.8 \\
 60  & 0.2963 & 0.0312  & 7.2 \\
@@ -334,7 +334,7 @@ $L$ (ms) & PER & gain/frame & $\times$ floor \\
 240\,ms it is $0.1973$. A 40\,ms budget therefore forgoes \textbf{39.7\%} of
 the achievable relative reduction, rising to 52.3\% against $L{=}640$\,ms.
 ``Current budgets are under-provisioned'' is thus supportable as
-diminishing-returns geometry with a measurable saturation point --- not as a
+diminishing-returns geometry with a measurable saturation point, not as a
 knee.
 
 \subsection{RQ2: manner class is the wrong axis}
@@ -371,13 +371,13 @@ Group means differ in the predicted direction ($0.676$ vs $0.636$), but that is
 the weakest available reading and three stronger checks fail. The effect size
 is $0.66$: the between-group difference ($0.040$) is smaller than the pooled SD
 across classes ($0.060$). The surviving group's \emph{internal} spread is
-$0.190$ --- $4.7\times$ the between-group difference. And 5 of 12 pairwise
+$0.190$, $4.7\times$ the between-group difference. And 5 of 12 pairwise
 orderings are violated, with nasals out-gaining all three breaks-first classes.
 By L1, only 3 of 6 support even the directional reading and the gain ratio
 straddles unity ($0.92$ Chinese to $1.23$ Vietnamese).
 
 \textbf{H2 is not supported.} The finding is not that lookahead fails to help
-vowels --- every class improves 52--72\% relative, all above the floor. The
+vowels, every class improves 52--72\% relative, all above the floor. The
 finding is that manner class does not predict which sounds need right context.
 
 \textbf{Reweighting each error by what it costs acoustically does not rescue
@@ -394,8 +394,8 @@ so it does detect errors where they occur, and mean distortion falls
 monotonically with lookahead (71.4 to 46.9, $-34\%$).
 
 The verdict is unchanged (Table~\ref{tab:h2audio}). Acoustic weighting does move
-in H2's favour --- effect size $0.607 \rightarrow 0.756$ and ordering violations
-$4/12 \rightarrow 2/12$ against the sequence metric on the same utterances ---
+in H2's favour, effect size $0.607 \rightarrow 0.756$ and ordering violations
+$4/12 \rightarrow 2/12$ against the sequence metric on the same utterances,
 but not far enough to clear the pre-registered threshold of $1.0$, and the
 failure has the same shape as before: the ``survives'' group's internal spread
 ($0.120$) is $3.5\times$ the difference between the groups ($0.034$), and a
@@ -434,8 +434,8 @@ canonical formant trajectories for whatever string it is given. This measures
 the cost of getting a phone's \emph{identity} wrong; it says nothing about a
 wrong trajectory for a phone whose identity is right. That still needs real
 converted audio against a native rendition (\S\ref{sec:remaining}). The sample
-is also far smaller than the sequence-level test --- 1451 phones per condition
-against 295{,}785 --- and is weighted accordingly.
+is also far smaller than the sequence-level test, 1451 phones per condition
+against 295{,}785, and is weighted accordingly.
 
 \subsection{RQ3: conversion needs more lookahead than transcription}
 \label{sec:rq3}
@@ -449,8 +449,8 @@ accent-faithful transcription, a paired difference of $+0.0802$
 \textbf{The dense grid replicates this, and sharpens it.} Running the full
 16-lookahead $\times$ 2-seed sweep on the transcription arm as well puts both
 arms on the same dense grid (Table~\ref{tab:h3dense}). The endpoint gains
-reproduce the 7-point result almost exactly --- 63.3\% for conversion against
-43.5\% for transcription, against 63.2\% and 42.8\% before --- on an
+reproduce the 7-point result almost exactly, 63.3\% for conversion against
+43.5\% for transcription, against 63.2\% and 42.8\% before, on an
 independent, denser sample. The exchange rates separate cleanly:
 \begin{center}
 conversion $-0.0452$ vs transcription $-0.0292$ PER per doubling,
@@ -463,7 +463,7 @@ arms are nearly the same task ($0.4256$ vs $0.4427$, a gap of $0.0171$); by
 $L{=}640$\,ms the gap is $0.0939$, \textbf{5.5$\times$ wider}. It widens in
 13 of 15 adjacent steps, and the transcription arm is worse at 16 of 16
 lookaheads, every one of them by more than the $0.0044$ noise floor. Lookahead,
-not accuracy, is what separates them --- which is the claim H3 makes.
+not accuracy, is what separates them, which is the claim H3 makes.
 
 Two secondary points fall out. Both arms saturate at the same
 ${\approx}240$\,ms, and neither yields a locatable knee (breakpoints move to
@@ -499,8 +499,8 @@ $L$ (ms) & conversion & transcription & gap \\
 \end{tabular}
 \end{table}
 
-The claim is carried by the \emph{preference margin} --- PER against the other
-arm's labels minus PER against its own --- which grows monotonically in 3/3
+The claim is carried by the \emph{preference margin}, PER against the other
+arm's labels minus PER against its own, which grows monotonically in 3/3
 seeds for conversion ($+0.032$ at $L{=}0$ to $+0.099$ at 640\,ms; 18/18
 adjacent step $\times$ seed comparisons positive) while the transcription
 control is 0/3 monotone and drifts \emph{down} ($-0.0103$). Building the claim
@@ -519,7 +519,7 @@ The I/O term is \textbf{not measured}, and we report why rather than
 substituting a number. An acoustic loopback failed on every attempt: the
 captured level was invariant to output amplitude (peak $0.00505$ at amplitude
 $0.50$ versus $0.00468$ at $0.95$), meaning the speaker contributes no
-measurable energy to the microphone --- consistent with the operating system's
+measurable energy to the microphone, consistent with the operating system's
 echo cancellation, which scales with its reference and therefore cannot be
 defeated by a louder probe. The driver-reported figure is not a substitute: its
 excess over the requested block is \emph{identically} 201.69\,ms at both 10 and
@@ -554,7 +554,7 @@ confident ``knee at 40\,ms''; dropping it yields $+5$ and no knee.
 \textbf{An analysis that buckets unmatched symbols into ``other'' will produce
 confident output on the wrong alphabet.} Our phoneme-class map was keyed on
 ARPAbet; the sweep emits IPA. Applying one to the other sent 57\% of reference
-tokens, including \emph{every vowel} and \textipa{/r/}, to ``other'' --- and
+tokens, including \emph{every vowel} and \textipa{/r/}, to ``other'', and
 still printed per-class slopes, an H2 verdict and a by-L1 table. Assert
 coverage; do not infer it from the absence of an error.
 
@@ -570,7 +570,7 @@ We report why, because ``unfunded'' would be the wrong reason. Stimuli can be
 built from the per-condition outputs and were, but they cannot carry the
 judgement a listening test needs, for two independent reasons. The phone
 sequences carry no word or stress structure, so even the ground-truth ceiling
-synthesises as one unsegmented stream --- \textipa{/aInEv3~2laUw2tk\ae ntbi\ldots/}
+synthesises as one unsegmented stream, \textipa{/aInEv3~2laUw2tk\ae ntbi\ldots/}
 for \emph{``I never allow what can't be changed\ldots''}. And a system at
 0.16--0.42 PER does not emit recognisable words to compare. An informal session
 confirmed both: the listener could not identify what was being said, and scored
@@ -588,7 +588,7 @@ Four items are outstanding, listed with what each would settle.
 done (\S\ref{sec:rq2}): forced alignment charges each error its measured
 acoustic cost, and the grouping still fails. What remains is the trajectory
 half, which a TTS cannot answer because it renders canonical trajectories by
-construction --- it needs a trained synthesis pipeline whose output can be
+construction, it needs a trained synthesis pipeline whose output can be
 aligned against a native rendition. Note also that a VITS-class synthesiser is
 globally coupled, so whole-utterance distortion cannot be charged to one phone;
 the per-phone span from forced alignment is what makes the measurement local at
@@ -642,7 +642,7 @@ references, which meets the project's 4+2 target but not a 4+1 rule}
 
 Lookahead buys accent-conversion quality at a stable exchange rate of
 ${\approx}0.045$ PER per doubling, with no knee to locate and measurable
-returns out to ${\approx}240$\,ms --- six times the budget the current state of
+returns out to ${\approx}240$\,ms, six times the budget the current state of
 the art uses, which forgoes about 40\% of the achievable reduction. Per-chunk
 compute is flat across that range, so the trade-off is a modelling decision
 rather than a hardware one. A pre-registered phoneme-class hypothesis was

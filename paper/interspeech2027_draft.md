@@ -1,6 +1,6 @@
 # Your "Causal" Encoder Is Not: Hidden Lookahead in Streaming Speech Models, and What Lookahead Actually Buys
 
-**Draft v0.1 — 2 August 2026.** Target: Interspeech 2027 (4 pages + 2 references).
+**Draft v0.1, 2 August 2026.** Target: Interspeech 2027 (4 pages + 2 references).
 Status markers used throughout: **[M]** measured, **[P]** projected, **[TBD]** pending.
 
 ---
@@ -11,7 +11,7 @@ Streaming accent conversion (AC) and voice conversion (VC) systems are built on
 self-supervised speech encoders made "causal" by masking self-attention. We show
 this is not sufficient. In wav2vec2/WavLM-base checkpoints, two components below
 the transformer stack leak future context: the positional convolution (kernel
-128 — **1.28 s** of future at a 20 ms frame rate) and the feature-encoder
+128, **1.28 s** of future at a 20 ms frame rate) and the feature-encoder
 GroupNorm, which normalises each channel over the **entire utterance** and is
 therefore unbounded. Under a truncation proof, attention masking alone leaves a
 relative deviation of 1.14e-2; patching the positional convolution alone leaves
@@ -23,12 +23,12 @@ masks attention and stops there has an unreported second of lookahead, and its
 With a provably causal encoder we then ask what lookahead buys. On 198
 L2-ARCTIC utterances, representation drift from the bidirectional reference is
 strongly log-linear in lookahead (R²=0.994 vs 0.727 linear) with no cliff: every
-doubling buys ≈0.081, and the marginal return *peaks* at 100–200 ms — 2.5–5×
+doubling buys ≈0.081, and the marginal return *peaks* at 100–200 ms, 2.5–5×
 the 40 ms budget used by current streaming AC. Training a causal phone translator over
 that encoder, in which accent conversion and accent-faithful transcription
 differ by a single label tensor, the model's preference for canonical over
-produced phones grows **monotonically in all three seeds** — 18/18 comparisons,
-tripling from *L*=0 to *L*=640 ms — while the transcription control drifts the
+produced phones grows **monotonically in all three seeds**, 18/18 comparisons,
+tripling from *L*=0 to *L*=640 ms, while the transcription control drifts the
 other way: more right context makes the model more *converting*, not merely more
 accurate. Three seeds per condition also show that this margin, not phone error
 rate, is the measurement that survives: PER's seed spread swamps every
@@ -64,14 +64,14 @@ Contributions:
 
 1. **Two unreported lookahead leaks** in base-sized SSL encoders, with patches
    and a truncation proof that gates the rest of the study (§3). **[M]**
-2. **A latency decomposition** — algorithmic / computational / buffer — measured
+2. **A latency decomposition**, algorithmic / computational / buffer, measured
    across Apple M4, Neoverse-N1 and Tesla T4, showing the terms are
    independently controllable and trade asymmetrically (§4). **[M]**
 3. **The lookahead exchange rate** at the encoder level on real accented speech:
    log-linear, no cliff, marginal return peaking at 100–200 ms (§5). **[M]**
 4. **A trained accent translator** whose conversion/transcription control differs
    in one label tensor, showing that the conversion signal grows monotonically
-   with lookahead while the transcription control does not — and, from three
+   with lookahead while the transcription control does not, and, from three
    seeds per condition, that phone error rate is too seed-noisy to support the
    per-condition claims such curves are usually asked to carry (§5.2). **[M]**
 5. **A properly decomposed streaming ASR→TTS cascade baseline**, showing it
@@ -104,13 +104,13 @@ latency. To our knowledge neither encoder-causality leak in §3 has been noted.
 
 **Positional convolution.** `WavLMPositionalConvEmbedding` is a depthwise Conv1d
 with kernel 128 and symmetric padding, applied *before* the transformer stack.
-At a 20 ms frame rate that is ~64 frames — **1.28 s** — of future entering every
+At a 20 ms frame rate that is ~64 frames, **1.28 s**, of future entering every
 frame. Fixed by left-only padding.
 
 **Feature-encoder GroupNorm.** Base checkpoints use `feat_extract_norm="group"`:
 `GroupNorm(num_groups=C, num_channels=C)` over a (B,C,T) tensor normalises each
 channel by statistics computed over the **entire utterance**. Every output frame
-depends on every input frame — unbounded, not merely long. Fixed by cumulative
+depends on every input frame, unbounded, not merely long. Fixed by cumulative
 (running) normalisation, applied identically in the bidirectional reference so
 the sweep stays unconfounded. The *-large* checkpoints use
 `feat_extract_norm="layer"` and are causal-safe; the leak is specific to the
@@ -129,7 +129,7 @@ earlier frame cannot change. Relative L2 deviation, tolerance 1e-4: **[M]**
 | **both patches** | **6.14e-6** | **0.0** | **yes** |
 
 Three things worth stating. Neither fix suffices alone. **Patching GroupNorm
-alone makes the measurement worse** — a partial causality fix is not a partial
+alone makes the measurement worse**, a partial causality fix is not a partial
 improvement. And the numbers replicate to five significant figures across two
 architectures and two torch versions, so this is a property of the checkpoint,
 not of an environment.
@@ -165,7 +165,7 @@ compute and does not cost quality.** A practitioner optimising a single fused
 ### 4.2 Chunk size, not lookahead, decides feasibility **[M]**
 
 A base-scale (768-dim, 12-layer) encoder at 20 ms chunks reaches **RTF 1.60 on
-an M4** — behind real time at *every* lookahead. At 80 ms chunks, RTF 0.54. No
+an M4**, behind real time at *every* lookahead. At 80 ms chunks, RTF 0.54. No
 reduction in *L* rescues the 20 ms configuration.
 
 Two secondary results with practical bite:
@@ -187,13 +187,13 @@ t_algorithmic  ASR chunk 320 + right-context 70   390 ms
                + commit timeout                   700 ms
 t_compute      ASR active step                     12 ms
                TTS, one word                       21 ms
-t_buffer       [TBD — not yet measured]           ~30 ms
+t_buffer       [TBD, not yet measured]           ~30 ms
                                                  ────────
 t_end_to_end                                     ~1153 ms   (95% algorithmic)
 ```
 
-Vocoder choice matters enormously — Piper synthesises a word in 21 ms against
-Kokoro's 973 ms, a 46× difference — but removing that term makes the conclusion
+Vocoder choice matters enormously, Piper synthesises a word in 21 ms against
+Kokoro's 973 ms, a 46× difference, but removing that term makes the conclusion
 *stronger*: what remains is almost entirely algorithmic, and no chip fixes it.
 
 We measured the commit delay rather than asserting it. 28.8% of words are
@@ -201,7 +201,7 @@ revised after first appearing; the release-while-unstable rate falls off a cliff
 between 300 ms (27%) and 400 ms (1.5%), and that cliff sits exactly at the
 model's 320 ms decode chunk. **The recogniser's chunk size sets the granularity
 at which any cascade built on it can commit.** Taking the most favourable
-correction — commit at 400 ms, accept 1.5% instability — gives ~853 ms, still
+correction, commit at 400 ms, accept 1.5% instability, gives ~853 ms, still
 ~93% algorithmic. *Caveat: 66 words of clean read speech; see §7.*
 
 ---
@@ -214,7 +214,7 @@ bidirectional reference.
 
 **Lookahead is quantised.** The encoder represents lookahead as
 `ceil(L / frame_ms)` frames, so at a 20 ms frame rate a knee narrower than 20 ms
-is not merely unmeasured — it is *unrepresentable*. Sampling finer produces
+is not merely unmeasured. It is *unrepresentable*. Sampling finer produces
 byte-identical duplicate conditions. We report 16 distinct conditions.
 
 | | value |
@@ -239,15 +239,15 @@ residuals are structure rather than noise). The model-free view resolves it:
 
 **No cliff, but a broad optimum in the exchange rate at 100–200 ms.** Nothing
 distinguishes 40 ms: it sits on the *least* productive doubling measured. The
-actionable form is the exchange rate — ≈0.08 per doubling, peaking at
-100–200 ms — not a recommended operating point.
+actionable form is the exchange rate, ≈0.08 per doubling, peaking at
+100–200 ms, not a recommended operating point.
 
 *Estimator note.* A maximum-distance-to-chord ("Kneedle") estimator reported
 "knee at 160 ms, bootstrap CI [160,160]" on this data. It is an artefact: the
 estimator always returns a point, and on a log-smooth curve it returns the
 middle of the sampled range; the CI was tight *because* there was no effect. We
 select between one- and two-segment fits by BIC instead, and note that a
-7-point geometric grid is **underpowered** — a synthetic planted cliff returns
+7-point geometric grid is **underpowered**, a synthetic planted cliff returns
 ΔBIC = −0.2 at n=7.
 
 ### 5.1 Phoneme-class asymmetry (H2) **[M, weak]**
@@ -270,7 +270,7 @@ directly trainable: a causal translator from non-native audio to the *native*
 phone sequence, via CTC against `g2p`.
 
 **The control is one tensor.** Identical architecture, capacity, seed, data
-order and step count; only the target changes — `g2p` (accent **conversion**:
+order and step count; only the target changes, `g2p` (accent **conversion**:
 decide what the speaker *should* have said) vs `ipa` (accent-faithful
 **transcription**: report the local gesture). Mean PER between the two targets
 is **0.175**, confirming they are genuinely different tasks.
@@ -281,7 +281,7 @@ WavLM-base-plus with both causality patches of §3; 24.6 M trainable parameters,
 vocabulary 37. Chunk 40 ms, look-back 2 s. AdamW, OneCycle, lr 3e-4, batch 8,
 **1200 steps** per condition. 3599 utterances, **speaker-disjoint** splits
 stratified by L1 (1800 train / 899 val / 900 test; 6 held-out speakers each for
-val and test) — a random utterance split would make this speaker memorisation.
+val and test), a random utterance split would make this speaker memorisation.
 **Three seeds, not one.** Every condition is trained at seeds {1337, 7, 99}:
 7 lookaheads × 2 targets × 3 seeds = **42 runs**. Caching the frozen encoder's
 features once per condition and reusing them across seeds makes three seeds cost
@@ -302,8 +302,8 @@ T4**. The causality proof runs before training and aborts it on failure.
 | **relative gain 0→640** | | **0.476 ± 0.043** | **0.380 ± 0.046** |
 
 **Most of this curve is not resolved, and that is the finding.** Blocking on
-seed — the correct analysis, since an unlucky seed raises PER at *every*
-lookahead — only the 0→20 ms step is significant at α=.05 in the conversion arm
+seed, the correct analysis, since an unlucky seed raises PER at *every*
+lookahead, only the 0→20 ms step is significant at α=.05 in the conversion arm
 (*t*(2)=+11.1). The 160→320 ms step is **−0.0009 PER with 1 of 3 seeds
 improving**: the mid-range plateau visible in a single-seed run is noise. What
 *is* solid is the endpoint, −0.212 ± 0.018 PER, *t*(2)=+20.1, unanimous. **The
@@ -318,7 +318,7 @@ including ours.
 
 **A more stable instrument.** Scoring each model against *both* label sets gives
 a **preference margin** (PER against the other target minus PER against its own).
-Its seed SD is **0.0023** against **0.0223** for PER — roughly **10× more
+Its seed SD is **0.0023** against **0.0223** for PER, roughly **10× more
 stable**, because the margin is a within-model difference and the seed's effect
 on overall accuracy cancels:
 
@@ -329,8 +329,8 @@ on overall accuracy cancels:
 
 The conversion margin is **strictly monotone increasing in all 3 seeds**, with
 **18/18** adjacent step × seed comparisons positive (exact sign test
-*p*=7.6×10⁻⁶), tripling from *L*=0 to *L*=640. The transcription arm — same
-architecture, same budget, one different label tensor — does the opposite:
+*p*=7.6×10⁻⁶), tripling from *L*=0 to *L*=640. The transcription arm, same
+architecture, same budget, one different label tensor, does the opposite:
 **0/3** seeds monotone, 7/18 positive (*p*=0.48), drifting *down* by 0.010. More
 right context does not merely make the conversion model more accurate; it makes
 it **more converting and less transcribing**.
@@ -351,7 +351,7 @@ PER-matched transcription margin; at *L*=0 it is **0.88×**, i.e. slightly
 **Task vs representation.** The trained curve is shallower than the encoder one
 (R²<sub>log</sub> 0.96 vs 0.99). The representation loses information faster
 than the task can exploit it, which is what one expects if the encoder is a
-bound and not a bottleneck — consistent with, but not proof of, the §5 reading.
+bound and not a bottleneck, consistent with, but not proof of, the §5 reading.
 
 **Knee, with a stated detection limit.** At *n*=21 per arm, BIC prefers a single
 log-linear regime (ΔBIC = +5.27 conversion, +4.25 transcription; the best
@@ -363,7 +363,7 @@ So this experiment excludes discontinuities larger than roughly **0.08 PER
 result carried no such bound and should not have been read as evidence of
 absence.
 
-**Limits.** 1200 steps, a frozen encoder, and three seeds — enough for the
+**Limits.** 1200 steps, a frozen encoder, and three seeds, enough for the
 endpoint and the margin, not for adjacent doublings. Absolute PER is high
 because training is deliberately short; every comparison above is relative and
 all conditions share a budget. A **zero-padding bug** was present in both this
@@ -371,12 +371,12 @@ run and the earlier single-seed run: the causal depthwise conv and the
 feed-forward ignored `key_padding_mask`, so batch composition leaked into the
 last *k*−1 real frames of every shorter utterance. It is now fixed, but a
 bug-free replication is still pending, so absolute PERs must not be compared
-across runs — only within one. All claims in this section are within-run
+across runs, only within one. All claims in this section are within-run
 comparisons, which a constant offset does not affect.
 
 ---
 
-## 6. Embedded feasibility **[P — PROJECTED, NOT MEASURED]**
+## 6. Embedded feasibility **[P, PROJECTED, NOT MEASURED]**
 
 > **These numbers are projections.** No Raspberry Pi was measured. Browser Pi
 > simulators model GPIO, not microarchitecture; QEMU models no timing at all.
@@ -385,7 +385,7 @@ comparisons, which a constant offset does not affect.
 
 First, a negative result that constrains any projection: **a single scalar does
 not describe the difference between two machines.** Across 63 matched
-conditions, the per-preset M4→Neoverse ratio ranges 0.93–1.68 (1.82× spread) —
+conditions, the per-preset M4→Neoverse ratio ranges 0.93–1.68 (1.82× spread),
 the ranking even reverses by model size. "The Pi is *N*× slower" is therefore
 not a well-defined statement, and the projection must be per configuration.
 
@@ -400,7 +400,7 @@ that survive the whole range:
 
 We do not need the Pi's exact slowdown to state that a base-scale encoder cannot
 stream on it and a tiny one can. Only two boundary configurations require the
-board — and those we decline to guess, because a peak-FLOPS derivation puts a
+board, and those we decline to guess, because a peak-FLOPS derivation puts a
 Pi 5 at 37–56× the M4 while an achieved-throughput derivation puts it far
 closer, a disagreement of roughly an order of magnitude. That disagreement *is*
 the finding: **embedded latency cannot be projected reliably from
@@ -446,7 +446,7 @@ residual leak is over a second. Once that is fixed and proven, the lookahead
 question has no cliff to find: the exchange rate is roughly constant per
 doubling, with the best marginal return well above the budgets currently in use.
 Meanwhile the term that actually decides whether a system runs on a CPU is chunk
-size, not lookahead — and the two trade in opposite directions, which a single
+size, not lookahead, and the two trade in opposite directions, which a single
 fused latency number hides.
 
 ---
@@ -463,11 +463,11 @@ fused latency number hides.
 
 ---
 
-## Appendix — reproducibility
+## Appendix, reproducibility
 
 All results from `github.com/Dipeshtripathi13/streaming-fac-lookahead`.
 Raw CSV/JSONL and host metadata for every number are in `results/raw/`.
 Hardware: Apple M4 (Mac16,1, 4P+6E, macOS 26.5, Accelerate);
 Neoverse-N1 (4 cores, OpenBLAS 0.3.29); Tesla T4 (14.6 GB, torch 2.11.0+cu128).
-Data: L2-ARCTIC via `KoelLabs/L2Arctic` (CC-BY-NC-4.0) — non-commercial, which
+Data: L2-ARCTIC via `KoelLabs/L2Arctic` (CC-BY-NC-4.0), non-commercial, which
 constrains any model-weight release.

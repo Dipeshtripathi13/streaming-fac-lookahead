@@ -1,4 +1,4 @@
-# RQ1, answered: there is no knee to publish — there is a saturation point
+# RQ1, answered: there is no knee to publish, there is a saturation onset
 
 > **PARTIALLY SUPERSEDED (numbers, not conclusion).** This document was written
 > against an *imported* noise floor of 2σ = 0.0044, taken from six accidental
@@ -12,16 +12,19 @@
 > strengthened: **there is no locatable knee**, and **the exchange rate
 > (−0.045 PER per doubling) is the citable result.** Everything below about
 > breakpoint unidentifiability still stands. Read "240 ms" as "340 ms" and
-> "0.0044" as "0.0029"; the paper (§RQ1) is authoritative.
+> "0.0044" as "0.0029". The ΔBIC values below were also recomputed when the
+> analysis was re-run over all 21 budgets, moving from −22.2/−31.2/−36.8 to
+> −31.0/−40.0/−46.5; the breakpoints are unchanged at 40/180/180 ms. The
+> paper (§RQ1) is authoritative throughout.
 >
-> A further caveat added later: the exchange rate is **encoder-specific** —
+> A further caveat added later: the exchange rate is **encoder-specific**,
 > see [`SECOND_ENCODER.md`](SECOND_ENCODER.md).
 
 **Status: RQ1 answered on the trained curve.** Supersedes the provisional
 answers in `PROPOSAL_v2.md` §3 (encoder-level F8) and the knee claim in
 `PADDING_FIX_RESOLVED.md` §3.
 
-Evidence: `results/raw/translator_dense.jsonl` — 16 lookaheads × 2 seeds = 32
+Evidence: `results/raw/translator_dense.jsonl`, 16 lookaheads × 2 seeds = 32
 runs, native arm, 1200 steps, batch 8, chunk 40 ms, T4, padding-fixed code.
 Analysed by `eval/analyse_dense_knee.py` (7 self-tests), output in
 `results/analysis_dense_knee.json`. All 32 cells present, single arm, no frame
@@ -30,7 +33,7 @@ quantisation collisions.
 ## The answer
 
 **Curvature is real. A knee location is not.** All three axis treatments prefer
-a two-segment fit — decisively, ΔBIC −22 to −37 — but the breakpoint moves and
+a two-segment fit, decisively, ΔBIC −22 to −37, but the breakpoint moves and
 none of them can localise it:
 
 | treatment of L=0 | ΔBIC | breakpoint | bootstrap 90% CI | identifiable |
@@ -75,7 +78,7 @@ Marginal PER gain per added 20 ms frame, against the measured 2σ = 0.0044 floor
 **Saturation at L ≈ 240 ms**: beyond it, every subsequent step is below the
 noise floor, so further lookahead is not measurably useful at this sample size.
 This is a deployment-relevant number that needs no breakpoint, and unlike a knee
-it is stable — it depends only on the floor, not on an axis choice.
+it is stable. It depends only on the floor, not on an axis choice.
 
 Note the honest weakness: the 140→160 and 180→200 steps are already at 1.0–1.5×
 the floor while 120→140 is 4.0×. The per-step series is noisy at that scale, so
@@ -88,7 +91,7 @@ Fitting L ≥ 20 ms on log₂(L):
 > **−0.0452 PER per doubling of lookahead, R² = 0.983 (n = 15, 20–640 ms).**
 
 Largest residual is L=640 (+0.018), i.e. the curve flattens slightly faster than
-log-linear at the extreme — consistent with saturation, and the reason ΔBIC
+log-linear at the extreme, consistent with saturation, and the reason ΔBIC
 prefers piecewise even though no single breakpoint fits.
 
 ## What this says about the field's 40 ms budget
@@ -103,7 +106,7 @@ PHONOS runs at ≤40 ms. On this curve:
 | 640 ms | 0.3275 → 0.1561 | 52.3% |
 
 **A 40 ms budget forgoes ~40% of the achievable PER reduction, and the returns
-remain measurable out to ~240 ms — six times that budget.** This is the
+remain measurable out to ~240 ms, six times that budget.** This is the
 strongest form of the "current budgets are under-provisioned" claim the project
 has produced, and it now rests on the trained conversion curve rather than on
 encoder representation drift.
@@ -129,7 +132,7 @@ best marginal return at 100–200 ms. Two different measurements, same region.
 
 ## Changes to make in the paper
 
-1. **Withdraw the knee entirely** — including the 40 ms figure from
+1. **Withdraw the knee entirely**, including the 40 ms figure from
    `PADDING_FIX_RESOLVED.md` §3, which this supersedes. Report ΔBIC prefers
    curvature *and* that the location is unidentifiable at 16 points.
 2. **Lead with the exchange rate** (−0.045 PER/doubling, R² 0.98) and the

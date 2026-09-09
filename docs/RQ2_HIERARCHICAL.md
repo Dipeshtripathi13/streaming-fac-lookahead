@@ -29,11 +29,11 @@ Bootstrapping the class rates over speakers (2000 draws):
 | stop | 0.615 | [0.550, 0.689] |
 | affricate | 0.525 | [0.397, 0.633] |
 
-Every individual class gain stays **large and clearly non-zero** — lookahead
+Every individual class gain stays **large and clearly non-zero**, lookahead
 unambiguously helps all seven. What fails is the *grouping*:
 
 > **between-group difference (breaks-first − survives): +0.040,
-> 95% CI [−0.010, +0.101] — includes zero.**
+> 95% CI [−0.010, +0.101], includes zero.**
 
 The estimator is not simply too blunt for six speakers: the *same* procedure
 applied to RQ3 gives [−0.0211, −0.0069], which **excludes** zero. So the null
@@ -59,13 +59,14 @@ speaker**:
 L1 and talker are therefore **perfectly confounded**. The by-L1 breakdown
 cannot separate a language effect from one person's idiosyncrasy, and every
 row is equally readable as a single speaker's variation. The paper reports it
-as a consistency check on the pooled result — the reversals matter because the
-pooled direction survives *no* disaggregation — and explicitly not as evidence
+as a consistency check on the pooled result, the reversals showing that the
+pooled ordering is not consistent across the six held-out speakers, and
+explicitly not as evidence
 about native language.
 
 One clarification while checking this: the paper's "the predicted direction
 appears in only 3 of 6 L1s" is correct but comes from a **two-part criterion**
 (the gain ratio *and* the mean slope must both move as predicted). By gain
-ratio alone it is 4 of 6 — Spanish, at 1.02, clears the gain test but not the
+ratio alone it is 4 of 6, Spanish, at 1.02, clears the gain test but not the
 slope test. The sentence previously read as if it followed from the ratios
 printed beside it.

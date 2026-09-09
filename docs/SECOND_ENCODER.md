@@ -1,4 +1,4 @@
-# The exchange rate is a property of the encoder, not of speech
+# The exchange rate is a property of the encoder: not of speech
 
 **Status: answers the reviewer question "is this a fact about speech or about
 WavLM?".** Qualifies the headline of
@@ -22,18 +22,18 @@ same two patches and both pass the same truncation proof.
 |---|---:|---:|---:|---:|---:|
 | WavLM base+ (layer 9) | 0.4256 | 0.1561 | **+63.3%** | −0.0446 | 0.989 |
 | wav2vec 2.0 base (layer 2) | 0.4359 | 0.4189 | **+3.9%** | −0.0015 | 0.099 |
-| wav2vec 2.0 base, seed 7 | 0.4376 | 0.4265 | **+2.5%** | — | — |
+| wav2vec 2.0 base, seed 7 | 0.4376 | 0.4265 | **+2.5%** | -- | -- |
 
 **Replicated at a second seed.** Seed 7 lands within 0.008 PER of seed 1337 at
 every shared budget (0.4376/0.4359 at L=0, 0.4219/0.4169 at 40, 0.4043/0.4004
 at 160, 0.4265/0.4189 at 640; seed 7 adds 0.4155 at 340). Both curves reach
 their minimum at **the same L=160 ms** and both rise again by 640 ms, so the
 non-monotonicity is a reproducible property of this encoder rather than one
-seed's noise — which matters, because that shape is the evidence that the
+seed's noise, which matters, because that shape is the evidence that the
 curve shape does not transfer.
 
-The two are **equally good with no future context** — 0.4359 against 0.4256,
-within 0.01 PER — and then differ by a factor of 16 in what they do with
+The two have **similar zero-lookahead PER**, 0.4359 against 0.4256, within
+0.01 PER, and then differ by more than an order of magnitude in what they do with
 640 ms of it. Direction replicates; magnitude does not. The log-linear fit that
 describes WavLM almost perfectly (R² 0.989) is meaningless here (R² 0.099), and
 the wav2vec 2.0 curve bottoms out at L=160 ms before rising again.
@@ -58,7 +58,7 @@ Monotone in depth. wav2vec 2.0 base carries phonetic information low in the
 stack; WavLM base+ carries it at 9. **Matching two encoders by layer index is
 not matching them.**
 
-### 2. "It's the 1200-step budget" — tested, and false
+### 2. "It's the 1200-step budget": tested, and false
 
 A second seed cannot rule out an optimisation effect that both seeds share, so
 wav2vec 2.0 gets the same convergence check WavLM has, at L ∈ {0, 160, 640} ms
@@ -72,11 +72,11 @@ to 6000 steps:
 
 Every condition improves, but **they improve together**. The minimum stays at
 L=160 ms and L=640 stays worse than it, so the non-monotonic shape is
-unchanged. The endpoint gain does not grow with training — it **shrinks**,
+unchanged. The endpoint gain does not grow with training, it **shrinks**,
 from +3.9% to +1.8%, while WavLM at the same 6000 steps gains +65.8%. Five
 times the budget widens the gap rather than closing it.
 
-### 3. "Layer 2 is too shallow to need context" — tested, and false
+### 3. "Layer 2 is too shallow to need context": tested, and false
 
 The natural objection to the result above: layer 2 has had almost no
 contextual mixing, so there was little context to withhold, and sensitivity
@@ -118,13 +118,13 @@ a trend.
 `MaskInjector` has two strategies. WavLM takes the `position_bias` path, which
 adds to an existing tensor and leaves the model's padding mask alone. **Every
 other encoder** takes the `layer_attention_mask` path, which *replaced* the
-layer's attention mask — discarding the padding mask that
+layer's attention mask, discarding the padding mask that
 `Wav2Vec2Encoder.forward` builds, so frames near the end of a short utterance
 attended into the zero-padded tail of the batch.
 
 It was worse than a constant bias: a strictly causal mask cannot reach the
 trailing pad at all, a wide one can, so **the corruption grows with lookahead**
-— 3.6e-4 at L=0 rising to 1.8e-2 at L=640 on a 3-layer probe — riding directly
+, 3.6e-4 at L=0 rising to 1.8e-2 at L=640 on a 3-layer probe, riding directly
 on the swept variable. `padding_mask_selftest()` makes it permanent, runs
 offline on a randomly initialised wav2vec 2.0, and the trainer aborts on
 failure. WavLM results are unaffected: they never took this path.

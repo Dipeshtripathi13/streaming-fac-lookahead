@@ -6,7 +6,7 @@ reopen it.
 
 ---
 
-## 2026-08-09 — No paid human listening test for now
+## 2026-08-09, No paid human listening test for now
 
 **Decided:** do not run the paid rater study (~$450, ~30 raters × ~30 stimuli ×
 3 rounds).
@@ -31,7 +31,7 @@ no listener notices, or raise it while sounding more native.* Concretely:
   improvement beyond 240 ms".
 - The **"40% of achievable reduction forgone at 40 ms"** figure is
   PER-relative, not quality-relative.
-- **H3 survives unaffected** — it lives on the preference margin, which is an
+- **H3 survives unaffected**, it lives on the preference margin, which is an
   objective quantity requiring no listeners.
 - For an *accent conversion* paper, accentedness is definitionally perceptual.
   Absence of any perceptual evaluation is the most likely reviewer objection at
@@ -47,7 +47,7 @@ phone-sequence measurement and should read as one.
 1. **Build the stimuli anyway (free).** `listening_test.py build` on the
    existing hyps, then listen informally, or run 3–5 colleagues through the
    HTML page. Not publishable as a rater study, but it would catch the
-   embarrassing case where the PER ordering and the audible ordering disagree —
+   embarrassing case where the PER ordering and the audible ordering disagree,
    which is exactly the failure the docstring warns about.
 2. **NISQA-MOS on the synthesised stimuli (free, automatic).** Gives a
    naturalness axis with no raters. Already referenced in §6 as the automatic

@@ -1,8 +1,8 @@
-# The padding fix changed the shape of the curve, not just its height
+# The padding fix changed the shape of the curve: not just its height
 
 **Status: resolved.** This closes the open question in
 `CACHING_CHANGED_THE_NUMBERS.md`. The 3-seed numbers can go in the paper, but
-**not** the ones already there — several conclusions change.
+**not** the ones already there, several conclusions change.
 
 Evidence: `results/raw/translator_sweep_3seed.jsonl` (42 conditions, 48 lines,
 6 accidental repeats), analysed by `eval/compare_padding_fix.py`, output in
@@ -14,8 +14,8 @@ reported no hyperparameter drift.
 ## 1. It is a shape change, and that was the thing that mattered
 
 The question was whether fixing the bug shifted every PER by roughly the same
-amount — in which case every *within-run* comparison survives untouched, because
-a constant cancels in every difference — or whether the shift depended on
+amount, in which case every *within-run* comparison survives untouched, because
+a constant cancels in every difference, or whether the shift depended on
 lookahead, in which case the curve's shape was partly an artefact.
 
 It depends on lookahead, by a wide margin:
@@ -24,7 +24,7 @@ It depends on lookahead, by a wide margin:
 |---|---|---|---|---|---|---|---|
 | mean ΔPER (new − old) | −0.014 | −0.019 | −0.027 | −0.054 | −0.068 | **−0.086** | −0.052 |
 
-Spread across lookahead is 0.072 PER against a measured noise floor of 0.0044 —
+Spread across lookahead is 0.072 PER against a measured noise floor of 0.0044,
 **16.4×**. Slope on log₂(L+1) is −3.98 standard errors from zero. All 42 cells
 improved.
 
@@ -51,7 +51,7 @@ Three things improve at once:
 - **Endpoint gain is much larger.** Native L0→640 improves by 0.270 absolute /
   **63.2% relative**, against 0.212 / 47.6% before.
 - **Seed spread collapses.** SD of the endpoint gain across seeds falls from
-  0.0183 to **0.0007** — a 26× reduction. The zero-pad contamination was itself
+  0.0183 to **0.0007**, a 26× reduction. The zero-pad contamination was itself
   a major source of apparent seed variance, which is why the earlier analysis
   had to work so hard to resolve anything.
 
@@ -72,7 +72,7 @@ Now a knee **is** detected (native ΔBIC −10.11, produced −7.41). That is a
 different answer to RQ1.
 
 **But the location is not identified, and this must not be reported as though it
-were.** The knee position depends entirely on an arbitrary choice — where L=0
+were.** The knee position depends entirely on an arbitrary choice, where L=0
 sits on a log axis:
 
 | treatment of L=0 | native | produced |
@@ -85,7 +85,7 @@ The cause is mechanical: on log₂(L+1) the gap from L=0 to L=20 is 4.39 units
 while every other gap is ~1.0. A piecewise fit will place a breakpoint just
 after that gap whatever the data does. The power calibration confirms the
 estimator cannot localise: planting a 0.05 cliff at 81 ms yields a "detected"
-knee at 40 ms — right conclusion, wrong place.
+knee at 40 ms, right conclusion, wrong place.
 
 Defensible claim: **the native curve has real curvature; its location cannot be
 resolved by a 7-point geometric grid.** The produced arm's detection is fragile
@@ -110,7 +110,7 @@ Both are worth having and they answer different questions. The encoder pilot
 also upgrades F8, whose 7-point grid the proposal already flags as underpowered
 (a planted cliff returns dBIC = -0.2 at n = 7).
 
-## 4. H3 is untouched — and that is not luck
+## 4. H3 is untouched, and that is not luck
 
 The conversion-vs-transcription claim survives intact:
 
@@ -127,11 +127,11 @@ That is a point in favour of the earlier decision to build H3 on the margin
 rather than on raw PER.
 
 *Coincidence, flagged so nobody reads meaning into it:* produced margin growth
-is −0.010311 new against −0.010300 old — agreement to four decimals is chance.
+is −0.010311 new against −0.010300 old, agreement to four decimals is chance.
 The per-seed values differ (new −0.0071/−0.0098/−0.0140, old
 −0.0089/−0.0119/−0.0101).
 
-## 5. A GPU non-determinism floor, measured by accident
+## 5. A GPU non-determinism floor: measured by accident
 
 Two sweep processes ran concurrently for about an hour (operator error), which
 repeated 6 conditions at **identical seed and configuration**. Those repeats are
@@ -172,5 +172,5 @@ floor, the shape spread 16.4×.
 6. Drop the "resolution floor ≈ 0.01 PER" framing inherited from the pooled-SD
    analysis; the measured fixed-seed floor is 0.0044 and the paired-by-seed SDs
    are now 0.001–0.006, so several previously "unresolvable" adjacent steps are
-   resolvable — indeed all six adjacent steps are now unanimous and significant
+   resolvable, indeed all six adjacent steps are now unanimous and significant
    in both arms.

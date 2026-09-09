@@ -1,4 +1,4 @@
-# The feature cache is not numerically neutral — and it looks like a bug fix
+# The feature cache is not numerically neutral, and it looks like a bug fix
 
 **Status: RESOLVED (9 Aug 2026). See `docs/PADDING_FIX_RESOLVED.md`.**
 
@@ -22,7 +22,7 @@ That claim is wrong. Same condition, same seed, same step:
 | original (no cache) | `L0_native step 1000` | **0.5314** |
 | cached | `L0_native_s1337 step 1000` | **0.4530** |
 
-A 0.078 PER difference — roughly 8× the ~0.01 resolution floor the single-seed
+A 0.078 PER difference, roughly 8× the ~0.01 resolution floor the single-seed
 run implied. Something real changed.
 
 ## Two candidate causes
@@ -31,15 +31,15 @@ run implied. Something real changed.
 casts back to fp32 on use. That loses precision. It should hurt, not help, so
 it does not explain an *improvement*.
 
-**2. Zero-pad contamination — the likely one.** In the original path, a batch of
+**2. Zero-pad contamination, the likely one.** In the original path, a batch of
 audio was padded to the batch maximum and the whole padded hidden-state tensor
 was handed to the head, with a key-padding mask. That mask is respected by
-attention — but **not** by the depthwise convolution or the feed-forward in
+attention, but **not** by the depthwise convolution or the feed-forward in
 `MaskedBlock`. So the causal conv could smear padded positions into real frames
 near the end of every short utterance in a batch. CTC itself was fine, because
 it used the true `in_len`.
 
-The cache stores `h[j, :fl[j]]` — each utterance trimmed to its true length —
+The cache stores `h[j, :fl[j]]`, each utterance trimmed to its true length,
 and re-pads at collate time. Same masking, but the padded region no longer
 contains encoder output derived from zero-padded audio.
 
@@ -53,7 +53,7 @@ original transcription curve.
 1. **Isolate it.** Re-run one condition three ways: (a) original path,
    (b) cache in fp32, (c) cache in fp16. If (b) ≈ (c) ≠ (a), it is padding, not
    precision.
-2. **Fix the conv/FFN padding** in `MaskedBlock` regardless — zero the padded
+2. **Fix the conv/FFN padding** in `MaskedBlock` regardless, zero the padded
    positions before the depthwise conv. It is a real bug whether or not it
    explains this gap.
 3. **Do not mix the two runs.** The 1-seed table in `RESULTS_M4.md` F11 and
@@ -63,6 +63,6 @@ original transcription curve.
 ## What this does *not* threaten
 
 The H3 direction and the monotone canonical-preference growth are *within-run*
-comparisons — every condition in a given run shared the same code path, so a
+comparisons, every condition in a given run shared the same code path, so a
 systematic padding artefact affects the level, not the ordering. But the
 magnitudes (1.48×, 2.8×) must be re-quoted from whichever run the paper uses.

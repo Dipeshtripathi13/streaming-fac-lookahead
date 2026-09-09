@@ -11,7 +11,7 @@ Evidence: `results/analysis_h2_sequences.json`, from `eval/analyse_h2_sequences.
 sweep (7 lookaheads × 3 seeds; the directory holds 42 files, the produced arm is
 excluded), 1 200 utterance-instances per lookahead after pooling seeds.
 **42 255 reference phones per lookahead, 295 785 in the native arm, and zero
-falling outside the seven pre-registered classes** — a coverage assertion across
+falling outside the seven pre-registered classes**, a coverage assertion across
 all 42 files (591 570 tokens, both arms) also returns zero unclassified.
 
 ## What was measured
@@ -36,13 +36,13 @@ Relative error-rate reduction from L=0 to L=640 ms, sorted:
 | 6 | stop | survives | 0.615 | 7 071 |
 | 7 | affricate | survives | 0.525 | 1 098 |
 
-Group means differ in the predicted **direction** — breaks-first 0.676 versus
-survives 0.636 — but that is the weakest possible reading, and three harder
+Group means differ in the predicted **direction**, breaks-first 0.676 versus
+survives 0.636, but that is the weakest possible reading, and three harder
 checks all fail:
 
 - **Effect size 0.66.** The between-group difference (0.040) is smaller than the
   pooled SD across classes (0.060).
-- **The survives group's internal spread is 0.190 — 4.7× the between-group
+- **The survives group's internal spread is 0.190, 4.7× the between-group
   difference.** Whatever separates nasals (0.716) from affricates (0.525) is a
   much stronger effect than anything the H2 grouping captures.
 - **5 of 12 pairwise orderings are violated.** `nasal` beats all three
@@ -62,13 +62,13 @@ right context.
 Two candidate explanations, neither tested here:
 
 1. **Sequence-level PER may not expose the phenomenon H2 is about.** H2's
-   rationale is formant trajectories over 80–250 ms — a property of the acoustic
+   rationale is formant trajectories over 80–250 ms, a property of the acoustic
    realisation. A discrete phone-label error rate can be blind to it: a vowel can
    be labelled correctly while its formant trajectory is wrong. The
    mel-cepstral-distortion form in `phoneme_analysis.py` is the test that would
    settle this, and it needs synthesis plus alignment.
-2. **The grouping may be genuinely wrong.** The observed ordering — nasals and
-   fricatives gaining most, affricates least — is not obviously about
+2. **The grouping may be genuinely wrong.** The observed ordering, nasals and
+   fricatives gaining most, affricates least, is not obviously about
    coarticulatory locality. Affricates gaining least is consistent with them
    being short and locally determined; nasals gaining most is not.
 
@@ -80,8 +80,8 @@ sequence level, is **not supported**.
 The first run of this analysis reported a plausible-looking H2 verdict that was
 meaningless. `phoneme_analysis.CLASS_OF` is keyed on **ARPAbet** (`IY`, `TH`,
 `NG`); the sweep emits **IPA** (`i`, `θ`, `ŋ`). Applying one to the other sent
-**8 094 of 14 085 reference tokens (57%) to class "other"** — including *every
-vowel* and /r/ — leaving `breaks_first` with `l` and `w` alone. The script still
+**8 094 of 14 085 reference tokens (57%) to class "other"**, including *every
+vowel* and /r/, leaving `breaks_first` with `l` and `w` alone. The script still
 printed per-class slopes, an H2 verdict and a by-L1 table.
 
 Two features of this transcription then forced context-sensitive mapping, both
@@ -89,7 +89,7 @@ verified against the data before being encoded:
 
 - **Diphthongs are decomposed**: `a`+`ɪ`, `a`+`ʊ`, `e`+`ɪ`, `o`+`ʊ`, `ɔ`+`ɪ`.
   `a` is followed by a glide 100% of the time, but `ɪ` follows a diphthong onset
-  only 38.6% of the time and `ʊ` 78.5% — so a context-free map would relabel
+  only 38.6% of the time and `ʊ` 78.5%, so a context-free map would relabel
   thousands of genuine monophthongs as diphthongs.
 - **Affricates are decomposed** as `t`+`ʃ` and `d`+`ʒ`, so without sequence
   detection the pre-registered `affricate` class is empty and H2's survives group
@@ -97,7 +97,7 @@ verified against the data before being encoded:
 
 Guards added: a coverage assertion that no declared phone maps to `other`, ten
 contextual class tests, and a reachability test that all seven pre-registered
-classes can be produced. The boolean criterion was also replaced — direction
+classes can be produced. The boolean criterion was also replaced, direction
 alone called a 6% group difference "supported", so it now additionally requires
 effect size ≥ 1.0 and a minority of ordering violations.
 
@@ -113,7 +113,7 @@ error.*
    "partially supported" on the strength of the group-mean direction.
 2. Keep the pre-registered prediction visible. The value of a pre-registered
    hypothesis is precisely that it can come out false.
-3. State that all classes improve by 52–72% relative — the negative result is
+3. State that all classes improve by 52–72% relative, the negative result is
    about the *grouping*, not about lookahead being useless.
 4. Record that the audio-domain form of H2 remains untested and is the
    experiment that would distinguish "wrong grouping" from "PER is blind to the

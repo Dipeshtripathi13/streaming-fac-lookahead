@@ -65,14 +65,14 @@ tapped at its own selected phonetic layer, changes the answer: it starts within
 $0.01$ PER of WavLM at $L{=}0$ yet gains only $3.9\%$ relative from $640$\,ms
 of lookahead against WavLM's $63.3\%$, and where WavLM is smooth and
 log-linear ($R^2=0.99$) its response is weak and non-monotonic ($R^2=0.10$),
-bottoming out at $160$\,ms and rising again --- a pattern reproduced at a
+bottoming out at $160$\,ms and rising again, a pattern reproduced at a
 second seed; at five times the training budget the $0/160/640$\,ms ordering is
 unchanged and its endpoint gain shrinks to $+1.8\%$ against WavLM's
 $+65.8\%$. Neither the measured exchange
 rate nor the detailed curve shape is a universal property of the task. Fifth, per-chunk compute depends only weakly on
-lookahead --- at most $1.9\%$ on an Apple M4 and $7.6\%$ on an ARM64 Linux
-host across a $17\times$ change in algorithmic latency --- a weak empirical
-dependence between lookahead and per-chunk compute over the tested range,
+lookahead, moving at most $1.9\%$ on an Apple M4 and $7.6\%$ on an ARM64 Linux
+host across a $17\times$ change in algorithmic latency. That is a weak
+empirical dependence over the tested range,
 subject to the throughput constraint $\tcmp<c$. We release the harness and the per-condition outputs.
 \end{abstract}
 
@@ -102,8 +102,8 @@ and publishes no ablation showing 40\,ms is necessary or sufficient;
 TVTSyn~\cite{tvtsyn2026} fixes 4 future tokens ($\approx$80\,ms) without
 varying them. DarkStream~\cite{darkstream2025} does ablate, over three points
 $\{0, 140, 280\}$\,ms, and finds the third buys
-$<$1pp --- but three points scored on anonymisation accuracy cannot tightly localise
-where returns stop, which is the question a deployment budget actually asks.
+$<$1pp. But three points scored on anonymisation accuracy cannot tightly
+localise where returns stop, which is the question a deployment budget actually asks.
 ``What would 160\,ms buy you'' still has no published answer.
 
 \textbf{Algorithmic and computational latency are reported fused.} A figure
@@ -164,7 +164,7 @@ isolate. PHONOS, TVTSyn~\cite{tvtsyn2026} and DarkStream~\cite{darkstream2025}
 come from one group and pair conversion with speaker anonymisation, and two
 report more than is sometimes credited. TVTSyn gives CPU as well as GPU latency
 ($\approx$132 and $\approx$79\,ms at 60\,ms chunk), so a CPU number is not
-unpublished --- a CPU latency--\emph{quality} curve is. DarkStream ablates
+unpublished; a CPU latency--\emph{quality} curve is. DarkStream ablates
 look-ahead over $\{0,140,280\}$\,ms and selects 140\,ms because the extra
 140\,ms buys $<$1pp at double the buffering delay: a three-point ablation,
 scored on anonymisation accuracy rather than conversion quality. DarkStream
@@ -198,7 +198,7 @@ provides, per utterance, both the canonical G2P/lexicon-derived phone sequence
 a CTC head over a frozen causal encoder. This provides a controlled supervised proxy for the
 phonetic-normalization stage, and swapping the target tensor from
 \texttt{g2p} to \texttt{ipa} yields a more tightly matched architectural
-control, differing in \emph{one tensor}, than an AC-versus-VC comparison ---
+control, differing in \emph{one tensor}, than an AC-versus-VC comparison,
 though the two targets still differ in label entropy, sequence length and
 annotation noise (\S\ref{sec:rq3}).
 
@@ -239,7 +239,7 @@ The three leak magnitudes are stable across library versions and reproduce
 exactly. The patched row is not: at $10^{-6}$ it sits at float32 accumulation
 noise, and moves with the \texttt{transformers} release (an earlier version
 gave $6.14\times10^{-6}$). Both values are four orders of magnitude below the
-$10^{-4}$ threshold, so the verdict is unaffected --- but the row should be
+$10^{-4}$ threshold, so the verdict is unaffected, but the row should be
 read as ``indistinguishable from causal at float32 precision'' rather than as
 a reproducible constant.
 
@@ -285,8 +285,8 @@ This supersedes an earlier estimate of $2\sigma=0.0044$ taken from six
 was inflated by a single outlying pair. The correction matters because the
 saturation onset in \S\ref{sec:rq1} is defined against this floor, and a
 smaller floor makes smaller gains measurable. We also note the floor is not
-constant across conditions --- per-condition $\sigma$ spans $0.00064$ to
-$0.00223$, a factor of $3.5$ --- so a single global threshold is an
+constant across conditions: per-condition $\sigma$ spans $0.00064$ to
+$0.00223$, a factor of $3.5$. A single global threshold is therefore an
 approximation, and marginal decisions near it should be read as such.
 
 \section{Results}
@@ -296,7 +296,7 @@ approximation, and marginal decisions near it should be read as such.
 
 Across $L\in[0,640]$\,ms at chunk 40\,ms on the M4, \talg{} spans 40--680\,ms
 ($17\times$) while median per-chunk compute moves from 43.23\,ms to at most
-44.06\,ms --- a range of $-0.3\%$ to $+1.9\%$. On ARM64 the span is $0$ to
+44.06\,ms, a range of $-0.3\%$ to $+1.9\%$. On ARM64 the span is $0$ to
 $+7.6\%$. The two terms of Eq.~\ref{eq:decomp} are therefore separately
 actionable, which is the practical justification for reporting them
 separately.
@@ -326,7 +326,7 @@ an optimization-rate difference rather than a context effect. We test this
 rather than list it as a caveat.
 
 Five representative budgets ($L\in\{0,40,160,240,640\}$\,ms) were trained for
-6000 steps --- five times the standard budget --- with validation every 500
+6000 steps, five times the standard budget, with validation every 500
 steps, giving a 12-point trace per condition (Table~\ref{tab:conv}).
 
 \begin{table}[t]
@@ -372,7 +372,7 @@ Improvement from step 1500 to 6000 is also roughly uniform across conditions
 ($-0.030$ to $-0.045$ PER) rather than concentrated at long lookahead, which is
 the specific pattern a convergence-rate confound would produce. Absolute PER
 does keep falling with longer training, so the fixed-budget numbers elsewhere
-are a comparison at matched budget rather than converged performance --- but
+are a comparison at matched budget rather than converged performance. But
 the \emph{relative} quantities this paper reports, the ranking and the exchange
 rate, are not artefacts of stopping at 1200 steps. The check is single-seed
 over five budgets and uses validation rather than test PER, so it bounds the
@@ -430,8 +430,8 @@ over wider sampled intervals.
 Gains run $+0.056$ (0$\rightarrow$20\,ms), $+0.021$ (60$\rightarrow$80) and
 $+0.0045$ (180$\rightarrow$200). Against the measured floor of $0.0029$
 (Eq.~\ref{eq:floor}), every observed 20\,ms step remains above it out to
-340\,ms --- $1.1\times$ (200$\rightarrow$220), $2.0$, $1.3$, $1.5$, $1.2$,
-$1.1$, $1.1$. The observed $340\rightarrow360$\,ms increment is the first to
+340\,ms, at $1.1\times$ (200$\rightarrow$220), $2.0$, $1.3$, $1.5$, $1.2$,
+$1.1$ and $1.1$. The observed $340\rightarrow360$\,ms increment is the first to
 fall below it, at $0.7\times$, and the average per-20\,ms gain over the two
 longer intervals that follow stays below it as well ($0.7$ over
 $360\rightarrow480$ and $0.4$ over $480\rightarrow640$). We therefore place
@@ -445,7 +445,7 @@ than a single number.} Recomputing the onset at each end of the floor's
 bootstrap interval moves it from 300\,ms (at $2\sigma=0.0034$) to 480\,ms (at
 $0.0013$). This span is a sensitivity range induced by uncertainty in the
 floor, not a confidence interval on a fitted saturation parameter. Under
-the superseded $0.0044$ estimate it would have been 240\,ms --- so the earlier
+the superseded $0.0044$ estimate it would have been 240\,ms, so the earlier
 figure was an artefact of an over-conservative floor, not of the curve. The
 gains between 200 and 340\,ms sit at only $1.1$--$2.0\times$ the floor, so this
 is a region where returns become marginal rather than a sharp cutoff. Unlike a
@@ -464,7 +464,7 @@ average over wider intervals.}
 \toprule
 $L$ (ms) & PER & gain/frame & $\times$ floor \\
 \midrule
-0   & 0.4256 & ---     & --- \\
+0   & 0.4256 & --      & -- \\
 20  & 0.3700 & 0.0556  & 19.2 \\
 40  & 0.3275 & 0.0426  & 14.7 \\
 60  & 0.2963 & 0.0312  & 10.8 \\
@@ -515,7 +515,7 @@ differs slightly from \S\ref{sec:rq1}. Both encoders are causalised by the same
 two patches and both pass the same truncation-based causality test.
 
 \textbf{The layer must be matched by function, not by index.} Tapping
-wav2vec 2.0 at layer 9 --- WavLM's phonetic layer --- produces a degenerate
+wav2vec 2.0 at layer 9, WavLM's phonetic layer, produces a degenerate
 run: PER rises from $0.772$ at $L{=}0$ to $0.928$ and the training loss is
 still falling steeply at step 1200. Probing the stack at $L{=}160$\,ms with
 everything else fixed shows why (PER by layer: $0.402$ at 2, $0.411$ at 3,
@@ -528,7 +528,7 @@ Matching two encoders by layer index is not matching them.
 result.} The two procedures are not symmetric and we state them plainly.
 WavLM's layer 9 was fixed in advance from prior practice, before any lookahead
 data existed, and was never re-selected. wav2vec 2.0's layer was chosen by the
-probe above, which runs at $L{=}160$\,ms --- inside the sweep it is later used
+probe above, which runs at $L{=}160$\,ms, inside the sweep it is later used
 to interpret, so layer and lookahead sensitivity rest on partly overlapping
 evidence. The concern this raises is that a layer picked mid-curve might
 flatter or flatten the curve it is picked from. It does not here: re-selecting
@@ -552,7 +552,7 @@ encoder & $L{=}0$ & $L{=}640$ & rel.\ gain & slope \\
 \midrule
 WavLM base+ (9)      & 0.4256 & 0.1561 & $+63.3\%$ & $-0.0446$ \\
 wav2vec 2.0 base (2) & 0.4359 & 0.4189 & $+3.9\%$  & $-0.0015$ \\
-\quad seed 7         & 0.4376 & 0.4265 & $+2.5\%$  & --- \\
+\quad seed 7         & 0.4376 & 0.4265 & $+2.5\%$  & -- \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -581,9 +581,9 @@ the same shape.
 rule out an optimisation effect the two seeds share: perhaps wav2vec 2.0's
 lookahead conditions simply separate later. We therefore give this encoder the
 same convergence check WavLM receives in \S\ref{sec:convergence}, at
-$L\in\{0,160,640\}$\,ms to 6000 steps. Every condition improves --- $0.4359
-\rightarrow 0.3782$, $0.4004 \rightarrow 0.3361$, $0.4189 \rightarrow 0.3714$
---- but they improve together, and the three-point ordering is unchanged: the
+$L\in\{0,160,640\}$\,ms to 6000 steps. Every condition improves ($0.4359
+\rightarrow 0.3782$, $0.4004 \rightarrow 0.3361$, $0.4189 \rightarrow 0.3714$),
+but they improve together, and the three-point ordering is unchanged: the
 minimum remains at $L{=}160$\,ms and $L{=}640$ remains worse than it. Three
 budgets test that ordering, not the full seven-point curve. The endpoint gain does not
 grow with training; it \emph{shrinks}, from $+3.9\%$ to $+1.8\%$, while WavLM
@@ -597,12 +597,12 @@ rather than closing it.
 substantially less contextual mixing than deeper layers, so the natural
 objection is that there was less context to withhold and that sensitivity
 would recover deeper in the stack. We do not observe that recovery. Relative gain from $L{=}0$ to $640$\,ms is $+3.9\%$ at layer 2,
-$+5.4\%$ at 4, $+5.2\%$ at 6 and $-14.1\%$ at 8 --- flat across every layer
+$+5.4\%$ at 4, $+5.2\%$ at 6 and $-14.1\%$ at 8: flat across every layer
 where the encoder can still decode phones, then negative. We looked for the
 trade-off and did not find it.
 
 Two encoders with similar zero-lookahead PER therefore differ by more than an
-order of magnitude in endpoint relative gain --- a statement that holds for
+order of magnitude in endpoint relative gain, a statement that holds for
 both wav2vec 2.0 seeds ($+2.5\%$ and $+3.9\%$ against $+63.3\%$). \textbf{The exchange
 rate of $-0.045$ PER per doubling is a property of WavLM base+, and should be
 read as one encoder's operating curve rather than as a fact about how much
@@ -629,10 +629,11 @@ hypothesis dumps it is tested on were committed (\texttt{b66d0a5}, 9 Aug
 that vowels and approximants break first while stops, fricatives, affricates
 and nasals would survive short lookahead. The reasoning was that vocalic
 identity is carried by formant movement across a syllable nucleus that is tens
-to hundreds of milliseconds long --- Peterson and Lehiste measured English
+to hundreds of milliseconds long. Peterson and Lehiste measured English
 syllable nuclei at roughly $80$--$250$\,ms \cite{petersonlehiste1960}, a range
 consistent with the vowel durations later reported over 139
-talkers \cite{hillenbrand1995} --- and that this movement is criterial rather
+talkers \cite{hillenbrand1995}. The second half of the reasoning was that this
+movement is criterial rather
 than incidental, since even nominal monophthongs are identified better from a
 trajectory than from a steady-state slice \cite{nearey1986}, with glides and
 diphthongs differing from vowels in rate of formant change rather than in
@@ -645,7 +646,7 @@ were assigned to the same group under the same short-context prediction, but
 the acoustic argument above is strongest for the obstruent classes and we do
 not claim it extends cleanly to nasals. We record this asymmetry as it stood
 at pre-registration rather than reconstructing a stronger rationale after the
-grouping failed --- and nasals in fact gain the most of any class
+grouping failed. Nasals in fact gain the most of any class
 (Table~\ref{tab:h2}). Testing this on 42{,}255 unique reference-phone tokens evaluated across seven
 lookahead conditions (295{,}785 phone--condition observations), with each
 substitution or deletion charged to the class of the \emph{reference} phone:
@@ -676,7 +677,7 @@ Group means differ in the predicted direction ($0.676$ vs $0.636$), but that is
 the weakest available reading and four stronger checks fail. The effect size
 is $0.66$: the between-group difference ($0.040$) is smaller than the pooled SD
 across classes ($0.060$). The surviving group's \emph{internal} spread is
-$0.190$ --- $4.7\times$ the between-group difference. And 5 of 12 pairwise
+$0.190$, which is $4.7\times$ the between-group difference. And 5 of 12 pairwise
 orderings are violated, with nasals out-gaining all three breaks-first classes.
 
 \textbf{Under speaker-level resampling the difference is not distinguishable
@@ -686,20 +687,21 @@ which the independent replicate is a talker rather than a phone. Resampling
 speakers rather than tokens (2000 draws, Table~\ref{tab:h2}) puts the
 between-group difference at $+0.040$ with a 95\% interval of
 $[-0.010, +0.101]$, which \textbf{includes zero}. Every individual class gain
-remains large and clearly non-zero --- the intervals in Table~\ref{tab:h2} sit
-between $0.40$ and $0.78$ --- so every class shows a substantial positive gain;
+remains large and clearly non-zero, with the intervals in Table~\ref{tab:h2}
+sitting between $0.40$ and $0.78$, so every class shows a substantial positive
+gain;
 what fails to separate from zero is the \emph{grouping}. Token-level intervals
 would have been roughly an order of magnitude narrower and would have declared
 this difference significant, which is the error the clustering avoids. The same
 procedure applied to RQ3 (Sec.~\ref{sec:rq3}) resolves the larger interaction
 there, showing that the estimator is not uniformly uninformative at six
-speakers --- though that does not by itself establish power for an effect this
+speakers, though that does not by itself establish power for an effect this
 small.
 A cluster bootstrap over six clusters leans on asymptotics that six clusters do
 not supply, so we add the non-asymptotic companion: recomputing the difference
 with each speaker removed in turn gives $+0.0217$ to $+0.0592$ (pooled
-$+0.0401$). No single talker drives the estimate --- the sign is stable across
-all six drops --- but the entire leave-one-out range also sits inside an
+$+0.0401$). No single talker drives the estimate, since the sign is stable
+across all six drops, but the entire leave-one-out range also sits inside an
 interval that contains zero, so the verdict does not change.
 
 \textbf{The pattern does not hold within L1 either, but that split cannot carry
@@ -715,11 +717,10 @@ is represented by exactly one speaker} (ABA, LXC, SVBI, HJK, EBVS, PNV), so L1
 and talker are perfectly confounded: this table cannot separate a language
 effect from an individual one, and every ``by-L1'' row is equally readable as a
 single speaker's idiosyncrasy. We report it as a consistency check on the
-pooled result --- and not as evidence
-about native language.
+pooled result, and not as evidence about native language.
 
 \textbf{H2 is not supported.} The finding is not that lookahead fails to help
-vowels --- every class improves 52--72\% relative. The finding is that the
+vowels, since every class improves 52--72\% relative. The finding is that the
 pre-registered manner grouping does not reliably order lookahead benefit.
 
 \textbf{Reweighting each error by a proxy for its acoustic cost does not rescue
@@ -776,9 +777,9 @@ S & affricate    & 0.257 & 0.526 & 44 \\
 \end{table}
 
 The verdict is unchanged (Table~\ref{tab:h2audio}). Acoustic weighting does move
-in H2's favour --- effect size $0.607 \rightarrow 0.756$ and ordering violations
-$4/12 \rightarrow 2/12$ against the sequence metric on the same utterances ---
-but not far enough to clear the pre-registered threshold of $1.0$, and the
+in H2's favour, with effect size $0.607 \rightarrow 0.756$ and ordering
+violations $4/12 \rightarrow 2/12$ against the sequence metric on the same
+utterances, but not far enough to clear the pre-registered threshold of $1.0$, and the
 failure has the same shape as before: the ``survives'' group's internal spread
 ($0.120$) is $3.5\times$ the difference between the groups ($0.034$), and a
 nasal again out-gains a diphthong. So this particular equal-cost objection is not supported by the synthesized
@@ -793,8 +794,8 @@ canonical formant trajectories for whatever string it is given. This measures
 the cost of getting a phone's \emph{identity} wrong; it says nothing about a
 wrong trajectory for a phone whose identity is right. That still needs real
 converted audio against a native rendition (\S\ref{sec:remaining}). The sample
-is also far smaller than the sequence-level test --- 1451 unique reference
-phones per acoustic condition against 42{,}255 per sequence condition --- and
+is also far smaller than the sequence-level test, at 1451 unique reference
+phones per acoustic condition against 42{,}255 per sequence condition, and
 is weighted accordingly.
 
 \subsection{RQ3: canonical-phone prediction benefits more from lookahead than realized-phone transcription}
@@ -812,8 +813,8 @@ relative to the effect.
 \textbf{The dense grid replicates this, and sharpens it.} Running the full
 16-lookahead $\times$ 2-seed sweep on the transcription arm as well puts both
 arms on the same dense grid (Table~\ref{tab:h3dense}). The endpoint gains
-reproduce the 7-point result almost exactly --- 63.3\% for conversion against
-43.5\% for transcription, against 63.2\% and 42.8\% before --- in an
+reproduce the 7-point result almost exactly, at 63.3\% for conversion against
+43.5\% for transcription, against 63.2\% and 42.8\% before, in an
 independent set of training runs on a denser grid, though on the same corpus
 and test split. The exchange rates separate cleanly:
 \begin{center}
@@ -879,7 +880,7 @@ deletion over substitution moves the slope difference from $-0.0127$ to
 $-0.0131$ (ratio $1.32$ to $1.33$, CI $[-0.0218, -0.0071]$, still 26 of 35
 phones in the same direction), so a deterministic tie rule is not doing the
 work. Recomputing the difference \emph{within each reference
-phone} and pooling gives $-0.0098$, steeper in 26 of 35 phones --- so phone
+phone} and pooling gives $-0.0098$, steeper in 26 of 35 phones, so phone
 composition accounts for roughly a quarter of the raw gap but not the effect.
 We report this as an association under matched conditions, not as evidence
 that \texttt{g2p}$\neq$\texttt{ipa} positions are exclusively where accent
@@ -922,9 +923,9 @@ $L$ (ms) & conversion & transcription & gap \\
 \end{tabular}
 \end{table}
 
-A complementary within-run measure is the \emph{preference margin} --- PER against the other
-arm's labels minus PER against its own --- which grows monotonically in 3/3
-seeds for conversion ($+0.032$ at $L{=}0$ to $+0.099$ at 640\,ms; 18/18
+A complementary within-run measure is the \emph{preference margin}, PER
+against the other arm's labels minus PER against its own. It grows
+monotonically in 3/3 seeds for conversion ($+0.032$ at $L{=}0$ to $+0.099$ at 640\,ms; 18/18
 adjacent step $\times$ seed comparisons positive) while the transcription
 control is 0/3 monotone and drifts \emph{down} ($-0.0103$). Building the claim
 on a difference rather than a level turned out to matter
@@ -944,7 +945,7 @@ below $1.3\times10^{-4}$\%. On this platform the jitter safety margin
 contributes nothing meaningful to the budget.
 
 \textbf{The I/O term is unmeasured, and the reason is instructive.} An acoustic
-loopback --- emit a chirp, record it, cross-correlate --- failed on every
+loopback (emit a chirp, record it, cross-correlate) failed on every
 attempt, with all 20 repetitions rejected at correlation $0.042$--$0.046$
 against a $0.20$ threshold. The diagnosis is not weak signal: captured level is
 \emph{invariant} to output amplitude (peak $0.00505$ at amplitude $0.50$ versus
@@ -958,9 +959,9 @@ roughly doubling at 40\,ms, which strongly suggests the reported quantity
 includes queueing rather than isolated converter delay: a quantity that is
 invariant to a doubling of the block size is not measuring the block.
 
-A digital loopback through a virtual audio device --- the signal never becomes
-sound, so echo cancellation cannot reach it --- also fails, for a different and
-more interesting reason. The path works mechanically, but the returned signal
+A digital loopback through a virtual audio device, where the signal never
+becomes sound and echo cancellation cannot reach it, also fails, for a
+different and more interesting reason. The path works mechanically, but the returned signal
 peaks near $0.014$; lowering the detection threshold until repetitions pass
 yields p50 $206$\,ms, p90 $491$\,ms, $\sigma=117$\,ms. A distribution whose p90
 is $2.4\times$ its p50, on a signal this weak and with this much threshold
@@ -979,8 +980,8 @@ without echo cancellation in the path.
 \textbf{A padding bug rewrote the curve's shape.} A masked block handed a
 zero-padded hidden-state tensor to a depthwise convolution and feed-forward
 that do not respect the key-padding mask. The correction was not a constant
-offset --- it grows with lookahead, from $-0.014$\,PER at $L{=}0$ to $-0.086$
-at 320\,ms, $16.4\times$ the noise floor --- so the buggy curve
+offset: it grows with lookahead, from $-0.014$\,PER at $L{=}0$ to $-0.086$
+at 320\,ms, $16.4\times$ the noise floor. The buggy curve therefore
 \emph{understated} the benefit of lookahead, biasing the central quantity of
 RQ1. A constant offset would have cancelled in every within-run comparison;
 this did not. Every number reported in this paper was regenerated after the
@@ -995,14 +996,14 @@ curve that is log-linear for $L\geq20$ with $L{=}0$ off the extrapolation,
 including $L{=}0$ yields $\Delta\mathrm{BIC}=-39$ and a confident ``knee at
 40\,ms'', while dropping it yields $+5$ and no knee at all. An earlier
 maximum-distance-to-chord estimator reported ``knee at 160\,ms, bootstrap 95\%
-CI $[160,160]$'' on this data --- a tight interval around a plausible value,
+CI $[160,160]$'' on this data, a tight interval around a plausible value,
 tight precisely \emph{because} the curve is smooth and every resample of a
 log-linear curve is also log-linear.
 
 \textbf{An analysis that buckets unmatched symbols into ``other'' will produce
 confident output on the wrong alphabet.} Our phoneme-class map was keyed on
 ARPAbet; the sweep emits IPA. Applying one to the other sent 57\% of reference
-tokens --- including \emph{every} vowel and \textipa{/\*r/} --- to ``other'',
+tokens, including \emph{every} vowel and \textipa{/\*r/}, to ``other'',
 and still printed per-class slopes, an H2 verdict and a by-L1 table. Nothing
 errored. The guard is to assert coverage rather than infer it from the absence
 of an exception, which the analysis now does.
@@ -1022,7 +1023,7 @@ study because the phone-sequence outputs are not valid FAC stimuli: synthesized
 from bare phone strings, they lack the lexical, prosodic and acoustic structure
 required to judge naturalness or accentedness. This is a property of the
 stimuli rather than of the budget. Training is 1200 steps at fixed budget
-over a frozen encoder --- a comparison at matched budget rather than at
+over a frozen encoder, a comparison at matched budget rather than at
 convergence, though \S\ref{sec:convergence} shows the ranking and exchange
 rate hold to $5\times$ that budget; the dense sweep has two
 seeds per arm. Its repeatability threshold now comes from a deliberate
@@ -1045,7 +1046,7 @@ re-selection at $L{=}0$ returns the same layer.
 For the causal WavLM phone-translation probe, future context reduces PER at an
 approximately log-linear average rate of ${\approx}0.045$ per doubling, with no
 identifiable knee and measurable returns out to a saturation onset near
-$340$\,ms --- well beyond PHONOS's 40\,ms translator budget, relative
+$340$\,ms, well beyond PHONOS's 40\,ms translator budget, relative
 to which a further 45.3\% reduction is available. That rate, however, is measured
 over one backbone: a second causalised encoder with similar zero-lookahead PER
 shows only a $3.9\%$ relative endpoint PER reduction from $0$ to $640$\,ms,

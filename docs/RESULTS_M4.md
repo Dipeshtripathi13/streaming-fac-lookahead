@@ -1,4 +1,4 @@
-# Measured results — Apple M4, 2 August 2026
+# Measured results, Apple M4, 2 August 2026
 
 Everything here came out of `run_m4.command` on Dipesh's machine. Raw data in
 `results/raw/`, host metadata in `hw_m4.json`, full logs in
@@ -9,7 +9,7 @@ Everything here came out of `run_m4.command` on Dipesh's machine. Raw data in
 | class | `cpu-apple-silicon` |
 | chip | Apple M4 (Mac16,1), **4 P-cores + 6 E-cores**, 16 GB |
 | OS / Python | macOS 26.5 (Darwin 25.5.0) / 3.11.15 |
-| BLAS | **Accelerate** (not OpenBLAS — recorded because they differ ~2×) |
+| BLAS | **Accelerate** (not OpenBLAS -- recorded because they differ ~2×) |
 | torch / MPS | 2.13.0, MPS available |
 | sgemm 512³ / 1024³ | **1632 / 1055 GFLOP/s** |
 | memcpy | 25.4 GB/s |
@@ -18,7 +18,7 @@ Comparison machine: `cpu-arm64` Neoverse-N1, 4 cores, 403 GFLOP/s sgemm.
 
 ---
 
-## Finding 0 — masking attention does **not** make WavLM causal
+## Finding 0: masking attention does **not** make WavLM causal
 
 This is the most important result of the day, and it is a correctness result
 rather than a performance one: **every lookahead number in this literature
@@ -38,9 +38,9 @@ Four ablations, relative L2 change, tolerance 1e-4:
 
 Two leaks, both underneath the transformer stack:
 
-1. **`pos_conv_embed`** — depthwise Conv1d, **kernel 128**, symmetric padding.
+1. **`pos_conv_embed`**, depthwise Conv1d, **kernel 128**, symmetric padding.
    At a 20 ms frame rate that is **1.28 s of future** entering every frame.
-2. **The feature-encoder GroupNorm** — wav2vec2/WavLM *base* checkpoints use
+2. **The feature-encoder GroupNorm**, wav2vec2/WavLM *base* checkpoints use
    `feat_extract_norm="group"`, i.e. `GroupNorm(num_groups=C, num_channels=C)`
    over a (B, C, T) tensor. Each channel is normalised by statistics taken over
    the **entire utterance**, so every output frame depends on every input frame.
@@ -49,14 +49,14 @@ Two leaks, both underneath the transformer stack:
 Three things worth stating carefully:
 
 - **Neither fix is sufficient alone.** Attention masking plus the positional
-  conv fix still leaks 6e-3 — a plausible-looking number that a project not
+  conv fix still leaks 6e-3, a plausible-looking number that a project not
   running this test would never see.
 - **Fixing GroupNorm alone makes the measurement *worse* (2.6e-2).** A partial
   causality fix is not a partial improvement. That is a good reason to treat
   "we made it causal" as a claim requiring proof rather than description.
 - **The `-large` checkpoints use `feat_extract_norm="layer"`**, which is
   per-frame and causal-safe. So the GroupNorm leak is specific to base-sized
-  encoders — which is exactly what a CPU/embedded system would choose.
+  encoders, which is exactly what a CPU/embedded system would choose.
 
 We patch both (left-only padding; cumulative running normalisation) and apply
 the *same* patches in the bidirectional reference condition, so the only thing
@@ -69,7 +69,7 @@ read. If it holds up, this alone justifies a methods section, and it makes the
 
 ---
 
-## Finding 1 — per-chunk compute is flat in lookahead (confirms ARM64)
+## Finding 1: per-chunk compute is flat in lookahead (confirms ARM64)
 
 63 conditions, 30 reps, 2 s lookback. L = 0 vs L = 640 ms:
 
@@ -90,10 +90,10 @@ architecture with a different BLAS. Two of the nine cells are slightly negative,
 i.e. within noise of zero. The ARM64 run gave +5.7% to +12.2%. The claim
 survives replication.
 
-## Finding 2 — peak FLOPS badly overpredicts streaming inference
+## Finding 2: peak FLOPS badly overpredicts streaming inference
 
 The M4's sgemm peak is **4.0× the Neoverse box** (1632 vs 403 GFLOP/s). On this
-workload it achieves only **74–164 GFLOP/s — 5–10% of its own peak**, and ends up
+workload it achieves only **74–164 GFLOP/s, 5–10% of its own peak**, and ends up
 roughly **1.4×** faster than the ARM64 machine, not 4×.
 
 Streaming transformer inference is a sequence of small matmuls; it is bound by
@@ -106,13 +106,13 @@ peak throughput, a Pi 5 should land ~4–8× slower than the M4 rather than the
 7–13× a peak-FLOPS estimate suggests. Still enough to put `base` firmly out of
 reach and to make `small` at 20 ms chunks marginal.
 
-## Finding 3 — a base-scale encoder cannot stream at 20 ms chunks, even on an M4
+## Finding 3: a base-scale encoder cannot stream at 20 ms chunks, even on an M4
 
 RTF **1.599** at 20 ms chunks. It falls behind real time at *every* lookahead;
 no reduction in L rescues it. At 80 ms chunks the same model runs at RTF 0.535.
-Chunk size, not lookahead, is the feasibility lever — replicated.
+Chunk size, not lookahead, is the feasibility lever, replicated.
 
-## Finding 4 — more threads is monotonically worse on Apple Silicon
+## Finding 4: more threads is monotonically worse on Apple Silicon
 
 Sweeping ONNX Runtime `num_threads` on the real sherpa-onnx models:
 
@@ -124,7 +124,7 @@ Sweeping ONNX Runtime `num_threads` on the real sherpa-onnx models:
 | 8 | 37.7 | 50.5 | **1.10** | 1548 | 33.4 |
 
 **Single-threaded is optimal for every model at every metric.** Eight threads
-makes the ASR encoder **3.2× slower** and pushes Kokoro past RTF 1.0 — from
+makes the ASR encoder **3.2× slower** and pushes Kokoro past RTF 1.0, from
 comfortably real-time to structurally infeasible, purely by asking for more
 parallelism.
 
@@ -139,7 +139,7 @@ streaming speech on a big.LITTLE CPU, and it is the default nearly everyone
 ships.** `accentbridge.py` currently uses `num_threads=2`; on this machine
 1 would be better. Cheap to state, easy to verify, and directly useful.
 
-## Finding 5 — the cascade's TTS bottleneck is a model choice, not structural
+## Finding 5: the cascade's TTS bottleneck is a model choice, not structural
 
 | | Kokoro int8 | Piper/VITS int8 | ratio |
 |---|---:|---:|---:|
@@ -170,13 +170,13 @@ recogniser to stop revising words. A faster chip cannot help; only abandoning
 the text bottleneck can.
 
 Two caveats to carry into the paper. The 700 ms commit timeout is
-`accentbridge`'s tuning parameter, not a law — but reducing it trades directly
+`accentbridge`'s tuning parameter, not a law, but reducing it trades directly
 against word-revision errors, and that trade needs measuring rather than
 asserting. And Kokoro is a full-utterance model; a streaming Kokoro would
 narrow the gap. The 390 ms of ASR geometry and the commit delay are the
 structural terms and neither moves.
 
-## Finding 6 — the commit delay, measured instead of asserted
+## Finding 6: the commit delay, measured instead of asserted
 
 Finding 5 says the cascade is ~1.15 s and 95% algorithmic, with the largest
 single term being `accentbridge`'s `COMMIT_TIMEOUT = 0.7 s`. Until now that
@@ -189,7 +189,7 @@ final hypothesis find the earliest time after which it never changed again.
 66 words, 2 utterances, clean read speech.
 
 **28.8% of words are revised after they first appear.** So the problem is real
-— you cannot simply emit on first sight.
+, you cannot simply emit on first sight.
 
 | | p50 | p90 | p95 | p99 | max |
 |---|---:|---:|---:|---:|---:|
@@ -215,7 +215,7 @@ cascade built on it can commit.* You cannot tune your way below it.
 Three things follow.
 
 1. **700 ms is over-provisioned by ~300 ms.** 400 ms buys 98.5% stability. That
-   takes the cascade from ~1153 ms to **~853 ms** — still 3.5× PHONOS's
+   takes the cascade from ~1153 ms to **~853 ms**, still 3.5× PHONOS's
    ≤241 ms, and still **~93% algorithmic**. The conclusion survives its own
    most favourable correction, which is the version worth publishing.
 2. **The irreducible floor is ~340 ms**, not 700. Even ignoring the commit
@@ -226,16 +226,16 @@ Three things follow.
 
 Caveats, which matter here more than usual: 66 words of clean read speech
 establishes the shape, not a publishable number. Everything is quantised to the
-320 ms decode chunk — a property, not error. And "stable" is measured against
+320 ms decode chunk, a property, not error. And "stable" is measured against
 the final hypothesis, so a word that is wrong from the start and never
 corrected counts as stable; this measures instability, not accuracy. Re-run
 over L2-ARCTIC with `--wavs`: accented speech should revise *more*, and if it
 does, the cascade argument gets stronger.
 
 
-## Finding 7 — RQ1 on real speech, first pass *(superseded by Finding 8)*
+## Finding 7: RQ1 on real speech, first pass *(superseded by Finding 8)*
 
-> **Read Finding 8 first.** This section's headline — "there is no knee" — was
+> **Read Finding 8 first.** This section's headline, "there is no knee", was
 > based on a 7-point grid that BIC later showed is underpowered to detect one.
 > The measurement is sound; the conclusion was over-confident. Kept because the
 > estimator failure it documents is the point.
@@ -268,7 +268,7 @@ decision. Also publishable, and the most actionable of the three."*
 
 The first pass used maximum-distance-to-chord (Kneedle without smoothing) and
 reported **"knee at 160 ms, bootstrap 95% CI [160, 160]"**. Tight CI, plausible
-number, four times PHONOS's 40 ms budget — a headline.
+number, four times PHONOS's 40 ms budget, a headline.
 
 It was an artefact. The chord method *always* returns a point, and on a curve
 that is smooth in log-space plotted against a linear axis it returns the middle
@@ -289,7 +289,7 @@ If the finding holds once a converter is trained, the framing changes from
 *"find the right budget"* to *"there is no right budget"*:
 
 - **Nothing special happens at 40 ms.** PHONOS's choice is not wrong, but it is
-  also not a discovered optimum — it is a point on a smooth curve.
+  also not a discovered optimum. It is a point on a smooth curve.
 - **Every doubling costs the same and buys the same.** 40→80 ms buys as much
   representational fidelity as 320→640 ms. That is a clean thing to tell a
   practitioner, and it is the opposite of what a knee would imply.
@@ -313,14 +313,14 @@ If the finding holds once a converter is trained, the framing changes from
 
 Paired per utterance, the sonorant/steady bucket gains **+0.0129** more from
 lookahead than the obstruent/transient bucket (bootstrap 95% CI
-[+0.0026, +0.0230], n = 48). The direction matches H2 — formant-defined sounds
-benefit more from right context — and it excludes zero, but a 1.3-point
+[+0.0026, +0.0230], n = 48). The direction matches H2, formant-defined sounds
+benefit more from right context, and it excludes zero, but a 1.3-point
 difference on a crude voicing × spectral-flux proxy is not evidence for a
 phoneme-class story. The real test needs forced alignment against L2-ARCTIC's
 phone annotations; this only shows the effect is worth looking for.
 
 
-## Finding 8 — RQ1 on GPU, 198 utterances: the answer, and two of my own errors
+## Finding 8: RQ1 on GPU, 198 utterances: the answer, and two of my own errors
 
 Tesla T4, torch 2.11.0+cu128, 198 L2-ARCTIC utterances (33 per L1 × 6 L1s),
 165 s. This supersedes Finding 7's conclusion.
@@ -335,7 +335,7 @@ Tesla T4, torch 2.11.0+cu128, 198 L2-ARCTIC utterances (33 per L1 × 6 L1s),
 | **both patches** | 6.14e-6 | **0.0 exactly** |
 
 Bit-identical across two architectures and two torch versions, and on the T4
-the patched encoder is causal to *machine zero* — `max_abs_delta = 0.0`.
+the patched encoder is causal to *machine zero*, `max_abs_delta = 0.0`.
 Finding 0 is solid.
 
 ### Then: my "dense" grid was invalid
@@ -355,7 +355,7 @@ L(ms)  frames  divergence
 26 nominal points → **16 distinct conditions**. The 10 duplicates all sat in
 0–200 ms, double-weighting that region and dragging R² from 0.994 to 0.989.
 
-**A knee narrower than 20 ms is not unmeasured — it is unrepresentable.** The
+**A knee narrower than 20 ms is not unmeasured. It is unrepresentable.** The
 encoder cannot express it. That is a real constraint on the whole question and
 it should have been obvious from `StreamGeometry.lookahead_frames`, which I
 wrote. `--dense` now steps by `frame_ms`, and the pilot deduplicates and warns.
@@ -369,7 +369,7 @@ one- and two-segment fit on the log₂ axis.
 
 That change immediately exposed a second problem: **on the original 7-point
 grid, BIC cannot detect a knee at all.** A synthetic curve with a planted cliff
-at 80 ms returns ΔBIC = −0.2 on 7 points — the `k·log n` penalty swamps it. So
+at 80 ms returns ΔBIC = −0.2 on 7 points, the `k·log n` penalty swamps it. So
 Finding 7's "no knee" was never evidence of absence; it was an underpowered
 grid. `find_knee` now returns `underpowered_for_bic` and says so.
 
@@ -391,7 +391,7 @@ has a small, real, systematic curvature that BIC detects because the residuals
 are genuine structure rather than sampling noise (each point is a mean over 198
 utterances, so noise is tiny).
 
-The model-free view settles it — gain per doubling of lookahead:
+The model-free view settles it, gain per doubling of lookahead:
 
 | doubling | Δ divergence |
 |---|---:|
@@ -414,19 +414,19 @@ closer to "no natural operating point" than to "a knee", but the flat statement
   curve: the 20→40 ms doubling is the *least* productive one measured.
 - **The best marginal return is 100–200 ms**, i.e. 2.5–5× PHONOS's budget. If
   the trained sweep reproduces this, "current budgets are under-provisioned"
-  becomes defensible — but as *diminishing-returns geometry*, not a knee.
+  becomes defensible, but as *diminishing-returns geometry*, not a knee.
 - **Report the exchange rate, not an operating point.** ~0.08 divergence per
   doubling, peaking around 100–200 ms.
 
 ### Caveats
 
-Still representation drift, not conversion quality — the trained sweep remains
+Still representation drift, not conversion quality, the trained sweep remains
 the real test. The 1−CKA curve agrees in shape. And "two-segment preferred at
 280 ms" should not be quoted as a knee: with n = 16 and near-zero noise, BIC
 will detect any curvature, and a 0.994 log-linear fit is not a cliff.
 
 
-## Finding 9 — a single scalar does not describe two machines
+## Finding 9: a single scalar does not describe two machines
 
 Before projecting anything onto hardware we do not have, the projection needs a
 model. The simplest one is `t_B = alpha * t_A`. Across **63 matched conditions**
@@ -452,10 +452,10 @@ statement for this workload, and any embedded projection has to be per
 configuration.
 
 This also sharpens Finding 2. Peak FLOPS does not merely mispredict the
-*magnitude* of streaming performance — it does not reliably predict the
+*magnitude* of streaming performance. It does not reliably predict the
 **ordering** of two machines.
 
-## Finding 10 — H4: quantisability is an operator-mix property, not a size one
+## Finding 10: H4: quantisability is an operator-mix property, not a size one
 
 Every benchmark before this passed `--skip-fp32`, so the quantisation half of H4
 had never been tested. int8 vs fp32, same inputs, ARM64, 1 thread:
@@ -469,11 +469,11 @@ had never been tested. int8 vs fp32, same inputs, ARM64, 1 thread:
 Across stages spanning **265× in parameter count**, int8 speedup stays in a
 narrow 1.55–2.09× band and correlates *negatively* with size
 (ρ = −0.51 against log params). The 69 M-parameter encoder quantises **worse**
-than the 0.26 M joiner — 1.88× size reduction against the joiner's near-ideal
+than the 0.26 M joiner, 1.88× size reduction against the joiner's near-ideal
 3.96×.
 
 The operator histogram says why. The encoder's graph is dominated by
-**Constant ×1785, Unsqueeze ×676, Add ×436, Gather ×365, Concat ×319** — shape
+**Constant ×1785, Unsqueeze ×676, Add ×436, Gather ×365, Concat ×319**, shape
 and indexing glue, not arithmetic. Those ops do not quantise. They are the
 streaming-state plumbing: this encoder takes **36 inputs**, most of them ring-KV
 cache tensors, and every one needs indexing and concatenation each step.
@@ -491,7 +491,7 @@ precisions; Kokoro ships int8 only. Until that is measured the vocoder claim
 stands unsupported, and the paper says so.
 
 
-## Finding 11 — the trained translator: H3 supported, and the conversion signal grows
+## Finding 11: the trained translator: H3 supported, and the conversion signal grows
 
 The first task-level result. 14 conditions (7 lookaheads × 2 targets), Tesla T4,
 2.5 h wall clock.
@@ -532,13 +532,13 @@ prefers canonical over produced phones:
 | preference (PER<sub>ipa</sub> − PER<sub>g2p</sub>) | +.036 | +.048 | +.056 | +.071 | +.087 | +.099 | **+.103** |
 
 **Monotone increasing at every step, growing 2.8×.** More right context does not
-just make the model more accurate — it makes it *more converting and less
+just make the model more accurate. It makes it *more converting and less
 transcribing*. Because this quantity is monotone where the raw PER curves are
 not, it is the more robust form of the finding.
 
 **Task vs representation.** The trained curve is shallower than the encoder one
 (−0.056 vs −0.081 per doubling; R²_log 0.96 vs 0.99). The representation loses
-information faster than the task can exploit it — consistent with the encoder
+information faster than the task can exploit it, consistent with the encoder
 being a bound rather than the binding constraint.
 
 **Limits, stated plainly.** One seed, 1200 steps, frozen encoder. The
@@ -561,17 +561,17 @@ for answering them at all: without both patches, every L label in the sweep
 would have been wrong.
 
 **Now unblocked:** HF login done; Finding 7 is real accented speech. The
-corpus check also confirms the RQ3 control is well posed — mean PER between
+corpus check also confirms the RQ3 control is well posed, mean PER between
 `g2p` (canonical) and `ipa` (produced) is **0.175**, far above the 0.02 floor
 below which the two training arms would be the same task.
 
 **Known issue, unresolved:** the commit-delay measurement (Finding 6) returns an
-empty hypothesis for every input on this macOS/arm64 machine — same sherpa-onnx
+empty hypothesis for every input on this macOS/arm64 machine, same sherpa-onnx
 1.13.4, same model files, same audio, int8 *and* fp32, with and without
 endpointing, whole-clip and chunked. The identical code produces 66 words on
 Linux/aarch64, and `bench_cascade_onnx.py` decodes fine on this same Mac. The
-Finding 6 numbers therefore come from the Linux run. That is defensible —
-revision behaviour is a deterministic property of the decoder, not of the host —
+Finding 6 numbers therefore come from the Linux run. That is defensible,
+revision behaviour is a deterministic property of the decoder, not of the host,
 but it should be reproduced on a second machine before publication.
 `bench_commit_delay.py --tag ...` prints a full diagnostic table rather than
 reporting zero.
@@ -585,12 +585,12 @@ python3 bench/bench_commit_delay.py    # Finding 6, ~1 min, no dataset needed
 ```
 
 *Finding 6 note:* commit delay is a property of the model's decoding, not of
-the host CPU — the measurement is deterministic and portable, so the result
+the host CPU, the measurement is deterministic and portable, so the result
 above is tagged `zipformer` rather than `m4`.
 
 ---
 
-## Finding 12 — PER is the wrong instrument; the preference margin is the right one
+## Finding 12: PER is the wrong instrument; the preference margin is the right one
 
 **Run:** 42 conditions (7 lookaheads × 2 targets × 3 seeds {1337, 7, 99}),
 1200 steps, batch 8, chunk 40 ms, frozen WavLM-base + both §3 causality
@@ -641,11 +641,11 @@ target must widen its margin, and conversion does improve more (0.212 vs
 conversion margin is **3.46×** the transcription margin; at *L* = 0 it is
 **0.88×**. The divergence is produced by lookahead, not by accuracy.
 
-## Finding 13 — no knee, now with a stated detection limit
+## Finding 13: no knee, now with a stated detection limit
 
 At *n* = 21 per arm BIC prefers a single log-linear regime: ΔBIC **+5.27**
 (conversion), **+4.25** (transcription), best breakpoint pinned at the grid
-edge — itself a signature of no interior knee.
+edge, itself a signature of no interior knee.
 
 The part that was missing before: **power**. Planting a cliff of known size at
 160 ms and re-testing:
@@ -661,12 +661,12 @@ relative)** in the conversion arm and says nothing about smaller ones. Finding
 7 and Finding 11's knee statements were absence of evidence; this is the first
 version with a bound attached.
 
-## Known issue — zero-pad contamination, fixed but not yet replicated
+## Known issue: zero-pad contamination, fixed but not yet replicated
 
 `MaskedBlock.forward` passed `key_padding_mask` to attention only. The causal
 depthwise conv (k=31) and the feed-forward did not honour it, so with a batch
 padded to its longest utterance the conv pulled padded positions into the last
-30 real frames of every shorter utterance — a **batch-composition-dependent**
+30 real frames of every shorter utterance, a **batch-composition-dependent**
 artefact. Feature caching changed batch composition, which is why the same
 condition/seed/step gave val PER 0.5314 uncached and 0.4530 cached (see
 `docs/CACHING_CHANGED_THE_NUMBERS.md`; the earlier commit message claiming
@@ -675,7 +675,7 @@ caching was numerically neutral was wrong).
 Fixed by zeroing padded positions at every stage. **Both** the single-seed and
 3-seed runs predate the fix, so absolute PERs are not comparable across runs.
 Findings 12 and 13 are entirely within-run comparisons, which a constant offset
-does not affect — but the published table should come from bug-free code.
+does not affect, but the published table should come from bug-free code.
 
 **Re-run required, and no longer optional:** the Colab runtime disconnected on
 idle after the sweep, wiping `/content` including the 42 saved hypothesis files

@@ -1,16 +1,16 @@
-# Streaming Accent Conversion — Lookahead / Latency Study
+# Streaming Accent Conversion: Lookahead and Latency Study
 
 **How much future do you need?** A characterisation of the lookahead
 requirement for streaming foreign accent conversion, on hardware people
 actually own.
 
 **The paper is the authoritative summary of what this repo found:**
-[`paper/taslp/taslp.pdf`](paper/taslp/taslp.pdf) — *Future-Context Requirements
+[`paper/taslp/taslp.pdf`](paper/taslp/taslp.pdf), *Future-Context Requirements
 for Streaming Accent Conversion: A Controlled Study Using Causal Phone
 Translation*. Submitted to IEEE/ACM TASLP; preprint on arXiv.
 
 Everything below is the working log that produced it. Where a finding here
-disagrees with the paper, **the paper is right** — superseded entries are
+disagrees with the paper, **the paper is right**, superseded entries are
 marked rather than deleted, because how a number moved is part of the record.
 
 ---
@@ -20,7 +20,7 @@ marked rather than deleted, because how a number moved is part of the record.
 **We are not trying to beat PHONOS or TVTSyn on quality.** This project
 characterises an axis those systems parameterise but do not study. Any PR,
 issue or branch whose goal is "also beat SOTA" is out of scope. This is written
-here on purpose — it is the highest-likelihood, highest-impact risk in the
+here on purpose. It is the highest-likelihood, highest-impact risk in the
 proposal's own risk table.
 
 ---
@@ -31,7 +31,7 @@ proposal's own risk table.
 |---|---|
 | [`docs/PROPOSAL_v2.md`](docs/PROPOSAL_v2.md) | The plan. Supersedes the v1 markdown in the parent folder. |
 | [`docs/LITERATURE.md`](docs/LITERATURE.md) | Verified citations + **four corrections to v1**, one strategically significant |
-| [`docs/RESULTS_M4.md`](docs/RESULTS_M4.md) | **Measured on the Apple M4**, 2 Aug 2026 — incl. the causality proof |
+| [`docs/RESULTS_M4.md`](docs/RESULTS_M4.md) | **Measured on the Apple M4**, 2 Aug 2026 -- incl. the causality audit |
 | [`docs/RESULTS_PILOT.md`](docs/RESULTS_PILOT.md) | Measured on ARM64 (replication), 2 Aug 2026 |
 | `setup/SETUP_*.md` | Per-platform install and benchmarking protocol |
 
@@ -50,7 +50,7 @@ python3 eval/metrics.py
 python3 eval/phoneme_analysis.py
 python3 bench/hardware_probe.py --out results/raw/hw_$(hostname).json
 
-# real benchmarks, no dataset download needed
+# real benchmarks: no dataset download needed
 python3 bench/bench_encoder_scaling.py --preset all --reps 20 \
         --out-prefix results/raw/encoder_scaling_$(hostname)
 python3 bench/bench_cascade_onnx.py --threads 1 2 4 --skip-fp32 \
@@ -115,7 +115,7 @@ assert_only_L_varies(configs)   # raises with a field-level diff
 ```
 
 `tests/test_causal.py` additionally proves the streaming buffer reproduces the
-offline training mask exactly — otherwise the model you benchmark is not the
+offline training mask exactly, otherwise the model you benchmark is not the
 model you trained.
 
 ---
@@ -141,7 +141,7 @@ model you trained.
    makes the ASR encoder **3.2× slower** than 1 and pushes Kokoro past RTF 1.0.
    Single-threaded wins at every metric on the M4.
 5. **The cascade loses structurally.** Piper synthesises a word in **21 ms** vs
-   Kokoro's **973 ms** (46×) — so with a fast vocoder the cascade is ~1.15 s and
+   Kokoro's **973 ms** (46×), so with a fast vocoder the cascade is ~1.15 s and
    **95% of it algorithmic**. It fails because it waits for the recogniser to
    stop revising words, not because synthesis is slow.
 6. **That commit delay is now measured, not asserted.** 28.8% of words get
@@ -153,7 +153,7 @@ model you trained.
 
 7. ~~**RQ1, first real answer (198 utts, Tesla T4).** Broad optimum in the
    exchange rate; gain per doubling peaks at +0.081 for 100→200 ms.~~
-   **SUPERSEDED** by the 16-point dense sweep — see the paper §RQ1 and
+   **SUPERSEDED** by the 16-point dense sweep. See the paper §RQ1 and
    [`docs/DENSE_SWEEP_RQ1_ANSWERED.md`](docs/DENSE_SWEEP_RQ1_ANSWERED.md).
    The per-doubling profile was too noisy at 7 points to locate an optimum;
    the curve is smooth with **no locatable knee**, an exchange rate of
@@ -162,7 +162,7 @@ model you trained.
 
 8. **The trained translator (H3 supported).** 14 conditions on a T4, 2.5 h.
    Conversion (CTC on canonical `g2p`) gains more from lookahead than
-   transcription (`ipa`), on arms that differ in one label tensor —
+   transcription (`ipa`), on arms that differ in one label tensor,
    **1.55×** (−0.045 against −0.029 PER per doubling). The claim is carried by
    the *preference margin*, which grows monotonically in 3/3 seeds
    (**+0.032 at L=0 → +0.099 at 640 ms**) while the transcription control is
@@ -172,8 +172,8 @@ model you trained.
    fix; see [`PADDING_FIX_RESOLVED.md`](docs/PADDING_FIX_RESOLVED.md).)*
 
 9. **The exchange rate is a property of the encoder, not of speech.** Repeating
-   the whole sweep on causalised wav2vec 2.0 base — same corpus, split, head,
-   optimiser, budget, seed and grid, only the checkpoint changed — gives
+   the whole sweep on causalised wav2vec 2.0 base, same corpus, split, head,
+   optimiser, budget, seed and grid held fixed, gives
    **+3.9%** relative gain from 640 ms of lookahead against WavLM's **+63.3%**,
    from a nearly identical starting point (0.4359 vs 0.4256 at L=0). The
    direction replicates; the magnitude does not. See
@@ -181,8 +181,8 @@ model you trained.
 
 10. **Match encoder layers by function, not by index.** Tapping wav2vec 2.0 at
     WavLM's layer 9 produces a degenerate run (PER *rises* to 0.93). Phone
-    decodability falls monotonically with depth in wav2vec 2.0 — 0.402 at
-    layer 2 up to 0.971 at layer 10 — so layer 9 is seven layers past its
+    decodability falls monotonically with depth in wav2vec 2.0, 0.402 at
+    layer 2 up to 0.971 at layer 10, so layer 9 is seven layers past its
     usable representation.
 
 11. **RQ2's uncertainty belongs at the speaker level.** Bootstrapping the
@@ -213,7 +213,7 @@ threshold. Both are fixed; both are documented rather than quietly corrected.
 2. **PHONOS, TVTSyn and DarkStream are all from the same lab** (TAMU PSI).
    That concentrates the competitive risk and makes emailing them the highest-
    value action in the whole plan.
-3. **L2-ARCTIC no longer needs a signed form** for the annotated subset — it is
+3. **L2-ARCTIC no longer needs a signed form** for the annotated subset. It is
    on Hugging Face as `KoelLabs/L2Arctic` (gated, CC-BY-NC-4.0, 3599 utterances
    with both `g2p` and `ipa`). The non-commercial licence settles the
    model-weights question. The full 26,867-utterance corpus still needs the
