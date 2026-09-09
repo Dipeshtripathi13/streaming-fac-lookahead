@@ -18,9 +18,53 @@ runs the citation and table-width checks, then copy the PDF here.
 
 ---
 
+## Publishing this for free
+
+Verified against the IEEE Signal Processing Society Information for Authors.
+Three separate charges exist and you can avoid all three, but only one of them
+is under your control after acceptance.
+
+| charge | amount | avoidable? |
+|---|---|---|
+| submission fee | none | there is no submission fee |
+| voluntary page charges | $110 per page, first 10 pages | **yes, they are voluntary.** Decline |
+| open access (APC) | varies | **yes.** SPS journals are hybrid; choose traditional publication |
+| overlength pages | **$220 per page beyond 10 published pages** | **only by staying at 10 pages** |
+
+So: decline the voluntary charges, decline open access, and keep the paper to
+ten published pages. The first two are checkboxes. The third is the one that
+can cost you real money, and it is mandatory and non-negotiable once incurred.
+
+**You have almost no margin.** The manuscript is exactly 10 pages and page 10
+is about 85% full, so roughly fifteen lines of slack stand between $0 and
+$220. Three things can eat that:
+
+- **Revision.** Responding to reviewers almost always adds text. Every round
+  of this paper so far has grown it.
+- **Author biography.** IEEE Transactions often print a short author biography,
+  sometimes with a photograph, at the end. I could not confirm whether TASLP
+  requires one or whether it counts toward the ten pages. If it does, it alone
+  could push you over. Ask the editor, or check a recent TASLP paper's last
+  page.
+- **IEEE typesetting.** The published version is set by IEEE, not by this
+  LaTeX build. Ten pages here is a good estimate, not a guarantee.
+
+For submission itself the limits are looser: SPS allows up to 13 pages at
+initial submission and 16 at revision. Those are review limits, not billing
+limits. Do not let the 13 tempt you into adding material, because the bill is
+computed on the *published* length.
+
+**If you want a safety margin, ask and I will cut a page.** The measurement-
+audit section compresses furthest without losing a result, and some of the
+RQ1 and RQ3 supporting detail could move to the repository. Cutting to nine
+pages costs nothing scientifically and buys a whole page of headroom for the
+revision round.
+
+---
+
 ## Read this before you start
 
-**Four things I could not verify, and you must.** I tried to confirm these
+**Three things I could not verify, and you must.** I tried to confirm these
 from the IEEE Signal Processing Society and IEEE Xplore pages and could not
 reach a current, authoritative statement for any of them. Do not submit on my
 guess. Open the journal's **Information for Authors** page and check:
@@ -32,11 +76,10 @@ guess. Open the journal's **Information for Authors** page and check:
    you, and it appears twice in the identified version. The script handles
    both and refuses to produce a PDF that still contains any identifying
    string.
-2. **Page limit and overlength charges.** The manuscript is 10 pages. You told
-   me you did not want to pay page charges, so confirm where the free limit
-   sits before submitting rather than after acceptance. If 10 pages is over
-   it, tell me and I will cut; the measurement-audit section is the most
-   compressible without losing a result.
+2. ~~Page limit and overlength charges.~~ **Answered**, see the section above:
+   ten published pages free, $220 per page beyond that, voluntary charges and
+   open access both declinable. Still worth confirming on the journal's own
+   page in case the figures have changed.
 3. **Which submission system.** IEEE has been migrating journals from
    ScholarOne Manuscripts to the IEEE Author Portal. The journal page will say
    which one TASLP uses and link to it.
