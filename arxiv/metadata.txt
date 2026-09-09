@@ -53,8 +53,18 @@ scripts: https://github.com/Dipeshtripathi13/streaming-fac-lookahead
 
 ABSTRACT
 --------
-See abstract.txt in this folder. Paste it as plain text; the arXiv abstract
-box does not render LaTeX macros, and that file already has them removed.
+Paste abstract.txt from this folder.
+
+  IT IS NOT THE PAPER'S ABSTRACT. arXiv caps the abstract field at 1920
+  characters and the manuscript's runs to 3369, so it would be rejected.
+  abstract.txt is a 1902-character version that keeps all five results and
+  every headline number, with the supporting detail dropped. The full one is
+  kept alongside as abstract_full_from_paper.txt for reference; do not paste
+  that one.
+
+  It is plain ASCII with no LaTeX markup, no Unicode and no "--" ranges, all
+  of which arXiv either rejects or renders literally. Line breaks in the file
+  are only for reading; arXiv strips them.
 
 
 LICENCE

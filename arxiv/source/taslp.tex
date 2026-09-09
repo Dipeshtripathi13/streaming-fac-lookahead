@@ -74,7 +74,7 @@ PER per doubling, $1.55\times$), and within the canonical-phone arm the benefit 
 $1.32\times$ larger in absolute PER slope at canonical-deviation positions
 (substitutions and deletions in the g2p--IPA alignment). Fourth, repeating the sweep on a second causalised encoder (wav2vec 2.0 base),
 tapped at its own selected phonetic layer, changes the answer: it starts within
-$0.01$ PER of WavLM at $L{=}0$ yet gains only $3.9\%$ relative from $640$\,ms
+$0.011$ PER of WavLM at $L{=}0$ yet gains only $3.9\%$ relative from $640$\,ms
 of lookahead against WavLM's $63.3\%$, and where WavLM is smooth and
 log-linear ($R^2=0.99$) its response is weak and non-monotonic ($R^2=0.10$),
 bottoming out at $160$\,ms and rising again, a pattern reproduced at a
@@ -567,7 +567,7 @@ wav2vec 2.0 base (2) & 0.4359 & 0.4189 & $+3.9\%$  & $-0.0015$ \\
 \end{table}
 
 \textbf{Direction replicates; magnitude does not.} At the selected layer 2,
-wav2vec 2.0 starts within $0.01$ PER of WavLM ($0.4359$ against $0.4256$) and
+wav2vec 2.0 starts within $0.011$ PER of WavLM ($0.4359$ against $0.4256$) and
 then barely moves: $3.9\%$ relative gain against $63.3\%$, and $-0.0015$ PER
 per doubling against $-0.0446$. The log-linear fit that gives $R^2=0.989$ on
 WavLM gives $R^2=0.099$ here, and the curve bottoms out at $L{=}160$\,ms

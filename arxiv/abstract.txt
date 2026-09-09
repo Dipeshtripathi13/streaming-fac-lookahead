@@ -1,45 +1,26 @@
-Streaming foreign accent conversion (FAC) systems choose a lookahead budget
-and report a single end-to-end latency, but to our knowledge prior streaming
-FAC work has not densely swept that budget while separately reporting
-algorithmic and computational latency. We train a causal phone translator in a
-16-point main sweep from 0 to 640 ms, augmented with five targeted budgets
-around the diminishing-return region (21 in all), with every other factor held
-fixed, and report five principal empirical results. First, phone-translation
-PER decreases smoothly with lookahead at -0.045 phone error rate (PER) per
+Streaming foreign accent conversion systems choose a lookahead budget and
+report a single end-to-end latency, but to our knowledge no prior work densely
+sweeps that budget while reporting algorithmic and computational latency
+separately. Using a causal phone translator as a controlled probe, we sweep 21
+lookahead budgets from 0 to 640 ms with every other factor held fixed, and
+report five results. First, phone error rate falls smoothly at -0.045 PER per
 doubling (R^2 = 0.98) with no locatable knee: a piecewise fit is preferred
-under every axis treatment we tried, yet the breakpoint moves between 40 and
-180 ms and even the narrowest bootstrap interval spans 2.6 octaves. Instead of
-a knee we identify saturation onset at 340 ms: with the grid completed to 20
-ms spacing over 200--360 ms, and against a fixed-seed repeatability floor
-measured from deliberate repeats (2 sigma = 0.0029), the 340->360 ms increment
-is the first to buy less than that floor, and the average per-20 ms gain stays
-below it thereafter. Propagating the floor's bootstrap interval moves the
-onset over 300--480 ms. At the 40 ms lookahead used by PHONOS's translator,
-our probe retains a further 45.3% relative PER reduction between 40 and 340
-ms. Second, a pre-specified hypothesis that vowels and approximants would
-benefit more from future context than stops, fricatives, affricates and nasals
-is not supported: all seven manner classes improve by 52--72% relative, and
-the between-group difference is smaller than the dispersion among classes
-within the groups. Bootstrapping over the six test speakers rather than over
-phone tokens, that difference is +0.040 with a 95% interval of [-0.010,
-+0.101]. It still fails when errors are reweighted by a synthesised spectral-
-distortion proxy for acoustic cost, so this is not an artefact of PER charging
-every error equally. Third, canonical-phone prediction benefits more from
-future context than realized-phone transcription at matched capacity (-0.045
-against -0.029 PER per doubling, 1.55x), and within the canonical-phone arm
-the benefit is 1.32x larger in absolute PER slope at canonical-deviation
-positions (substitutions and deletions in the g2p--IPA alignment). Fourth,
-repeating the sweep on a second causalised encoder (wav2vec 2.0 base), tapped
-at its own selected phonetic layer, changes the answer: it starts within 0.01
-PER of WavLM at L = 0 yet gains only 3.9% relative from 640 ms of lookahead
-against WavLM's 63.3%, and where WavLM is smooth and log-linear (R^2 = 0.99)
-its response is weak and non-monotonic (R^2 = 0.10), bottoming out at 160 ms
-and rising again, a pattern reproduced at a second seed; at five times the
-training budget the 0/160/640 ms ordering is unchanged and its endpoint gain
-shrinks to +1.8% against WavLM's +65.8%. Neither the measured exchange rate
-nor the detailed curve shape is a universal property of the task. Fifth, per-
-chunk compute depends only weakly on lookahead, moving at most 1.9% on an
-Apple M4 and 7.6% on an ARM64 Linux host across a 17x change in algorithmic
-latency. That is a weak empirical dependence over the tested range, subject to
-the throughput constraint t_cmp<c. We release the harness and the per-
-condition outputs.
+under every axis treatment, yet the breakpoint moves between 40 and 180 ms and
+the narrowest bootstrap interval spans 2.6 octaves. We instead identify
+saturation onset near 340 ms against a repeatability floor measured from
+deliberate fixed-seed repeats, leaving 45.3% relative PER reduction unclaimed
+at a 40 ms budget. Second, a pre-specified hypothesis that vowels and
+approximants benefit more from future context than stops, fricatives,
+affricates and nasals is not supported: bootstrapping over speakers rather
+than phone tokens, the between-group difference is +0.040 with a 95% interval
+of [-0.010, +0.101]. Third, canonical-phone prediction benefits more than
+realized-phone transcription at matched capacity (1.55x), and more still at
+canonical-deviation positions (1.32x). Fourth, repeating the sweep on a second
+causalised encoder changes the answer: wav2vec 2.0 starts within 0.011 PER of
+WavLM at zero lookahead yet gains 3.9% from 640 ms against WavLM's 63.3%, with
+a weak non-monotonic response (R^2 = 0.10 against 0.99) reproduced at a second
+seed and unchanged at five times the training budget. Neither the exchange
+rate nor the curve shape is a universal property of the task. Fifth, per-chunk
+compute depends only weakly on lookahead, moving at most 7.6% across a 17x
+change in algorithmic latency. We release the harness and per-condition
+outputs.
