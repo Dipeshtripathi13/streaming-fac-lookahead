@@ -41,7 +41,7 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Is the curve an optimization-rate curve?}{3}{}\protected@file@percent }
 \newlabel{sec:convergence}{{\mbox  {V-B}}{3}}
 \citation{kassraftery1995}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Dense sweep, conversion arm, 16 lookaheads $\times $ 2 seeds. \textbf  {Left:} smooth curvature; the shaded band spans the breakpoint estimates produced by three defensible treatments of $L{=}0$, none identifiable. \textbf  {Right:} marginal return per added 20\,ms frame against the measured $2\sigma $ floor; red bars are below it.}}{4}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Dense sweep, canonical-phone arm, 2 seeds: the 16-point main sweep (circles) with the five targeted saturation-region additions (diamonds). \textbf  {Left:} smooth curvature; the shaded band spans the breakpoint estimates produced by three defensible treatments of $L{=}0$, none identifiable. \textbf  {Right:} marginal return per added 20\,ms frame against the measured $2\sigma $ floor; red bars are below it.}}{4}{}\protected@file@percent }
 \newlabel{fig:dense}{{1}{4}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}RQ1: an exchange rate and a saturation onset, not a knee}{4}{}\protected@file@percent }
 \newlabel{sec:rq1}{{\mbox  {V-C}}{4}}
@@ -49,10 +49,10 @@
 \@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Conversion-arm PER against lookahead (mean of 2 seeds) and marginal return per added 20\,ms frame, in units of the measured $2\sigma {=}0.0029$ floor (Eq.\nobreakspace  {}2\hbox {}). Below $1.0\times $, the gain from an additional frame is smaller than the measured fixed-seed repeatability threshold. The grid is 20\,ms-spaced to 360\,ms; the final two rows average over wider intervals.}}{4}{}\protected@file@percent }
 \newlabel{tab:dense}{{III}{4}}
 \citation{wav2vec2}
-\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Same sweep, second encoder, each tapped at its selected phonetic layer, given in parentheses (\S  \mbox  {V-D}\hbox {}). Slope is PER per doubling of lookahead, fitted over the matched grid. The two start with similar PER at $L{=}0$ but exhibit markedly different lookahead responses.}}{5}{}\protected@file@percent }
-\newlabel{tab:encoder}{{IV}{5}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}The exchange rate does not transfer across encoders}{5}{}\protected@file@percent }
 \newlabel{sec:encoder}{{\mbox  {V-D}}{5}}
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Same sweep, second encoder, each tapped at its selected phonetic layer, given in parentheses (\S  \mbox  {V-D}\hbox {}). Slope is PER per doubling of lookahead, fitted over the matched grid. The two start with similar PER at $L{=}0$ but exhibit markedly different lookahead responses.}}{5}{}\protected@file@percent }
+\newlabel{tab:encoder}{{IV}{5}}
 \citation{petersonlehiste1960}
 \citation{hillenbrand1995}
 \citation{nearey1986}
@@ -67,7 +67,7 @@
 \newlabel{tab:h2audio}{{VI}{7}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-F}}RQ3: canonical-phone prediction benefits more from lookahead than realized-phone transcription}{7}{}\protected@file@percent }
 \newlabel{sec:rq3}{{\mbox  {V-F}}{7}}
-\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Both arms on the dense grid, mean of 2 seeds. The gap is the transcription arm's PER minus the conversion arm's: near zero at $L{=}0$ and substantially wider at large lookahead; the full 16-point curve widens in 13 of 15 adjacent steps rather than monotonically.}}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Both arms on the dense grid, mean of 2 seeds. The gap is the transcription arm's PER minus the canonical-phone arm's: near zero at $L{=}0$ and substantially wider at large lookahead; the full 16-point curve widens in 13 of 15 adjacent steps rather than monotonically.}}{8}{}\protected@file@percent }
 \newlabel{tab:h3dense}{{VII}{8}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-G}}\ensuremath  {t_{\mathrm  {buf}}}{}: jitter measured, I/O not}{8}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {VI}Measurement audits and failure modes}{9}{}\protected@file@percent }

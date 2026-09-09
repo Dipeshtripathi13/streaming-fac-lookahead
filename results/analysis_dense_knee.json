@@ -1,13 +1,13 @@
 {
   "provenance": {
-    "path": "results/raw/translator_dense.jsonl",
+    "path": "results/raw/translator_dense_plus_sat.jsonl",
     "target": "native",
     "targets_in_file": [
       "native"
     ],
-    "n_rows": 32,
-    "n_lookaheads": 16,
-    "n_cells": 32,
+    "n_rows": 42,
+    "n_lookaheads": 21,
+    "n_cells": 42,
     "seeds": [
       1337,
       7
@@ -90,9 +90,21 @@
       "n_seeds": 2
     },
     {
+      "L_ms": 220.0,
+      "mean_per": 0.20303,
+      "seed_spread": 0.00979,
+      "n_seeds": 2
+    },
+    {
       "L_ms": 240.0,
       "mean_per": 0.19732,
       "seed_spread": 0.00086,
+      "n_seeds": 2
+    },
+    {
+      "L_ms": 260.0,
+      "mean_per": 0.19342,
+      "seed_spread": 0.0025,
       "n_seeds": 2
     },
     {
@@ -102,9 +114,27 @@
       "n_seeds": 2
     },
     {
+      "L_ms": 300.0,
+      "mean_per": 0.18554,
+      "seed_spread": 0.00147,
+      "n_seeds": 2
+    },
+    {
       "L_ms": 320.0,
       "mean_per": 0.18231,
       "seed_spread": 0.00235,
+      "n_seeds": 2
+    },
+    {
+      "L_ms": 340.0,
+      "mean_per": 0.17901,
+      "seed_spread": 0.00211,
+      "n_seeds": 2
+    },
+    {
+      "L_ms": 360.0,
+      "mean_per": 0.17704,
+      "seed_spread": 0.00202,
       "n_seeds": 2
     },
     {
@@ -123,50 +153,50 @@
   "axis_sweep": [
     {
       "axis": "log2(L+1), all points",
-      "n": 16,
-      "delta_bic": -22.16,
+      "n": 21,
+      "delta_bic": -31.04,
       "knee_detected": true,
       "knee_ms": 40.0,
       "bootstrap_ci90_ms": [
         40.0,
-        320.0
+        360.0
       ],
       "identifiable": false
     },
     {
       "axis": "L=0 dropped",
-      "n": 15,
-      "delta_bic": -31.24,
+      "n": 20,
+      "delta_bic": -40.0,
       "knee_detected": true,
       "knee_ms": 180.0,
       "bootstrap_ci90_ms": [
         60.0,
-        320.0
+        360.0
       ],
       "identifiable": false
     },
     {
       "axis": "L=0 at half a frame",
-      "n": 16,
-      "delta_bic": -36.79,
+      "n": 21,
+      "delta_bic": -46.49,
       "knee_detected": true,
       "knee_ms": 180.0,
       "bootstrap_ci90_ms": [
         40.0,
-        320.0
+        360.0
       ],
       "identifiable": false
     }
   ],
   "marginal_returns": {
-    "noise_2sigma": 0.00436,
+    "noise_2sigma": 0.0029,
     "steps": [
       {
         "from_ms": 0.0,
         "to_ms": 20.0,
         "gain": 0.05557725233750632,
         "gain_per_frame": 0.05557725233750632,
-        "over_noise": 12.747076224198697,
+        "over_noise": 19.164569771553907,
         "resolvable": true
       },
       {
@@ -174,7 +204,7 @@
         "to_ms": 40.0,
         "gain": 0.0425503550013685,
         "gain_per_frame": 0.0425503550013685,
-        "over_noise": 9.75925573425883,
+        "over_noise": 14.672536207368449,
         "resolvable": true
       },
       {
@@ -182,7 +212,7 @@
         "to_ms": 60.0,
         "gain": 0.031176823262591746,
         "gain_per_frame": 0.031176823262591746,
-        "over_noise": 7.150647537291684,
+        "over_noise": 10.750628711238534,
         "resolvable": true
       },
       {
@@ -190,7 +220,7 @@
         "to_ms": 80.0,
         "gain": 0.020899433891273245,
         "gain_per_frame": 0.020899433891273245,
-        "over_noise": 4.793448140200285,
+        "over_noise": 7.206701341818361,
         "resolvable": true
       },
       {
@@ -198,7 +228,7 @@
         "to_ms": 100.0,
         "gain": 0.019026392157013516,
         "gain_per_frame": 0.019026392157013516,
-        "over_noise": 4.363851412159063,
+        "over_noise": 6.5608248817287995,
         "resolvable": true
       },
       {
@@ -206,7 +236,7 @@
         "to_ms": 120.0,
         "gain": 0.011827548356463602,
         "gain_per_frame": 0.011827548356463602,
-        "over_noise": 2.712740448730184,
+        "over_noise": 4.07846495050469,
         "resolvable": true
       },
       {
@@ -214,7 +244,7 @@
         "to_ms": 140.0,
         "gain": 0.017639726997030925,
         "gain_per_frame": 0.017639726997030925,
-        "over_noise": 4.045808944273148,
+        "over_noise": 6.082664481734802,
         "resolvable": true
       },
       {
@@ -222,7 +252,7 @@
         "to_ms": 160.0,
         "gain": 0.006365372128761149,
         "gain_per_frame": 0.006365372128761149,
-        "over_noise": 1.4599477359543918,
+        "over_noise": 2.1949559064693616,
         "resolvable": true
       },
       {
@@ -230,7 +260,7 @@
         "to_ms": 180.0,
         "gain": 0.009925278116650671,
         "gain_per_frame": 0.009925278116650671,
-        "over_noise": 2.276439935011622,
+        "over_noise": 3.4225096953967835,
         "resolvable": true
       },
       {
@@ -238,39 +268,79 @@
         "to_ms": 200.0,
         "gain": 0.0044795611421334924,
         "gain_per_frame": 0.0044795611421334924,
-        "over_noise": 1.0274222803058468,
+        "over_noise": 1.5446762559081009,
         "resolvable": true
       },
       {
         "from_ms": 200.0,
+        "to_ms": 220.0,
+        "gain": 0.0031269273335636227,
+        "gain_per_frame": 0.0031269273335636227,
+        "over_noise": 1.0782508046771113,
+        "resolvable": true
+      },
+      {
+        "from_ms": 220.0,
         "to_ms": 240.0,
-        "gain": 0.008838629500810352,
-        "gain_per_frame": 0.004419314750405176,
-        "over_noise": 1.0136043005516457,
+        "gain": 0.005711702167246729,
+        "gain_per_frame": 0.005711702167246729,
+        "over_noise": 1.9695524714643895,
         "resolvable": true
       },
       {
         "from_ms": 240.0,
+        "to_ms": 260.0,
+        "gain": 0.003894205569475534,
+        "gain_per_frame": 0.003894205569475534,
+        "over_noise": 1.3428295067157014,
+        "resolvable": true
+      },
+      {
+        "from_ms": 260.0,
         "to_ms": 280.0,
-        "gain": 0.008210617218144423,
-        "gain_per_frame": 0.004105308609072211,
-        "over_noise": 0.941584543365186,
-        "resolvable": false
+        "gain": 0.004316411648668889,
+        "gain_per_frame": 0.004316411648668889,
+        "over_noise": 1.4884178098858238,
+        "resolvable": true
       },
       {
         "from_ms": 280.0,
+        "to_ms": 300.0,
+        "gain": 0.003565575868232057,
+        "gain_per_frame": 0.003565575868232057,
+        "over_noise": 1.2295089200800198,
+        "resolvable": true
+      },
+      {
+        "from_ms": 300.0,
         "to_ms": 320.0,
-        "gain": 0.006794585573536599,
-        "gain_per_frame": 0.0033972927867682995,
-        "over_noise": 0.7791955932954815,
-        "resolvable": false
+        "gain": 0.003229009705304542,
+        "gain_per_frame": 0.003229009705304542,
+        "over_noise": 1.1134516225188076,
+        "resolvable": true
       },
       {
         "from_ms": 320.0,
+        "to_ms": 340.0,
+        "gain": 0.003306861283575935,
+        "gain_per_frame": 0.003306861283575935,
+        "over_noise": 1.1402969943365293,
+        "resolvable": true
+      },
+      {
+        "from_ms": 340.0,
+        "to_ms": 360.0,
+        "gain": 0.001969361437078654,
+        "gain_per_frame": 0.001969361437078654,
+        "over_noise": 0.6790901507167773,
+        "resolvable": false
+      },
+      {
+        "from_ms": 360.0,
         "to_ms": 480.0,
-        "gain": 0.017413744670786768,
-        "gain_per_frame": 0.002176718083848346,
-        "over_noise": 0.499247266937694,
+        "gain": 0.01213752195013218,
+        "gain_per_frame": 0.00202292032502203,
+        "over_noise": 0.6975587327662173,
         "resolvable": false
       },
       {
@@ -278,12 +348,12 @@
         "to_ms": 640.0,
         "gain": 0.008779438929322259,
         "gain_per_frame": 0.0010974298661652823,
-        "over_noise": 0.2517040977443308,
+        "over_noise": 0.37842409178113184,
         "resolvable": false
       }
     ],
-    "saturation_ms": 240.0,
-    "reading": "marginal gain per 20 ms frame stays above the 0.0044 noise floor until L=240.0 ms, beyond which further lookahead is not measurably useful at this sample size"
+    "saturation_ms": 340.0,
+    "reading": "marginal gain per 20 ms frame stays above the 0.0029 noise floor until L=340.0 ms, beyond which further lookahead is not measurably useful at this sample size"
   },
   "verdict": {
     "statement": "CURVATURE but NO LOCATABLE KNEE -- BIC prefers piecewise, but the breakpoint moves across axis treatments ([40.0, 180.0, 180.0] ms). Report the exchange rate and the saturation point, not a knee.",
@@ -293,7 +363,7 @@
       180.0
     ],
     "detected_under_n_axes": "3/3",
-    "saturation_ms": 240.0,
-    "practical_reading": "marginal gain per 20 ms frame stays above the 0.0044 noise floor until L=240.0 ms, beyond which further lookahead is not measurably useful at this sample size"
+    "saturation_ms": 340.0,
+    "practical_reading": "marginal gain per 20 ms frame stays above the 0.0029 noise floor until L=340.0 ms, beyond which further lookahead is not measurably useful at this sample size"
   }
 }

@@ -29,6 +29,13 @@ OUT = os.path.join(HERE, "..", "results", "figures", "fig_dense_no_knee")
 CONV = "#1b4f72"
 WARN = "#a93226"
 GREY = "#7f8c8d"
+ADDED = "#b9770e"
+
+# The five budgets added after the main sweep to resolve the diminishing-return
+# region. Marked separately in panel A so a reader can see which points are the
+# original grid and which were sampled later, and check that the targeted
+# additions did not create the shape they were added to measure.
+MAIN_SWEEP = {0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 240, 280, 320, 480, 640}
 
 
 def main() -> None:
@@ -49,7 +56,15 @@ def main() -> None:
     fig, (a, b) = plt.subplots(1, 2, figsize=(10.2, 3.9))
 
     # ---------------- Panel A ----------------
-    a.plot(xs, ys, "o-", color=CONV, lw=1.8, ms=4.5, label="conversion (g2p), 2 seeds")
+    a.plot(xs, ys, "-", color=CONV, lw=1.8, zorder=2)
+    main = [(x, y) for x, y, L in zip(xs, ys, Ls) if int(L) in MAIN_SWEEP]
+    add = [(x, y) for x, y, L in zip(xs, ys, Ls) if int(L) not in MAIN_SWEEP]
+    a.plot([p[0] for p in main], [p[1] for p in main], "o", color=CONV, ms=4.5,
+           zorder=3, label=f"main sweep ({len(main)} budgets), 2 seeds")
+    if add:
+        a.plot([p[0] for p in add], [p[1] for p in add], "D", color=ADDED,
+               ms=5.0, mec="white", mew=0.6, zorder=4,
+               label=f"targeted additions ({len(add)}), same protocol")
     a.fill_between(xs, [y - s / 2 for y, s in zip(ys, sp)],
                    [y + s / 2 for y, s in zip(ys, sp)],
                    color=CONV, alpha=0.18, lw=0)
@@ -80,7 +95,7 @@ def main() -> None:
     if sat is not None:
         a.axvline(math.log2(sat), color="#117864", lw=1.4, ls=":")
         a.text(math.log2(sat) + 0.10, max(ys) * 0.80,
-               f"saturation\n{sat:.0f} ms", color="#117864",
+               f"saturation onset\n$\\approx${sat:.0f} ms", color="#117864",
                fontsize=7.4, va="top")
 
     a.set_title("A  smooth curvature, no locatable knee", fontsize=10, loc="left")
@@ -100,7 +115,8 @@ def main() -> None:
         cols.append(CONV if s["resolvable"] else WARN)
     b.bar(mids, gains, width=0.26, color=cols)
     b.axhline(floor, color="k", lw=1.2, ls="--")
-    b.text(mids[0], floor * 1.25, f"2$\\sigma$ noise floor = {floor:.4f}",
+    b.text(mids[0], floor * 1.25,
+           f"fixed-seed repeatability floor\n2$\\sigma$ = {floor:.4f}",
            fontsize=7.4, va="bottom")
     if sat is not None:
         b.axvline(math.log2(sat), color="#117864", lw=1.4, ls=":")
@@ -113,15 +129,17 @@ def main() -> None:
     b.set_xticklabels(["0" if t == 10 else str(t) for t in ticks])
     b.grid(alpha=0.25, axis="y")
     b.text(0.97, 0.95,
-           f"red = below floor:\nnot measurably useful\n"
-           f"from {sat:.0f} ms on",
+           f"red = gain below the\nrepeatability floor,\nfrom {sat:.0f} ms on",
            transform=b.transAxes, fontsize=7.2, color=WARN,
            va="top", ha="right")
 
     prov = d["provenance"]
+    n_add = len([L for L in Ls if int(L) not in MAIN_SWEEP])
     fig.suptitle(f"{prov['n_rows']} runs: {prov['n_lookaheads']} lookaheads "
-                 f"$\\times$ {len(prov['seeds'])} seeds, {prov['target']} arm, "
-                 f"padding-fixed, 1200 steps, T4", fontsize=8.6, color="#555")
+                 f"({prov['n_lookaheads'] - n_add}-point main sweep + {n_add} "
+                 f"targeted) $\\times$ {len(prov['seeds'])} seeds, "
+                 f"canonical-phone arm, padding-fixed, 1200 steps, T4",
+                 fontsize=8.6, color="#555")
     fig.tight_layout(rect=(0, 0, 1, 0.94))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     for ext in ("png", "pdf"):

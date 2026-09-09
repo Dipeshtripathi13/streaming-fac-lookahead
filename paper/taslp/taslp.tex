@@ -65,9 +65,10 @@ tapped at its own selected phonetic layer, changes the answer: it starts within
 $0.01$ PER of WavLM at $L{=}0$ yet gains only $3.9\%$ relative from $640$\,ms
 of lookahead against WavLM's $63.3\%$, and where WavLM is smooth and
 log-linear ($R^2=0.99$) its response is weak and non-monotonic ($R^2=0.10$),
-bottoming out at $160$\,ms and rising again --- a shape reproduced at a second
-seed and unchanged at five times the training budget, where its endpoint gain
-shrinks to $+1.8\%$ against WavLM's $+65.8\%$. Neither the measured exchange
+bottoming out at $160$\,ms and rising again --- a pattern reproduced at a
+second seed; at five times the training budget the $0/160/640$\,ms ordering is
+unchanged and its endpoint gain shrinks to $+1.8\%$ against WavLM's
+$+65.8\%$. Neither the measured exchange
 rate nor the detailed curve shape is a universal property of the task. Fifth, per-chunk compute depends only weakly on
 lookahead --- at most $1.9\%$ on an Apple M4 and $7.6\%$ on an ARM64 Linux
 host across a $17\times$ change in algorithmic latency --- a weak empirical
@@ -259,7 +260,7 @@ Frozen causal WavLM-base-plus, CTC phone head, 1200 steps, batch 8, chunk
 40\,ms, 100-frame lookback, speaker-disjoint test split of 400 utterances.
 Two sweeps: a 7-lookahead $\times$ 2-target $\times$ 3-seed sweep (42 runs)
 and a 16-lookahead $\times$ 2-seed dense sweep, run on \emph{both} target arms
-(64 runs), later augmented on the conversion arm with five budgets (220, 260,
+(64 runs), later augmented on the canonical-phone arm with five budgets (220, 260,
 300, 340, 360\,ms) to resolve the diminishing-return region, all on an NVIDIA
 T4. Compute measurements use an Apple M4
 (10 CPU cores: 4 performance, 6 efficiency; 16\,GB; macOS 25.5) and an
@@ -383,7 +384,8 @@ concern rather than eliminating it.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fig_dense_no_knee.png}
-\caption{Dense sweep, conversion arm, 16 lookaheads $\times$ 2 seeds.
+\caption{Dense sweep, canonical-phone arm, 2 seeds: the 16-point main sweep
+(circles) with the five targeted saturation-region additions (diamonds).
 \textbf{Left:} smooth curvature; the shaded band spans the breakpoint estimates
 produced by three defensible treatments of $L{=}0$, none identifiable.
 \textbf{Right:} marginal return per added 20\,ms frame against the measured
@@ -406,14 +408,17 @@ rate.
 
 \textbf{There is curvature, and it is not localisable.} BIC prefers a
 two-segment fit under all three axis treatments we tried
-($\Delta\mathrm{BIC}=-22.2$, $-31.2$, $-36.8$), which by the usual
-thresholds~\cite{kassraftery1995} is strong evidence. But the breakpoint lands
-at 40, 180 and 180\,ms respectively, and every bootstrap 90\% interval spans
-about three octaves. Sixteen points did not rescue a knee. The reason is
+($\Delta\mathrm{BIC}=-31.0$, $-40.0$, $-46.5$ over all 21 budgets), which by
+the usual thresholds~\cite{kassraftery1995} is strong evidence. But the
+breakpoint lands at 40, 180 and 180\,ms respectively, and the bootstrap 90\%
+intervals span 3.2, 2.6 and 3.2 octaves ($[40,360]$, $[60,360]$,
+$[40,360]$\,ms). Twenty-one points did not rescue a knee: the five budgets
+added in the region where a knee would have to lie sharpened the evidence for
+curvature without moving the breakpoint. The reason is
 mechanical and worth stating: on a $\log_2(L{+}1)$ axis the $L{=}0
 \rightarrow 20$\,ms gap is 4.39 units while every other gap is ${\approx}1.0$,
-so a piecewise fit is strongly biased toward placing a breakpoint just past that gap whatever the data
-does.
+so a piecewise fit can be strongly biased toward placing a breakpoint just
+past that gap even when the underlying curve has no localised knee.
 
 \textbf{What we report instead} is the lookahead beyond which marginal return
 falls below the measured floor. Because the original grid was 20\,ms-spaced
@@ -884,16 +889,16 @@ annotation error.
 One secondary point falls out: neither arm yields a locatable knee
 (breakpoints move to $[40, 240, 160]$\,ms across axis treatments for
 transcription, against $[40, 180, 180]$ for conversion), so
-\S\ref{sec:rq1}'s structural conclusion is not an artefact of the conversion
-arm. We do not compare saturation onsets between the arms: the five budgets
-added over 200--360\,ms to locate it were run on the conversion arm only, so
+\S\ref{sec:rq1}'s structural conclusion is not an artefact of the
+canonical-phone arm. We do not compare saturation onsets between the arms: the five budgets
+added over 200--360\,ms to locate it were run on the canonical-phone arm only, so
 the transcription arm lacks the resolution the comparison would need. The
 transcription arm's own curve is just as log-linear, with a shallower slope.
 
 \begin{table}[t]
 \centering\small
 \caption{Both arms on the dense grid, mean of 2 seeds. The gap is the
-transcription arm's PER minus the conversion arm's: near zero at $L{=}0$ and
+transcription arm's PER minus the canonical-phone arm's: near zero at $L{=}0$ and
 substantially wider at large lookahead; the full
 16-point curve widens in 13 of 15 adjacent steps rather than monotonically.}
 \label{tab:h3dense}
