@@ -98,18 +98,33 @@ SUBJECT CATEGORY (1 minimum, 3 maximum)
   phonetic, but HLT usually means NLP, and a reviewer from there is a weaker
   match than one from either of the first two.
 
-EDICS (the widget says 1 to 5; the instructions say 3 to 10, so aim for 3-5)
-  Type these into the search box and take whichever real entries come back;
-  do not guess at codes:
-    voice conversion        the closest thing to accent conversion
-    speech synthesis        for the conversion framing
-    speech analysis         for the phonetic and manner-class work
-    representation / self-supervised   for the WavLM and wav2vec 2.0 work
-    speech recognition      only if the CTC phone-recognition framing fits an
-                            entry better than the above
-  Prefer entries under the speech branch over the AA-AUD ones shown by
-  default; this paper is not audio signal enhancement, source separation or
-  array processing.
+EDICS (widget allows 1 to 5; aim for 3 to 5)
+  The speech tree is SL Speech and Language Processing, so search within SL
+  rather than the AA-AUD branch the widget opens on by default. AA-AUD is
+  enhancement, source separation and array processing, none of which this
+  paper does.
+
+  Confirmed present:
+    [x] SL-GEN-CONV  Speech/singing voice conversion and cloning
+        Under SL > SL-GEN Speech generation. The closest existing category to
+        accent conversion, and the one a reviewer for this paper should be
+        drawn from.
+
+  Search these next and take whatever real SL entries come back. Roughly half
+  the manuscript is the encoder work, so at least one representation entry
+  matters as much as the conversion one:
+    self-supervised   or  representation    the WavLM and wav2vec 2.0 half
+    speech synthesis                        the rest of SL-GEN
+    speech recognition                      the CTC phone head
+    phonetics  or  phonology                RQ2's manner classes, RQ3's
+                                            canonical versus realized phones
+    real-time  or  streaming  or  latency   if such an entry exists; the
+                                            latency decomposition is a
+                                            contribution in its own right
+
+  Choose for reviewer fit, not coverage. An entry that pulls in someone who
+  works on streaming speech representations is worth more here than one that
+  merely overlaps a keyword.
 
 HAS THIS BEEN SUBMITTED PREVIOUSLY TO THIS JOURNAL?
   No, it wasn't submitted previously.
