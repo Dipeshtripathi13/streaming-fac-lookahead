@@ -36,16 +36,19 @@ IEEE has been migrating journals from **ScholarOne Manuscripts** to the
 **IEEE Author Portal**. Either is possible here. The steps below apply to both,
 since the fields are substantially the same; only the layout differs.
 
-## Step 1: also confirm these two
+## Step 1: do NOT anonymise
 
-- **Is review double-blind?** If yes, submit
-  `anonymous/manuscript_anon.pdf`, not `manuscript.pdf`. Removing your name
-  is not enough on its own: the repository URL contains your username and
-  appears twice in the identified version. `make_anonymous.sh` handles both
-  and refuses to emit a PDF still containing an identifying string.
-- **Are source files required at submission?** Some IEEE journals take a PDF
-  for review and ask for source only on acceptance. `source/` and
-  `taslp_source.tar.gz` are ready either way.
+SPS journals use **single-anonymised** review: reviewers see who you are, you
+do not see who they are. So submit `manuscript.pdf`, the version carrying your
+name and affiliation.
+
+`make_anonymous.sh` and `anonymous/` exist because this was unresolved
+earlier. They are not part of this submission. Do not run the script and do
+not upload it.
+
+Still worth confirming: **are source files required at submission?** Some IEEE
+journals take a PDF for review and ask for source only on acceptance.
+`source/` and `taslp_source.tar.gz` are ready either way.
 
 ## Step 2: account
 
@@ -63,17 +66,20 @@ Confirm the category names on the journal's own page, since they vary.
 From `metadata.txt`:
 
 - **Title.** Copy exactly; do not retype and risk a typo.
-- **Abstract.** The manuscript's own abstract, 318 words. Note this is
-  *not* the shortened arXiv one in `../arxiv/abstract.txt`, which was cut to
-  fit arXiv's 1920-character field. If the portal has its own limit, tell me
-  and I will cut one to fit.
+- **Abstract.** The manuscript's own abstract, 177 words, which sits inside
+  the SPS requirement of 150 to 250 words with no references, footnotes,
+  displayed equations or abbreviations. This is *not* the arXiv abstract in
+  `../arxiv/abstract.txt`, which was written to a different limit.
 - **Index terms.** accent conversion, streaming speech, latency, lookahead,
   self-supervised models.
 - **Author.** You alone, corresponding and submitting.
 
 ## Step 5: upload
 
-Identified or anonymised per Step 1. `manuscript.pdf` is nine pages.
+`manuscript.pdf`, nine pages, with your name on it. Upload
+`taslp_source.tar.gz` only if the portal asks for source. Do not upload
+`metadata.txt`, `COVER_LETTER_NOTES.md`, `make_anonymous.sh` or anything in
+`anonymous/`; those are working files.
 
 ## Step 6: the questions that cost money
 
@@ -101,20 +107,51 @@ These are the ones to read rather than click through.
 
 ## Step 8: reviewers
 
-If the form asks for suggestions, that is fine. If it asks for exclusions, or
-if you are choosing whom to suggest, **exclude Texas A&M PSI**: Waris Quamer,
-Mu-Ruei Tseng, Ghady Nasrallah and Ricardo Gutierrez-Osuna authored PHONOS,
-TVTSyn and DarkStream, the three systems this paper measures itself against.
-That is a conflict of interest, not a recommendation.
+If the form asks for suggestions, you may prefer not to name Quamer, Tseng,
+Nasrallah or Gutierrez-Osuna, who wrote PHONOS, TVTSyn and DarkStream, the
+three systems this paper measures itself against.
+
+Do not mark them as conflicts of interest. IEEE means something specific by
+that: shared institution, recent collaboration, or a supervisory relationship.
+Having authored work you compare against is not one, and declaring it as such
+would be inaccurate.
 
 ## Step 9: cover letter
 
-Paste `cover_letter.md`. Two things to adjust before you do:
+Paste `cover_letter.md`. It contains the letter and nothing else, so it needs
+no editing before use. `COVER_LETTER_NOTES.md` holds the two things worth
+checking first (the salutation, and swapping in the arXiv identifier if it has
+been announced); that file is for you and is not submitted.
 
-- It opens "Dear Editor-in-Chief". If the portal names a handling editor, use
-  their name.
-- If arXiv has announced by then, replace the awaiting-announcement sentence
-  with the real identifier. The replacement sentence is at the top of the file.
+## Step 9b: the LLM policy, which applies to you
+
+Read this properly rather than clicking through it.
+
+SPS policy: authors take full responsibility and ownership for the manuscript.
+Improving language and clarity, and accelerating code development, are
+acceptable uses. What is not acceptable is generating most or significant
+components of a manuscript with an LLM, or using LLM-generated text or code
+without thorough verification of correctness. Submitting the paper is itself
+your confirmation that you have read the policy and done that verification.
+
+This project used an LLM heavily: for drafting manuscript text, writing the
+analysis code, running experiments and interpreting results. That is well
+beyond "language polishing", so the confirmation you give at submission is not
+a formality. Before you click Submit you should be able to:
+
+- state what every number in the paper means and where it came from;
+- defend every methodological choice, including the ones that changed under
+  review, such as clustering on speakers rather than tokens, treating the
+  repeatability floor as a floor rather than a significance threshold, and
+  matching encoder layers by function rather than index;
+- explain the code well enough to answer a reviewer asking how a result was
+  computed. The self-tests help, but they are not a substitute for
+  understanding.
+
+If any of that is not yet true, the fix is to read the manuscript and the
+analysis scripts end to end before submitting, not to submit and hope. The
+policy does not require you to disclose LLM use in the manuscript, but it does
+require the verification to have actually happened.
 
 ## Step 10: approve the generated PDF
 

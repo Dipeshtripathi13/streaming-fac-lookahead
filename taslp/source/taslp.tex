@@ -42,36 +42,25 @@ rather than model weights.}}
 
 
 \begin{abstract}
-\noindent Streaming foreign accent conversion (FAC) systems choose a lookahead
-budget and report a single end-to-end latency, but to our knowledge no prior
-work densely sweeps that budget while reporting algorithmic and computational
-latency separately. Using a causal phone translator as a controlled probe, we
-sweep 21 lookahead budgets from 0 to 640\,ms with every other factor held
-fixed, and report five results. First, phone error rate falls smoothly at
-$-0.045$ PER per doubling ($R^2=0.98$) with no locatable knee: a piecewise fit
-is preferred under every axis treatment, yet the breakpoint moves between 40
-and 180\,ms and the narrowest bootstrap interval spans 2.6 octaves. We instead
-identify \emph{saturation onset} near 340\,ms against a repeatability floor
-measured from deliberate fixed-seed repeats, leaving 45.3\% relative PER
-reduction unclaimed at the 40\,ms budget used by PHONOS's translator. Second, a
-pre-specified hypothesis that vowels and approximants benefit more from future
-context than stops, fricatives, affricates and nasals is \emph{not supported}:
-bootstrapping over the six test speakers rather than over phone tokens, the
-between-group difference is $+0.040$ with a 95\% interval of
-$[-0.010, +0.101]$, and it still fails when errors are reweighted by a
-spectral-distortion proxy for acoustic cost. Third, canonical-phone prediction
-benefits more from future context than realized-phone transcription at matched
-capacity ($1.55\times$), and more still at canonical-deviation positions
-($1.32\times$). Fourth, repeating the sweep on a second causalised encoder
-changes the answer: wav2vec 2.0 starts within $0.011$ PER of WavLM at zero
-lookahead yet gains $3.9\%$ from $640$\,ms against WavLM's $63.3\%$, with a
-weak non-monotonic response ($R^2=0.10$ against $0.99$) reproduced at a second
-seed and unchanged at five times the training budget. Neither the measured
-exchange rate nor the detailed curve shape is a universal property of the task.
-Fifth, per-chunk compute depends only weakly on lookahead, moving at most
-$7.6\%$ across a $17\times$ change in algorithmic latency, subject to the
-throughput constraint $\tcmp<c$. We release the harness and the per-condition
-outputs.
+\noindent Streaming foreign accent conversion systems choose a lookahead
+budget, but prior work does not densely characterise how future context trades
+algorithmic latency for accuracy. We use a causal phone translator as a
+controlled probe and evaluate 21 lookahead budgets from 0 to 640\,ms while
+holding other factors fixed. For WavLM base+, phone error rate decreases
+approximately $0.045$ per doubling of lookahead ($R^2=0.98$). Piecewise fits
+indicate curvature but no identifiable knee; instead, a repeatability-aware
+analysis places the onset of diminishing returns near 340\,ms, with a
+300--480\,ms sensitivity range. At 40\,ms, the probe retains a further 45.3\%
+relative reduction by 340\,ms. A pre-specified manner-class hypothesis is not
+supported under speaker-level resampling or spectral-distortion reweighting.
+Canonical-phone prediction benefits more from future context than
+realized-phone transcription, with a steeper absolute slope at
+canonical-deviation positions. Repeating the sweep with causalised
+wav2vec 2.0 yields a weak, non-monotonic response and only 3.9\% relative
+endpoint improvement, against 63.3\% for WavLM, showing that the lookahead
+response is encoder dependent. Per-chunk compute varies only weakly with
+lookahead; algorithmic latency and hardware throughput should therefore be
+reported separately.
 \end{abstract}
 
 

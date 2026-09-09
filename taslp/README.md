@@ -11,8 +11,8 @@ manuscript is *written*; this folder is what gets *sent*.
 | `taslp_source.tar.gz` | the same source packaged, if the system wants an archive |
 | `cover_letter.md` | draft cover letter. Read before sending |
 | `metadata.txt` | title, author, index terms, and what to declare |
-| `make_anonymous.sh` | builds a blinded version, only if it is required |
-| `anonymous/` | output of that script |
+| `make_anonymous.sh` | **not needed.** SPS review is single-anonymised; kept only because this was unresolved earlier |
+| `anonymous/` | output of that script; not part of this submission |
 
 Regenerate the manuscript with `../paper/make_arxiv_package.sh`, which also
 runs the citation and table-width checks, then copy the PDF here.

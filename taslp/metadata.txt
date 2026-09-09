@@ -25,8 +25,12 @@ models
 
 ABSTRACT
 --------
-See ../arxiv/abstract.txt for a plain-text version with LaTeX stripped, if
-the form does not accept markup. Otherwise copy from the manuscript.
+Copy the manuscript's abstract. It is 177 words, inside the SPS requirement of
+150-250 words, and contains no references, footnotes, displayed equations or
+abbreviations.
+
+  Do NOT use ../arxiv/abstract.txt. That one was written to arXiv's
+  1920-character field and is a different text.
 
 
 MANUSCRIPT TYPE
@@ -38,9 +42,11 @@ Regular paper.
   publication in a hybrid SPS journal costs the author nothing so long as the
   paper stays within ten published pages.
 
-  TASLP also has shorter categories. This is a full-length study at 10 pages,
-  so a regular paper is the right class, but confirm the current category
-  names on the Information for Authors page.
+  The manuscript is nine double-column pages. SPS allows up to 13 at initial
+  submission, so there is room for a revision to grow; the ten-page figure is
+  the published length beyond which overlength charges begin, not a
+  submission limit. Confirm the current category names on the Information for
+  Authors page.
 
 
 REPRODUCIBILITY
@@ -63,6 +69,13 @@ publication, but the submission form asks and you should answer it.
 
 SUGGESTED REVIEWERS
 -------------------
-If the form asks, avoid anyone at Texas A&M PSI: Quamer, Tseng, Nasrallah and
-Gutierrez-Osuna are the authors of PHONOS, TVTSyn and DarkStream, which this
-paper measures against directly. That is a conflict, not a recommendation.
+If the form asks for suggestions, you may prefer not to name Quamer, Tseng,
+Nasrallah or Gutierrez-Osuna, who wrote PHONOS, TVTSyn and DarkStream, the
+three systems this paper measures itself against.
+
+  Do not declare them as conflicts unless one actually applies. IEEE means
+  something specific by conflict of interest: shared institution, recent
+  collaboration, or a supervisory relationship. Having written a paper you
+  compare against is not one, and marking it as such would be inaccurate.
+  Preferring more independent reviewers is a different thing and needs no
+  declaration.
