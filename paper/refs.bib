@@ -97,23 +97,18 @@
   month   = feb
 }
 
-% PROVENANCE: [V] Authors, title and date (4 Sep 2025) verified. The 140 ms
-%   figure is CONFIRMED from the full text and is a LOOK-AHEAD (LA): "we select
-%   the 140ms LA with CL as our default streaming config", chosen because "an
-%   extra 140ms of look-ahead yields a marginal <1pp absolute improvement at
-%   the expense of doubling the buffering delay". End-to-end latency is 203 ms
-%   at 140 ms LA against a stated 350 ms budget; zero-LA latency is 84.3 ms.
-%   NOTE FOR RELATED WORK: DarkStream DOES ablate lookahead, over LA in
-%   {0, 140, 280} ms -- so "nobody reports a lookahead ablation" is false and
-%   has been corrected. It also describes a non-causal layer with "a receptive
-%   field spanning up to 280 ms into the future", independent support for this
-%   paper's causality argument. Measured on an RTX 3090 at 60 ms chunk.
-@article{darkstream2025,
-  author  = {Quamer, Waris and Guti{\'e}rrez-Osuna, Ricardo},
-  title   = {{DarkStream}: Real-Time Speech Anonymization with Low Latency},
-  journal = {arXiv preprint arXiv:2509.04667},
-  year    = {2025},
-  month   = sep
+% PROVENANCE: [V] Upgraded from the arXiv preprint after a bibliographic
+%   re-check. Published at IEEE ASRU 2025; venue, year, pages (1--7) and author
+%   list all confirmed by resolving DOI 10.1109/ASRU65441.2025.11434609 through
+%   the Crossref API.
+@inproceedings{darkstream2025,
+  author    = {Quamer, Waris and Guti{\'e}rrez-Osuna, Ricardo},
+  title     = {{DarkStream}: Real-Time Speech Anonymization with Low Latency},
+  booktitle = {IEEE Automatic Speech Recognition and Understanding Workshop
+               (ASRU)},
+  pages     = {1--7},
+  year      = {2025},
+  doi       = {10.1109/ASRU65441.2025.11434609}
 }
 
 % PROVENANCE: [V] Authors, title, date (5 Jan 2024) and ICASSP 2024 acceptance
@@ -128,7 +123,9 @@
   title     = {{StreamVC}: Real-Time Low-Latency Voice Conversion},
   booktitle = {IEEE International Conference on Acoustics, Speech and Signal
                Processing (ICASSP)},
-  year      = {2024}
+  pages     = {11016--11020},
+  year      = {2024},
+  doi       = {10.1109/ICASSP48485.2024.10446863}
 }
 
 % PROVENANCE: [V] Authors, full title and date (30 Apr 2026) verified.
@@ -154,8 +151,13 @@
   year      = {2026}
 }
 
-% PROVENANCE: [V] Authors, full title and date (6 Mar 2026) verified. No
-%   acceptance venue stated on arXiv.
+% PROVENANCE: [V] Authors, full title and date (6 Mar 2026) verified. Kept as
+%   a preprint deliberately. A reviewer suggested upgrading this to Interspeech
+%   2026, but the arXiv abstract page carries no journal-ref and no acceptance
+%   comment; the paper's own text says "submitted to Interspeech 2026", and
+%   submitted is not accepted. Upgrading on that basis would repeat the
+%   unsupported "ICLR 2026" attribution this file already had to remove from
+%   tvtsyn2026. Revisit if proceedings appear.
 @article{streamvoiceanonplus2026,
   author  = {Kuzmin, Nikita and Lee, Kong Aik and Chng, Eng Siong},
   title   = {{StreamVoiceAnon+}: Emotion-Preserving Streaming Speaker
@@ -165,14 +167,18 @@
   month   = mar
 }
 
-% PROVENANCE: [V] Authors, title and date (13 Jun 2024; v2 31 Oct 2024)
-%   verified. The abstract states a "lite" variant reaching 66 ms.
-@article{e2eanon2024,
-  author  = {Quamer, Waris and Guti{\'e}rrez-Osuna, Ricardo},
-  title   = {End-to-End Streaming Model for Low-Latency Speech Anonymization},
-  journal = {arXiv preprint arXiv:2406.09277},
-  year    = {2024},
-  month   = jun
+% PROVENANCE: [V] Upgraded from the arXiv preprint after a bibliographic
+%   re-check. Published at IEEE SLT 2024; venue, year, pages (727--734) and
+%   author list all confirmed by resolving DOI 10.1109/SLT61566.2024.10832303
+%   through the Crossref API.
+@inproceedings{e2eanon2024,
+  author    = {Quamer, Waris and Guti{\'e}rrez-Osuna, Ricardo},
+  title     = {End-to-End Streaming Model for Low-Latency Speech
+               Anonymization},
+  booktitle = {IEEE Spoken Language Technology Workshop (SLT)},
+  pages     = {727--734},
+  year      = {2024},
+  doi       = {10.1109/SLT61566.2024.10832303}
 }
 
 % PROVENANCE: [V] Authors, title, venue, year and pages verified via DBLP.
@@ -216,6 +222,11 @@
 %   (arXiv:2006.11477). The second author appears as "Henry Zhou" on arXiv and
 %   in the proceedings, and is normalised to "Yuhao Zhou" by DBLP; the
 %   proceedings form is used here.
+% RE-CHECKED: public metadata disagrees on the third author (Google Research
+%   lists "Pen Li"; DOI/arXiv records list "Yunpeng Li"). Resolved against the
+%   authoritative IEEE proceedings record via Crossref DOI
+%   10.1109/ICASSP48485.2024.10446863, which gives Yunpeng Li, matching the
+%   entry as it already stood. Pages 11016--11020 and the DOI added.
 @inproceedings{wav2vec2,
   author    = {Baevski, Alexei and Zhou, Henry and Mohamed, Abdelrahman and
                Auli, Michael},

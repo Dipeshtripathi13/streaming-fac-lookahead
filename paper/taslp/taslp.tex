@@ -29,10 +29,9 @@ USA (e-mail: dipesh.tripathi@coyotes.usd.edu).}%
 \thanks{Harness, causality audit, sweep configurations, analysis scripts with
 self-tests and per-condition hypothesis dumps:
 \url{https://github.com/Dipeshtripathi13/streaming-fac-lookahead}. Data is
-L2-ARCTIC~\protect\cite{l2arctic2018} via \texttt{KoelLabs/L2Arctic}
-(CC-BY-NC-4.0);
-that licence is non-commercial, so configurations are released rather than
-weights.}}
+L2-ARCTIC~\protect\cite{l2arctic2018} via \texttt{KoelLabs/L2Arctic}. Given
+that corpus's CC-BY-NC-4.0 licence, we conservatively release configurations
+rather than model weights.}}
 
 \begin{document}
 % Suppress IEEEtran.bst's em-dash substitution for repeated author lists; see
@@ -584,8 +583,8 @@ sample. Seed 7 lands within $0.008$ PER of seed 1337 at every shared budget
 sampled 320 and gave $0.4028$). Both curves reach their minimum at the same
 $L{=}160$\,ms and both rise again by 640\,ms, so the non-monotonicity is a
 reproducible feature of this encoder rather than one seed's noise. The endpoint
-gain is $+2.5\%$ against $+3.9\%$: the effect is small in both, and small in
-the same shape.
+gain is $+2.5\%$ against $+3.9\%$: the effect is small in both seeds, with the
+same non-monotonic pattern.
 
 \textbf{Nor is it an artefact of the training budget.} A second seed cannot
 rule out an optimisation effect the two seeds share: perhaps wav2vec 2.0's

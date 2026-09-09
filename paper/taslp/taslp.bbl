@@ -38,8 +38,8 @@ W.~Quamer, M.-R. Tseng, G.~Nasrallah, and R.~Guti{\'e}rrez-Osuna, ``{TVTSyn}:
 
 \bibitem{darkstream2025}
 W.~Quamer and R.~Guti{\'e}rrez-Osuna, ``{DarkStream}: Real-time speech
-  anonymization with low latency,'' \emph{arXiv preprint arXiv:2509.04667},
-  Sep. 2025.
+  anonymization with low latency,'' in \emph{IEEE Automatic Speech Recognition
+  and Understanding Workshop (ASRU)}, 2025, pp. 1--7.
 
 \bibitem{nguyen2025streaming}
 T.-N. Nguyen, N.-Q. Pham, {\c{S}}.~Akti, and A.~Waibel, ``Streaming
@@ -50,7 +50,7 @@ T.-N. Nguyen, N.-Q. Pham, {\c{S}}.~Akti, and A.~Waibel, ``Streaming
 Y.~Yang, Y.~Kartynnik, Y.~Li, J.~Tang, X.~Li, G.~Sung, and M.~Grundmann,
   ``{StreamVC}: Real-time low-latency voice conversion,'' in \emph{IEEE
   International Conference on Acoustics, Speech and Signal Processing
-  (ICASSP)}, 2024.
+  (ICASSP)}, 2024, pp. 11\,016--11\,020.
 
 \bibitem{acsurvey2026}
 Y.~Halychanskyi, J.~S. Guo, and V.~Kindratenko, ``Accent conversion: A
@@ -70,8 +70,8 @@ N.~Kuzmin, K.~A. Lee, and E.~S. Chng, ``{StreamVoiceAnon+}: Emotion-preserving
 
 \bibitem{e2eanon2024}
 W.~Quamer and R.~Guti{\'e}rrez-Osuna, ``End-to-end streaming model for
-  low-latency speech anonymization,'' \emph{arXiv preprint arXiv:2406.09277},
-  Jun. 2024.
+  low-latency speech anonymization,'' in \emph{IEEE Spoken Language Technology
+  Workshop (SLT)}, 2024, pp. 727--734.
 
 \bibitem{zhao2021fac}
 G.~Zhao, S.~Ding, and R.~Guti{\'e}rrez-Osuna, ``Converting foreign accent
