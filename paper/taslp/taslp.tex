@@ -48,7 +48,7 @@ less than that floor, and the average per-20\,ms gain stays below it
 thereafter. Propagating the floor's bootstrap interval moves the onset over
 300--480\,ms. At the 40\,ms lookahead used by PHONOS's translator, our probe
 retains a further 45.3\% relative PER reduction between 40 and 340\,ms.
-Second, a pre-registered hypothesis that vowels and approximants would benefit
+Second, a pre-specified hypothesis that vowels and approximants would benefit
 more from future context than stops, fricatives, affricates and nasals is
 \emph{not supported}: all seven manner classes improve by
 52--72\% relative, and the between-group difference is smaller than the
@@ -136,7 +136,7 @@ Our contributions:
       plus five targeted additions), reporting an average
       exchange rate and a floor-relative saturation region rather than an
       unidentifiable knee (\S\ref{sec:rq1}).
-\item A negative result on a pre-registered phoneme-class hypothesis
+\item A negative result on a pre-specified phoneme-class hypothesis
       (\S\ref{sec:rq2}).
 \item Evidence that canonical-phone prediction benefits more strongly from
       lookahead than realized-phone transcription under matched capacity, and
@@ -536,7 +536,7 @@ on PER at $L{=}0$ alone, which is the endpoint the relative gain is measured
 \emph{from} rather than a point on the response, returns the same layer
 ($0.4359$ at 2, $0.4590$ at 4, $0.5735$ at 6, $0.6940$ at 8). The comparison
 below is therefore insensitive to which of the two criteria is used, though it
-would be cleaner still to fix both layers by a pre-registered rule.
+would be cleaner still to fix both layers by a pre-specified rule.
 
 \begin{table}[t]
 \centering\footnotesize
@@ -618,14 +618,23 @@ system actually deploys. Whether the gap traces to pretraining scale (960\,h aga
 94\,k\,h), to WavLM's denoising and speaker-conditioned objectives, or to
 something else is not something a two-encoder comparison can decide.
 
-\subsection{RQ2: the preregistered manner grouping does not predict lookahead benefit}
+\subsection{RQ2: the pre-specified manner grouping does not predict lookahead benefit}
 \label{sec:rq2}
 
-We pre-registered, before the evaluated hypothesis outputs were generated, that vowels and
-approximants would break first. The prediction is fixed in the public
-repository at commit \texttt{c5066dc} (2 Aug 2026), seven days before the
-hypothesis dumps it is tested on were committed (\texttt{b66d0a5}, 9 Aug
-2026), so the ordering is verifiable rather than asserted. The prediction was
+We fixed this prediction in code before the hypothesis outputs it is tested on
+were generated. The grouping, and the rationale for it, sit in
+\texttt{eval/phoneme\_analysis.py} at commit \texttt{c5066dc} of the public
+repository (2 Aug 2026),\footnote{\url{https://github.com/Dipeshtripathi13/streaming-fac-lookahead/commit/c5066dc}}
+seven days before the hypothesis dumps were committed (\texttt{b66d0a5}, 9 Aug
+2026). We are precise about what this does and does not establish. It is not a
+registered pre-registration, and we do not call it one: git author and
+committer dates are set by the
+committing machine and history can be rewritten, so the chronology is a claim
+about our repository rather than third-party attestation. What it does give a
+reader is the \emph{content} of the prediction, verbatim and inspectable,
+including the class assignment and the reasoning we offered for it at the
+time, in a form we could not have quietly rewritten to match the outcome
+without the rewrite itself being visible in the history. The prediction was
 that vowels and approximants break first while stops, fricatives, affricates
 and nasals would survive short lookahead. The reasoning was that vocalic
 identity is carried by formant movement across a syllable nucleus that is tens
@@ -645,7 +654,7 @@ release \cite{stevensblumstein1978}, so a narrow window should suffice. Nasals
 were assigned to the same group under the same short-context prediction, but
 the acoustic argument above is strongest for the obstruent classes and we do
 not claim it extends cleanly to nasals. We record this asymmetry as it stood
-at pre-registration rather than reconstructing a stronger rationale after the
+when it was specified rather than reconstructing a stronger rationale after the
 grouping failed. Nasals in fact gain the most of any class
 (Table~\ref{tab:h2}). Testing this on 42{,}255 unique reference-phone tokens evaluated across seven
 lookahead conditions (295{,}785 phone--condition observations), with each
@@ -654,7 +663,7 @@ substitution or deletion charged to the class of the \emph{reference} phone:
 \begin{table}[t]
 \centering\small
 \caption{Relative error-rate reduction, $L{=}0\rightarrow640$\,ms. B =
-pre-registered as breaking first, S = as surviving. Intervals are
+pre-specified as breaking first, S = as surviving. Intervals are
 percentile bootstrap over the six test speakers, not over phone
 tokens. The predicted grouping does not order the data.}
 \label{tab:h2}
@@ -721,7 +730,7 @@ pooled result, and not as evidence about native language.
 
 \textbf{H2 is not supported.} The finding is not that lookahead fails to help
 vowels, since every class improves 52--72\% relative. The finding is that the
-pre-registered manner grouping does not reliably order lookahead benefit.
+pre-specified manner grouping does not reliably order lookahead benefit.
 
 \textbf{Reweighting each error by a proxy for its acoustic cost does not rescue
 it.} PER charges every error exactly $1.0$, so the natural objection is that
@@ -754,7 +763,7 @@ distortion falls monotonically with lookahead ($71.4$ to $46.9$, $-34\%$).
 \centering\small
 \caption{H2 under acoustic weighting: relative reduction in per-phone
 distortion, $L{=}0\rightarrow640$\,ms, 40 utterances, 1451 reference phones per
-condition. B = pre-registered as breaking first, S = as surviving. The
+condition. B = pre-specified as breaking first, S = as surviving. The
 sequence-metric column is computed on the same utterances, so the two differ
 only in weighting.}
 \label{tab:h2audio}
@@ -779,7 +788,7 @@ S & affricate    & 0.257 & 0.526 & 44 \\
 The verdict is unchanged (Table~\ref{tab:h2audio}). Acoustic weighting does move
 in H2's favour, with effect size $0.607 \rightarrow 0.756$ and ordering
 violations $4/12 \rightarrow 2/12$ against the sequence metric on the same
-utterances, but not far enough to clear the pre-registered threshold of $1.0$, and the
+utterances, but not far enough to clear the pre-specified threshold of $1.0$, and the
 failure has the same shape as before: the ``survives'' group's internal spread
 ($0.120$) is $3.5\times$ the difference between the groups ($0.034$), and a
 nasal again out-gains a diphthong. So this particular equal-cost objection is not supported by the synthesized
