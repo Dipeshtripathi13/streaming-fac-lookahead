@@ -1,0 +1,57 @@
+arXiv submission metadata. Copy each field into the corresponding box.
+=======================================================================
+
+TITLE
+-----
+Future-Context Requirements for Streaming Accent Conversion: A Controlled
+Study Using Causal Phone Translation
+
+
+AUTHORS
+-------
+Dipesh Tripathi
+
+  arXiv wants "Forename Surname", comma-separated for multiple authors.
+  Do not include the affiliation in this box; there is no affiliation field
+  on the form, and it is already on the title page of the PDF.
+
+
+PRIMARY CATEGORY
+----------------
+eess.AS   (Electrical Engineering and Systems Science > Audio and Speech
+           Processing)
+
+
+CROSS-LIST CATEGORIES
+---------------------
+cs.SD     (Sound)
+cs.CL     (Computation and Language)
+
+
+COMMENTS
+--------
+10 pages, 1 figure, 7 tables. Submitted to IEEE/ACM Transactions on Audio,
+Speech, and Language Processing. Code, per-condition outputs and analysis
+scripts: https://github.com/Dipeshtripathi13/streaming-fac-lookahead
+
+
+ABSTRACT
+--------
+See abstract.txt in this folder. Paste it as plain text; the arXiv abstract
+box does not render LaTeX macros, and that file already has them removed.
+
+
+LICENCE
+-------
+arXiv.org perpetual, non-exclusive license (the default).
+
+  This is compatible with submitting the same work to IEEE. IEEE permits an
+  author-prepared preprint on arXiv. Do not pick a CC licence unless you have
+  a reason to; the default is the least restrictive choice for your later
+  options.
+
+
+JOURNAL REFERENCE / DOI
+-----------------------
+Leave both blank now. Fill them in later, after TASLP acceptance, by
+submitting a new version.
