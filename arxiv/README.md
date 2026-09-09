@@ -69,6 +69,13 @@ matches `taslp.pdf`. Check:
   the tarball and its name matches the `.tex` file, which is arXiv's
   requirement, so this should not happen.
 
+**5b. Licence and category.** Take the **arXiv.org perpetual, non-exclusive
+license**; the form warns that the choice is irrevocable, and this is the one
+that does not complicate the IEEE copyright transfer later. For the category,
+read the line on that page saying which groups you are registered for. If it
+says only `cs`, `eess.AS` will not be in the dropdown; `metadata.txt` explains
+the two ways forward.
+
 **6. Enter the metadata.** Copy from `metadata.txt`. Paste the abstract from
 `abstract.txt` rather than from the PDF; the PDF text has ligature and
 line-break artefacts, and arXiv's abstract box does not render LaTeX.

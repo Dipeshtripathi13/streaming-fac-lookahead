@@ -21,11 +21,29 @@ PRIMARY CATEGORY
 eess.AS   (Electrical Engineering and Systems Science > Audio and Speech
            Processing)
 
+  CHECK YOUR REGISTRATION FIRST. The submission page prints which groups you
+  are registered for, e.g. "dipeshtripathi13 has registered as author to the
+  groups: cs". If EESS is not among them, the eess.AS option will not appear
+  in the primary-classification dropdown and you have two choices:
+
+  (a) Follow the "registration form" link on that same page, add EESS, and
+      come back. eess.AS is where the speech community looks and is the right
+      primary for a TASLP-bound paper. Adding a group may require endorsement
+      for that archive, so do it before the day you want to post.
+
+  (b) Submit with cs.SD as primary now. This is not a misclassification:
+      cs.SD covers "sound signal processing" and "analysis and synthesis",
+      which is what this paper does. Cross-list to eess.AS so it still
+      reaches that audience.
+
+  arXiv's taxonomy does not declare cs.SD and eess.AS to be aliases, so the
+  primary you choose does determine which listing the paper lands in.
+
 
 CROSS-LIST CATEGORIES
 ---------------------
-cs.SD     (Sound)
-cs.CL     (Computation and Language)
+If primary is eess.AS:  cross-list cs.SD and cs.CL
+If primary is cs.SD:    cross-list eess.AS and cs.CL
 
 
 COMMENTS
@@ -43,12 +61,18 @@ box does not render LaTeX macros, and that file already has them removed.
 
 LICENCE
 -------
-arXiv.org perpetual, non-exclusive license (the default).
+arXiv.org perpetual, non-exclusive license.
 
-  This is compatible with submitting the same work to IEEE. IEEE permits an
-  author-prepared preprint on arXiv. Do not pick a CC licence unless you have
-  a reason to; the default is the least restrictive choice for your later
-  options.
+  Pick this one, and note the form's own warning that the choice is
+  IRREVOCABLE. The reason to prefer it here is the TASLP submission that
+  follows: the arXiv licence grants arXiv what it needs to distribute the
+  paper and nothing more, so it does not collide with an IEEE copyright
+  transfer later. A CC licence, by contrast, grants the world irrevocable
+  reuse rights, which is a commitment you cannot walk back if a publisher
+  later asks you not to have made it.
+
+  Choose a CC licence only if a funder requires one. None applies here: the
+  paper states there was no external funding.
 
 
 JOURNAL REFERENCE / DOI
