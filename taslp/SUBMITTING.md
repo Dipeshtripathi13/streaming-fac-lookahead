@@ -76,10 +76,29 @@ From `metadata.txt`:
 
 ## Step 5: upload
 
-`manuscript.pdf`, nine pages, with your name on it. Upload
-`taslp_source.tar.gz` only if the portal asks for source. Do not upload
-`metadata.txt`, `COVER_LETTER_NOTES.md`, `make_anonymous.sh` or anything in
-`anonymous/`; those are working files.
+The portal asks for two required items.
+
+**Main Manuscript: upload `taslp_source.tar.gz`.** The field accepts "MS Word
+or LaTeX", not PDF, and explicitly invites bundling the LaTeX files, BibTeX
+files, figures, classes and packages in one archive. That is what this archive
+is. It now also carries `IEEEtran.cls` and `IEEEtran.bst`, so their compiler
+cannot fail for want of the class; verified by extracting the archive into an
+empty directory and building from nothing else, which gives 9 pages,
+references 1 to 22 and no unresolved citations.
+
+`manuscript.pdf` is your reference copy. Do not upload it here unless the
+portal separately asks for a PDF, since this field wants source.
+
+**Conflict of Interest: tick "None of the authors have a conflict of
+interest to disclose."** There is no conflict to declare: no shared
+institution, no recent collaboration and no supervisory relationship with
+anyone in the compared work. Ticking the box is the correct answer and means
+no document to upload. The form also requires the statement inside the
+manuscript, which is already there, in Compliance with Ethical Standards:
+"The author declares no competing interests."
+
+Do not upload `metadata.txt`, `COVER_LETTER_NOTES.md`, `make_anonymous.sh` or
+anything in `anonymous/`. Those are working files.
 
 ## Step 6: the questions that cost money
 
