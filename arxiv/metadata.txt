@@ -18,35 +18,30 @@ Dipesh Tripathi
 
 PRIMARY CATEGORY
 ----------------
-cs.SD     (Computer Science > Sound)
+cs.CL     (Computer Science > Computation and Language)
 
-  Use this. eess.AS would be the natural home for a TASLP-bound speech paper,
-  but it needs endorsement in the EESS archive, and cs.SD is not a fallback
-  for this paper: arXiv describes it as covering "all aspects of computing
-  with sound", explicitly including "sound signal processing" and "analysis
-  and synthesis". A latency-accuracy study of a causal speech encoder sits
-  inside that description.
+  This is what was used. Both eess.AS and cs.SD required endorsements this
+  account did not have; cs.CL did not.
 
-  In the dropdown on the submission page: leave the left box on
-  "Computer Science" and pick "cs.SD" in the subject-class box.
+  It is a sound choice on the merits, not only on availability. arXiv defines
+  cs.CL as covering natural language processing, ACM class I.2.7, and its own
+  scope note names "computational linguistics, speech" explicitly. The
+  substance of this paper is phonetic: the probe predicts phone sequences, the
+  pre-specified hypothesis is about manner classes, RQ3 turns on canonical
+  versus realized phones, and the H2 rationale rests on the phonetics
+  literature. cs.SD would have fitted the signal-processing framing; cs.CL
+  fits the analysis.
 
 
 CROSS-LIST CATEGORIES
 ---------------------
 eess.AS   (Audio and Speech Processing)
-cs.CL     (Computation and Language)
+cs.SD     (Sound)
 
-  Ask for both on the screen after the primary. Endorsement gates the primary
-  category; cross-lists are decided by the subject moderators instead, so
-  requesting eess.AS here is the way to reach that audience without waiting
-  for an EESS endorsement. The moderators may decline, which costs nothing.
-
-  cs.CL is the weaker of the two but is reasonable: the probe predicts phone
-  sequences with a CTC head and the analysis is phonetic throughout.
-
-  If you would rather have eess.AS as the primary, the alternative is to get
-  endorsed in EESS first and submit afterwards. That is a better listing but a
-  slower one, and nothing about the paper requires it.
+  Request both after the primary. Endorsement gates the primary category,
+  while cross-lists are decided by the subject moderators, so this is the
+  route to an eess.AS listing without an EESS endorsement. A declined
+  cross-list costs nothing.
 
 
 COMMENTS

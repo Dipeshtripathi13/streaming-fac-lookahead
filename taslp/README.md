@@ -63,9 +63,9 @@ not declaring it.
 `cover_letter.md` has a bracketed `arXiv:[ID]` to fill in, or a paragraph to
 cut if you go to TASLP first.
 
-The preprint is going up under **cs.SD** as primary, with eess.AS requested as
-a cross-list, because eess.AS requires an endorsement the account does not
-have. This has no bearing on the TASLP submission; arXiv classification and
+The preprint is going up under **cs.CL** as primary, with eess.AS and cs.SD
+requested as cross-lists, because both of those require endorsements the
+account does not have. This has no bearing on the TASLP submission; arXiv classification and
 journal scope are unrelated.
 
 ---

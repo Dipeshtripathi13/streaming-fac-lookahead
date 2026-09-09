@@ -72,10 +72,10 @@ matches `taslp.pdf`. Check:
 **5b. Licence and category.** Take the **arXiv.org perpetual, non-exclusive
 license**; the form warns that the choice is irrevocable, and this is the one
 that does not complicate the IEEE copyright transfer later. For the category, pick
-**Computer Science -> cs.SD (Sound)**. eess.AS needs an EESS endorsement this
-account does not have; request it as a cross-list on the following screen
-instead, along with cs.CL. See `metadata.txt` for why cs.SD is a correct
-primary here rather than a consolation.
+**Computer Science -> cs.CL (Computation and Language)**. eess.AS and cs.SD
+both need endorsements this account does not have. Request them as
+cross-lists on the following screen instead. See `metadata.txt` for why cs.CL
+is a defensible primary for this paper on its own merits.
 
 **6. Enter the metadata.** Copy from `metadata.txt`. Paste the abstract from
 `abstract.txt` rather than from the PDF; the PDF text has ligature and
