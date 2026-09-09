@@ -142,3 +142,40 @@ INFORMED CONSENT: did this research involve human subjects?
 ANIMAL SUBJECTS
   Not applicable. Choose the dropdown option meaning no animal subjects were
   involved.
+
+DATA ASSOCIATED WITH THE MANUSCRIPT
+  Yes, I have data associated with my article that I will share.
+
+  Answer Yes. The repository holds 65 result files including 42 per-condition
+  hypothesis dumps, the raw sweep JSONL, the analysis scripts with their
+  self-tests and the causality audit:
+    https://github.com/Dipeshtripathi13/streaming-fac-lookahead
+
+  If the form asks for a DOI rather than a URL, a GitHub link is usually
+  accepted, but a Zenodo archive of the repository would mint a real DOI in a
+  few minutes and is worth doing if IEEE insists.
+
+  One thing to state plainly if there is a free-text box: what is shared is
+  the code and the derived outputs, not the corpus. L2-ARCTIC is CC-BY-NC-4.0
+  and gated, so it is cited rather than redistributed.
+
+RESUBMISSION OF, OR RELATED TO, A PREVIOUSLY REJECTED OR WITHDRAWN MANUSCRIPT
+  No.
+
+  This manuscript has never been submitted to any venue for peer review, so
+  it has never been rejected or withdrawn anywhere. Note the question spans
+  all publication venues, not just IEEE, so check each of these before
+  answering:
+
+    - The arXiv preprint is not a submission in this sense. arXiv is not
+      peer-reviewed, nothing was rejected, and it is declared separately as a
+      preprint.
+    - The Interspeech and ICASSP drafts in paper/ were abandoned before
+      submission, not rejected. Abandoning a draft is not a rejection and
+      does not need declaring.
+    - The informal reviews this manuscript went through were solicited
+      privately, not run by a venue.
+
+  If the text box will not accept an empty answer, one sentence is enough:
+  "This manuscript has not previously been submitted to, reviewed by, or
+  withdrawn from any publication venue."
