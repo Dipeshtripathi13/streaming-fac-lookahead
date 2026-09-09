@@ -41,7 +41,7 @@ the wav2vec 2.0 curve bottoms out at L=160 ms before rising again.
 The gain is small but **real, not noise**: 0.017 PER absolute is 5.9× the
 2σ = 0.0029 repeatability floor.
 
-## Two things that had to be ruled out first
+## Three things that had to be ruled out first
 
 ### 1. Layer 9 is the wrong tap for wav2vec 2.0
 
@@ -58,7 +58,25 @@ Monotone in depth. wav2vec 2.0 base carries phonetic information low in the
 stack; WavLM base+ carries it at 9. **Matching two encoders by layer index is
 not matching them.**
 
-### 2. "Layer 2 is too shallow to need context" — tested, and false
+### 2. "It's the 1200-step budget" — tested, and false
+
+A second seed cannot rule out an optimisation effect that both seeds share, so
+wav2vec 2.0 gets the same convergence check WavLM has, at L ∈ {0, 160, 640} ms
+to 6000 steps:
+
+| L (ms) | 1200 steps | 6000 steps |
+|---:|---:|---:|
+| 0 | 0.4359 | 0.3782 |
+| 160 | 0.4004 | **0.3361** |
+| 640 | 0.4189 | 0.3714 |
+
+Every condition improves, but **they improve together**. The minimum stays at
+L=160 ms and L=640 stays worse than it, so the non-monotonic shape is
+unchanged. The endpoint gain does not grow with training — it **shrinks**,
+from +3.9% to +1.8%, while WavLM at the same 6000 steps gains +65.8%. Five
+times the budget widens the gap rather than closing it.
+
+### 3. "Layer 2 is too shallow to need context" — tested, and false
 
 The natural objection to the result above: layer 2 has had almost no
 contextual mixing, so there was little context to withhold, and sensitivity
@@ -85,8 +103,10 @@ WavLM does. We looked for the trade-off and did not find it.
 
 ## What this does not establish
 
-Two checkpoints at one seed. This is enough to show the exchange rate does not
-transfer, and not enough to say *why*. The gap could trace to pretraining scale
+Two pretrained checkpoints. The wav2vec 2.0 side is replicated at a second
+training seed and re-checked at 6000 steps; the WavLM curve rests on the seeds
+of the main sweep. This is enough to show the exchange rate does not transfer,
+and not enough to say *why*. The gap could trace to pretraining scale
 (960 h against 94k h), to WavLM's denoising and speaker-conditioned objectives,
 or to architecture. Each encoder is also tapped at a single layer chosen by a
 probe at one lookahead, so layer and sensitivity are selected on partly

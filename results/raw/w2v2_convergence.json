@@ -1,0 +1,7 @@
+{
+  "encoder": "facebook/wav2vec2-base", "layer": 2, "seed": 1337,
+  "steps": 6000, "target": "native", "chunk_ms": 40, "lookback_ms": 2000,
+  "question": "Is the weak, non-monotonic wav2vec response an artefact of the 1200-step budget calibrated for WavLM?",
+  "test_per_6000": {"0": 0.3781924874847216, "160": 0.3361164275154072, "640": 0.3714259815364227},
+  "test_per_1200": {"0": 0.4359, "160": 0.4004, "640": 0.4189}
+}

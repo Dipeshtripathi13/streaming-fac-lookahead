@@ -65,8 +65,9 @@ $0.01$ PER of WavLM at $L{=}0$ yet gains only $3.9\%$ relative from $640$\,ms
 of lookahead against WavLM's $63.3\%$, and where WavLM is smooth and
 log-linear ($R^2=0.99$) its response is weak and non-monotonic ($R^2=0.10$),
 bottoming out at $160$\,ms and rising again --- a shape reproduced at a second
-seed. Neither the measured exchange rate nor the detailed curve shape is a
-universal property of the task. Fifth, per-chunk compute depends only weakly on
+seed and unchanged at five times the training budget, where its endpoint gain
+shrinks to $+1.8\%$ against WavLM's $+65.8\%$. Neither the measured exchange
+rate nor the detailed curve shape is a universal property of the task. Fifth, per-chunk compute depends only weakly on
 lookahead --- at most $1.9\%$ on an Apple M4 and $7.6\%$ on an ARM64 Linux
 host across a $17\times$ change in algorithmic latency --- a weak empirical
 dependence between lookahead and per-chunk compute over the tested range,
@@ -554,6 +555,18 @@ reproducible feature of this encoder rather than one seed's noise. The endpoint
 gain is $+2.5\%$ against $+3.9\%$: the effect is small in both, and small in
 the same shape.
 
+\textbf{Nor is it an artefact of the training budget.} A second seed cannot
+rule out an optimisation effect the two seeds share: perhaps wav2vec 2.0's
+lookahead conditions simply separate later. We therefore give this encoder the
+same convergence check WavLM receives in \S\ref{sec:convergence}, at
+$L\in\{0,160,640\}$\,ms to 6000 steps. Every condition improves --- $0.4359
+\rightarrow 0.3782$, $0.4004 \rightarrow 0.3361$, $0.4189 \rightarrow 0.3714$
+--- but they improve together, and the shape is unchanged: the minimum stays at
+$L{=}160$\,ms and $L{=}640$ remains worse than it. The endpoint gain does not
+grow with training; it \emph{shrinks}, from $+3.9\%$ to $+1.8\%$, while WavLM
+at the same 6000 steps gains $+65.8\%$. Five times the budget widens the gap
+rather than closing it.
+
 \textbf{This is not an artefact of tapping a shallow layer.} Layer 2 has had
 almost no contextual mixing, so the natural objection is that there was little
 context to withhold and that sensitivity would recover deeper in the stack. It
@@ -984,10 +997,11 @@ that threshold is global while the per-condition $\sigma$ it pools varies by a
 factor of $3.5$, so marginal decisions near the threshold should be treated as
 approximate. \tbuf{}'s I/O term is unmeasured, and compute is characterised on Apple
 Silicon and ARM64 Linux only. The encoder comparison in
-\S\ref{sec:encoder} is two checkpoints, with the wav2vec 2.0 result replicated
-at a second training seed but the WavLM curve resting on the seeds of the main
-sweep; that is enough to show the exchange rate does not transfer, but not to
-attribute the gap to pretraining scale, objective or architecture; and the layer-selection protocols are not
+\S\ref{sec:encoder} compares two pretrained encoder checkpoints. The wav2vec
+2.0 result is replicated at a second training seed and re-checked at 6000
+steps, while the WavLM curve rests on the seeds of the main sweep; that is
+enough to show the exchange rate does not transfer, but not to attribute the
+gap to pretraining scale, objective or architecture; and the layer-selection protocols are not
 fully symmetric: WavLM's layer 9 was fixed a priori from prior practice,
 whereas wav2vec 2.0's was selected by a phonetic probe at one lookahead, though
 re-selection at $L{=}0$ returns the same layer.
@@ -1000,8 +1014,8 @@ identifiable knee and measurable returns out to a saturation onset near
 ${\approx}340$\,ms --- well beyond PHONOS's 40\,ms translator budget, relative
 to which a further 45.3\% reduction is available. That rate, however, is measured
 over one backbone: a second causalised encoder that matches WavLM at $L{=}0$
-recovers only $3.9\%$ of it from $640$\,ms of future context
-(\S\ref{sec:encoder}). Neither the magnitude nor the detailed shape of the
+recovers only $3.9\%$ of it from $640$\,ms of future context, and $1.8\%$ when
+both are trained to 6000 steps (\S\ref{sec:encoder}). Neither the magnitude nor the detailed shape of the
 lookahead response transfers unchanged across the two encoders tested: WavLM
 exhibits a strong smooth diminishing-return curve, whereas wav2vec 2.0 shows a
 weak, non-monotonic one. Future-context budgets should therefore be
