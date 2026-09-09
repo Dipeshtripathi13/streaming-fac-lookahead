@@ -31,20 +31,20 @@ W.~Quamer, M.-R. Tseng, G.~Nasrallah, and R.~Guti{\'e}rrez-Osuna, ``{PHONOS}:
   {PHO}netic neutralization for online streaming applications,'' \emph{arXiv
   preprint arXiv:2603.27001}, Mar. 2026.
 
-\bibitem{nguyen2025streaming}
-T.-N. Nguyen, N.-Q. Pham, {\c{S}}.~Akti, and A.~Waibel, ``Streaming
-  non-autoregressive model for accent conversion and pronunciation
-  improvement,'' in \emph{Interspeech}, 2025, pp. 4163--4167.
-
 \bibitem{tvtsyn2026}
-W.~Quamer, M.-R. Tseng, G.~Nasrallah, and R.~Guti{\'e}rrez-Osuna, ``{TVTSyn}:
-  Content-synchronous time-varying timbre for streaming voice conversion and
-  anonymization,'' \emph{arXiv preprint arXiv:2602.09389}, Feb. 2026.
+------, ``{TVTSyn}: Content-synchronous time-varying timbre for streaming voice
+  conversion and anonymization,'' \emph{arXiv preprint arXiv:2602.09389}, Feb.
+  2026.
 
 \bibitem{darkstream2025}
 W.~Quamer and R.~Guti{\'e}rrez-Osuna, ``{DarkStream}: Real-time speech
   anonymization with low latency,'' \emph{arXiv preprint arXiv:2509.04667},
   Sep. 2025.
+
+\bibitem{nguyen2025streaming}
+T.-N. Nguyen, N.-Q. Pham, {\c{S}}.~Akti, and A.~Waibel, ``Streaming
+  non-autoregressive model for accent conversion and pronunciation
+  improvement,'' in \emph{Interspeech}, 2025, pp. 4163--4167.
 
 \bibitem{streamvc2024}
 Y.~Yang, Y.~Kartynnik, Y.~Li, J.~Tang, X.~Li, G.~Sung, and M.~Grundmann,

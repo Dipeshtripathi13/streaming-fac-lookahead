@@ -1,6 +1,9 @@
 \relax 
 \citation{l2arctic2018}
 \citation{phonos2026}
+\citation{tvtsyn2026}
+\citation{darkstream2025}
+\citation{phonos2026}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
 \newlabel{eq:decomp}{{1}{1}}
 \citation{nguyen2025streaming}
@@ -40,13 +43,13 @@
 \citation{kassraftery1995}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Dense sweep, conversion arm, 16 lookaheads $\times $ 2 seeds. \textbf  {Left:} smooth curvature; the shaded band spans the breakpoint estimates produced by three defensible treatments of $L{=}0$, none identifiable. \textbf  {Right:} marginal return per added 20\,ms frame against the measured $2\sigma $ floor; red bars are below it.}}{4}{}\protected@file@percent }
 \newlabel{fig:dense}{{1}{4}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}RQ1: an exchange rate and a saturation point, not a knee}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}RQ1: an exchange rate and a saturation onset, not a knee}{4}{}\protected@file@percent }
 \newlabel{sec:rq1}{{\mbox  {V-C}}{4}}
 \newlabel{eq:rate}{{4}{4}}
 \@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Conversion-arm PER against lookahead (mean of 2 seeds) and marginal return per added 20\,ms frame, in units of the measured $2\sigma {=}0.0029$ floor (Eq.\nobreakspace  {}2\hbox {}). Below $1.0\times $, the gain from an additional frame is smaller than the measured fixed-seed repeatability threshold. The grid is 20\,ms-spaced to 360\,ms; the final two rows average over wider intervals.}}{4}{}\protected@file@percent }
 \newlabel{tab:dense}{{III}{4}}
 \citation{wav2vec2}
-\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Same sweep, second encoder, each tapped at its selected phonetic layer (\S  \mbox  {V-D}\hbox {}). The two start with similar PER at $L{=}0$ but exhibit markedly different lookahead responses.}}{5}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Same sweep, second encoder, each tapped at its selected phonetic layer, given in parentheses (\S  \mbox  {V-D}\hbox {}). Slope is PER per doubling of lookahead, fitted over the matched grid. The two start with similar PER at $L{=}0$ but exhibit markedly different lookahead responses.}}{5}{}\protected@file@percent }
 \newlabel{tab:encoder}{{IV}{5}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}The exchange rate does not transfer across encoders}{5}{}\protected@file@percent }
 \newlabel{sec:encoder}{{\mbox  {V-D}}{5}}
@@ -56,32 +59,30 @@
 \citation{lehistepeterson1961}
 \citation{delattre1955}
 \citation{stevensblumstein1978}
-\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Relative error-rate reduction, $L{=}0\rightarrow 640$\,ms. B = pre-registered as breaking first, S = as surviving. Intervals are percentile bootstrap over the six test speakers, not over phone tokens. The predicted grouping does not order the data.}}{6}{}\protected@file@percent }
-\newlabel{tab:h2}{{V}{6}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}RQ2: the preregistered manner grouping does not predict lookahead benefit}{6}{}\protected@file@percent }
 \newlabel{sec:rq2}{{\mbox  {V-E}}{6}}
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Relative error-rate reduction, $L{=}0\rightarrow 640$\,ms. B = pre-registered as breaking first, S = as surviving. Intervals are percentile bootstrap over the six test speakers, not over phone tokens. The predicted grouping does not order the data.}}{6}{}\protected@file@percent }
+\newlabel{tab:h2}{{V}{6}}
 \@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces H2 under acoustic weighting: relative reduction in per-phone distortion, $L{=}0\rightarrow 640$\,ms, 40 utterances, 1451 reference phones per condition. B = pre-registered as breaking first, S = as surviving. The sequence-metric column is computed on the same utterances, so the two differ only in weighting.}}{7}{}\protected@file@percent }
 \newlabel{tab:h2audio}{{VI}{7}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-F}}RQ3: canonical-phone prediction benefits more from lookahead than realized-phone transcription}{7}{}\protected@file@percent }
 \newlabel{sec:rq3}{{\mbox  {V-F}}{7}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-G}}\ensuremath  {t_{\mathrm  {buf}}}{}: jitter measured, I/O not}{8}{}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Both arms on the dense grid, mean of 2 seeds. The gap is the transcription arm's PER minus the conversion arm's: near zero at $L{=}0$ and substantially wider at large lookahead; the full 16-point curve widens in 13 of 15 adjacent steps rather than monotonically.}}{8}{}\protected@file@percent }
 \newlabel{tab:h3dense}{{VII}{8}}
-\bibstyle{IEEEtran}
-\bibdata{refs}
-\bibcite{l2arctic2018}{1}
-\bibcite{phonos2026}{2}
-\bibcite{nguyen2025streaming}{3}
-\bibcite{tvtsyn2026}{4}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-G}}\ensuremath  {t_{\mathrm  {buf}}}{}: jitter measured, I/O not}{8}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {VI}Measurement audits and failure modes}{9}{}\protected@file@percent }
 \newlabel{sec:lessons}{{VI}{9}}
 \@writefile{toc}{\contentsline {section}{\numberline {VII}Limitations}{9}{}\protected@file@percent }
 \newlabel{sec:remaining}{{VII}{9}}
 \@writefile{toc}{\contentsline {section}{\numberline {VIII}Conclusion}{9}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {IX}Acknowledgements}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {X}Compliance with ethical standards}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{9}{}\protected@file@percent }
-\bibcite{darkstream2025}{5}
+\bibstyle{IEEEtran}
+\bibdata{refs}
+\bibcite{l2arctic2018}{1}
+\bibcite{phonos2026}{2}
+\bibcite{tvtsyn2026}{3}
+\bibcite{darkstream2025}{4}
+\bibcite{nguyen2025streaming}{5}
 \bibcite{streamvc2024}{6}
 \bibcite{acsurvey2026}{7}
 \bibcite{streamvoiceanon2026}{8}
@@ -99,4 +100,6 @@
 \bibcite{lehistepeterson1961}{20}
 \bibcite{delattre1955}{21}
 \bibcite{stevensblumstein1978}{22}
+\@writefile{toc}{\contentsline {section}{\numberline {X}Compliance with ethical standards}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{10}{}\protected@file@percent }
 \gdef \@abspage@last{10}

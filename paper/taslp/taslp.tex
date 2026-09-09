@@ -58,7 +58,7 @@ interval of $[-0.010, +0.101]$. It still fails when errors are reweighted by a s
 proxy for acoustic cost, so this is not an artefact of PER charging every error
 equally. Third, canonical-phone prediction benefits more from future context than
 realized-phone transcription at matched capacity ($-0.045$ against $-0.029$
-PER per doubling, $1.55\times$), and within the conversion arm the benefit is
+PER per doubling, $1.55\times$), and within the canonical-phone arm the benefit is
 $1.32\times$ larger in absolute PER slope at canonical-deviation positions
 (substitutions and deletions in the g2p--IPA alignment). Fourth, repeating the sweep on a second causalised encoder (wav2vec 2.0 base),
 tapped at its own selected phonetic layer, changes the answer: it starts within
@@ -75,7 +75,7 @@ dependence between lookahead and per-chunk compute over the tested range,
 subject to the throughput constraint $\tcmp<c$. We release the harness and the per-condition outputs.
 \end{abstract}
 
-\blfootnote{Harness, causality proof, sweep configurations, analysis scripts
+\blfootnote{Harness, causality audit, sweep configurations, analysis scripts
 with self-tests and per-condition hypothesis dumps:
 \url{https://github.com/Dipeshtripathi13/streaming-fac-lookahead}. Data is
 L2-ARCTIC~\cite{l2arctic2018} via \texttt{KoelLabs/L2Arctic} (CC-BY-NC-4.0);
@@ -97,15 +97,17 @@ GPU.
 Three gaps motivate the study.
 
 \textbf{The budget is chosen, not characterised.} PHONOS \emph{states} 40\,ms
-and publishes no ablation showing 40\,ms is necessary or sufficient; TVTSyn
-fixes 4 future tokens ($\approx$80\,ms) without varying them. DarkStream does
-ablate, over three points $\{0, 140, 280\}$\,ms, and finds the third buys
+and publishes no ablation showing 40\,ms is necessary or sufficient;
+TVTSyn~\cite{tvtsyn2026} fixes 4 future tokens ($\approx$80\,ms) without
+varying them. DarkStream~\cite{darkstream2025} does ablate, over three points
+$\{0, 140, 280\}$\,ms, and finds the third buys
 $<$1pp --- but three points scored on anonymisation accuracy cannot tightly localise
 where returns stop, which is the question a deployment budget actually asks.
 ``What would 160\,ms buy you'' still has no published answer.
 
 \textbf{Algorithmic and computational latency are reported fused.} A figure
-such as ``${<}241$\,ms on a single GPU'' combines a modelling choice with
+such as PHONOS's ``${<}241$\,ms on a single GPU''~\cite{phonos2026} combines a
+modelling choice with
 unstated inference and buffering costs. A reader cannot tell whether a faster
 chip would help. We decompose throughout as
 \begin{equation}
@@ -167,7 +169,7 @@ look-ahead over $\{0,140,280\}$\,ms and selects 140\,ms because the extra
 scored on anonymisation accuracy rather than conversion quality. DarkStream
 likewise reports diminishing marginal return at its largest tested budget,
 though a three-point ablation on a different objective is too sparse to compare
-saturation locations with the estimate we obtain over 16 budgets.
+saturation locations with the estimate we obtain over 21 budgets.
 
 StreamVC~\cite{streamvc2024} reports mobile operation without device, core or
 thread details, limiting hardware-level reproducibility. A
@@ -280,7 +282,7 @@ with a bootstrap 95\% interval of $[0.0013, 0.0034]$ on $2\sigma$.
 This supersedes an earlier estimate of $2\sigma=0.0044$ taken from six
 \emph{accidental} repeats, which the present interval excludes; that estimate
 was inflated by a single outlying pair. The correction matters because the
-saturation point in \S\ref{sec:rq1} is defined against this floor, and a
+saturation onset in \S\ref{sec:rq1} is defined against this floor, and a
 smaller floor makes smaller gains measurable. We also note the floor is not
 constant across conditions --- per-condition $\sigma$ spans $0.00064$ to
 $0.00223$, a factor of $3.5$ --- so a single global threshold is an
@@ -375,7 +377,7 @@ rate, are not artefacts of stopping at 1200 steps. The check is single-seed
 over five budgets and uses validation rather than test PER, so it bounds the
 concern rather than eliminating it.
 
-\subsection{RQ1: an exchange rate and a saturation point, not a knee}
+\subsection{RQ1: an exchange rate and a saturation onset, not a knee}
 \label{sec:rq1}
 
 \begin{figure}[t]
@@ -484,7 +486,7 @@ $L$ (ms) & PER & gain/frame & $\times$ floor \\
 
 \textbf{The cost of a 40\,ms budget.} PER at $L{=}40$\,ms is $0.3275$; at
 340\,ms it is $0.1790$. \textbf{Relative to the 40\,ms condition, increasing
-lookahead to the saturation point reduces PER by a further 45.3\%}, and to
+lookahead to the saturation onset reduces PER by a further 45.3\%}, and to
 640\,ms by 52.3\%. In absolute terms, of the $0.2466$ PER separating $L{=}0$
 from $340$\,ms, a 40\,ms budget has captured $0.0981$, or $39.8\%$.
 \textbf{For WavLM base+, then, 40\,ms lies well before the observed
@@ -499,8 +501,9 @@ Every number above is measured over one frozen backbone, so the obvious
 question is whether the exchange rate describes speech or describes WavLM. We
 repeated the sweep on a second causalised encoder, wav2vec 2.0
 base~\cite{wav2vec2}, holding the corpus, split, head, optimiser, step budget,
-seed, chunk, lookback and grid fixed and changing only the checkpoint. The
-matched grid is $L\in\{0,20,40,80,160,320,640\}$\,ms, a subset of the main
+seed, chunk, lookback and matched lookahead grid fixed. The pretrained
+backbone and the selected phonetic tap layer both differ, for reasons set out
+below. The matched grid is $L\in\{0,20,40,80,160,320,640\}$\,ms, a subset of the main
 sweep; fitted over this reduced grid the WavLM slope is $-0.0446$ rather than
 the $-0.0452$ of Eq.~\ref{eq:rate}, which is why Table~\ref{tab:encoder}
 differs slightly from \S\ref{sec:rq1}. Both encoders are causalised by the same
@@ -531,19 +534,20 @@ below is therefore insensitive to which of the two criteria is used, though it
 would be cleaner still to fix both layers by a pre-registered rule.
 
 \begin{table}[t]
-\centering\small
+\centering\footnotesize
+\setlength{\tabcolsep}{3.5pt}
 \caption{Same sweep, second encoder, each tapped at its selected phonetic
-layer (\S\ref{sec:encoder}). The two start with similar PER at $L{=}0$ but
-exhibit markedly different lookahead responses.}
+layer, given in parentheses (\S\ref{sec:encoder}). Slope is PER per doubling
+of lookahead, fitted over the matched grid. The two start with similar PER at
+$L{=}0$ but exhibit markedly different lookahead responses.}
 \label{tab:encoder}
-\begin{tabular}{lrrrr}
+\begin{tabular}{@{}lrrrr@{}}
 \toprule
-& \multicolumn{1}{c}{$L{=}0$} & \multicolumn{1}{c}{$L{=}640$}
-& \multicolumn{1}{c}{rel.\ gain} & \multicolumn{1}{c}{PER/doubling} \\
+encoder & $L{=}0$ & $L{=}640$ & rel.\ gain & slope \\
 \midrule
-WavLM base+ (layer 9)      & 0.4256 & 0.1561 & $+63.3\%$ & $-0.0446$ \\
-wav2vec 2.0 base (layer 2) & 0.4359 & 0.4189 & $+3.9\%$  & $-0.0015$ \\
-\quad \emph{seed 7}        & 0.4376 & 0.4265 & $+2.5\%$  & --- \\
+WavLM base+ (9)      & 0.4256 & 0.1561 & $+63.3\%$ & $-0.0446$ \\
+wav2vec 2.0 base (2) & 0.4359 & 0.4189 & $+3.9\%$  & $-0.0015$ \\
+\quad seed 7         & 0.4376 & 0.4265 & $+2.5\%$  & --- \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -574,8 +578,9 @@ lookahead conditions simply separate later. We therefore give this encoder the
 same convergence check WavLM receives in \S\ref{sec:convergence}, at
 $L\in\{0,160,640\}$\,ms to 6000 steps. Every condition improves --- $0.4359
 \rightarrow 0.3782$, $0.4004 \rightarrow 0.3361$, $0.4189 \rightarrow 0.3714$
---- but they improve together, and the shape is unchanged: the minimum stays at
-$L{=}160$\,ms and $L{=}640$ remains worse than it. The endpoint gain does not
+--- but they improve together, and the three-point ordering is unchanged: the
+minimum remains at $L{=}160$\,ms and $L{=}640$ remains worse than it. Three
+budgets test that ordering, not the full seven-point curve. The endpoint gain does not
 grow with training; it \emph{shrinks}, from $+3.9\%$ to $+1.8\%$, while WavLM
 at the same 6000 steps gains $+65.8\%$ on test PER
 ($0.4135\rightarrow0.1414$). Both encoder figures are test PER and so are
@@ -626,10 +631,17 @@ talkers \cite{hillenbrand1995} --- and that this movement is criterial rather
 than incidental, since even nominal monophthongs are identified better from a
 trajectory than from a steady-state slice \cite{nearey1986}, with glides and
 diphthongs differing from vowels in rate of formant change rather than in
-kind \cite{lehistepeterson1961}. Obstruents were placed on the other side
-because stop place is signalled by brief formant transitions to a
+kind \cite{lehistepeterson1961}. Stops, fricatives and affricates were placed
+in the comparison group because their defining cues are comparatively
+localised: stop place is signalled by brief formant transitions to a
 locus \cite{delattre1955} and is recoverable from a short-time spectrum at the
-release \cite{stevensblumstein1978}, so a narrow window should suffice. Testing this on 42{,}255 unique reference-phone tokens evaluated across seven
+release \cite{stevensblumstein1978}, so a narrow window should suffice. Nasals
+were assigned to the same group under the same short-context prediction, but
+the acoustic argument above is strongest for the obstruent classes and we do
+not claim it extends cleanly to nasals. We record this asymmetry as it stood
+at pre-registration rather than reconstructing a stronger rationale after the
+grouping failed --- and nasals in fact gain the most of any class
+(Table~\ref{tab:h2}). Testing this on 42{,}255 unique reference-phone tokens evaluated across seven
 lookahead conditions (295{,}785 phone--condition observations), with each
 substitution or deletion charged to the class of the \emph{reference} phone:
 
@@ -1030,9 +1042,10 @@ approximately log-linear average rate of ${\approx}0.045$ per doubling, with no
 identifiable knee and measurable returns out to a saturation onset near
 $340$\,ms --- well beyond PHONOS's 40\,ms translator budget, relative
 to which a further 45.3\% reduction is available. That rate, however, is measured
-over one backbone: a second causalised encoder that matches WavLM at $L{=}0$
-recovers only $3.9\%$ of it from $640$\,ms of future context, and $1.8\%$ when
-both are trained to 6000 steps (\S\ref{sec:encoder}). Neither the magnitude nor the detailed shape of the
+over one backbone: a second causalised encoder with similar zero-lookahead PER
+shows only a $3.9\%$ relative endpoint PER reduction from $0$ to $640$\,ms,
+against $63.3\%$ for WavLM; trained to 6000 steps the corresponding wav2vec
+reduction is $1.8\%$ (\S\ref{sec:encoder}). Neither the magnitude nor the detailed shape of the
 lookahead response transfers unchanged across the two encoders tested: WavLM
 exhibits a strong smooth diminishing-return curve, whereas wav2vec 2.0 shows a
 weak, non-monotonic one. Future-context budgets should therefore be
@@ -1053,9 +1066,8 @@ possible.
 \section{Compliance with ethical standards}
 
 This work used only the publicly released L2-ARCTIC corpus and involved no new
-data collection and no human subjects, so no ethical approval was required. No
-listening study was run, and no claim about perceived accentedness or
-naturalness is made. The author declares no competing interests.
+participant recruitment, interaction or data collection. No listening study
+was run, and no claim about perceived accentedness or naturalness is made. The author declares no competing interests.
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
