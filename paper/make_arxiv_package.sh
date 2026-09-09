@@ -14,6 +14,11 @@ SRC=taslp
 OUT=arxiv_build
 rm -rf "$OUT" && mkdir -p "$OUT"
 
+# Clear intermediates first. A .aux written before a preamble change (adding
+# hyperref, say) makes the next run fail with errors that point at innocent
+# lines, and the file is not in git so the failure does not reproduce for
+# anyone else.
+rm -f "$SRC"/taslp.aux "$SRC"/taslp.bbl "$SRC"/taslp.log "$SRC"/taslp.blg
 ( cd "$SRC" && tectonic --keep-intermediates taslp.tex >/dev/null 2>&1 )
 [ -s "$SRC/taslp.bbl" ] || { echo "FAIL: no taslp.bbl produced"; exit 1; }
 

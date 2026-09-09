@@ -11,9 +11,12 @@
 \documentclass[journal]{IEEEtran}
 \usepackage{amsmath,amssymb,graphicx,booktabs,url,tipa}
 \usepackage[T1]{fontenc}
+% hyperref last, so it can patch the other packages' cross-referencing.
+% hidelinks: no coloured frames, which IEEE styles do not want in print;
+% breaklinks: a URL split across two lines stays one clickable target, which
+% both URLs in this paper are.
+\usepackage[hidelinks,breaklinks=true]{hyperref}
 
-\newcommand{\blfootnote}[1]{%
-  \begingroup\renewcommand\thefootnote{}\footnote{#1}\addtocounter{footnote}{-1}\endgroup}
 \newcommand{\talg}{\ensuremath{t_{\mathrm{alg}}}}
 \newcommand{\tcmp}{\ensuremath{t_{\mathrm{cmp}}}}
 \newcommand{\tbuf}{\ensuremath{t_{\mathrm{buf}}}}
@@ -22,7 +25,14 @@
 A Controlled Study Using Causal Phone Translation}
 \author{Dipesh~Tripathi%
 \thanks{D. Tripathi is with the University of South Dakota, Vermillion, SD,
-USA (e-mail: dipesh.tripathi@coyotes.usd.edu).}}
+USA (e-mail: dipesh.tripathi@coyotes.usd.edu).}%
+\thanks{Harness, causality audit, sweep configurations, analysis scripts with
+self-tests and per-condition hypothesis dumps:
+\url{https://github.com/Dipeshtripathi13/streaming-fac-lookahead}. Data is
+L2-ARCTIC~\protect\cite{l2arctic2018} via \texttt{KoelLabs/L2Arctic}
+(CC-BY-NC-4.0);
+that licence is non-commercial, so configurations are released rather than
+weights.}}
 
 \begin{document}
 \maketitle
@@ -76,12 +86,6 @@ empirical dependence over the tested range,
 subject to the throughput constraint $\tcmp<c$. We release the harness and the per-condition outputs.
 \end{abstract}
 
-\blfootnote{Harness, causality audit, sweep configurations, analysis scripts
-with self-tests and per-condition hypothesis dumps:
-\url{https://github.com/Dipeshtripathi13/streaming-fac-lookahead}. Data is
-L2-ARCTIC~\cite{l2arctic2018} via \texttt{KoelLabs/L2Arctic} (CC-BY-NC-4.0);
-that licence is non-commercial, so configurations are released rather than
-weights.}
 
 \begin{IEEEkeywords}
 accent conversion, streaming speech, latency, lookahead, self-supervised models
