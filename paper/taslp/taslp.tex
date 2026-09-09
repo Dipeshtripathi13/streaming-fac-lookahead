@@ -33,8 +33,9 @@ USA (e-mail: dipesh.tripathi@coyotes.usd.edu).}}
 \noindent
 Streaming foreign accent conversion (FAC) systems choose a lookahead budget and
 report a single end-to-end latency, but to our knowledge prior streaming FAC work has not densely swept that budget
-while separately reporting algorithmic and computational latency. We train a causal phone translator at 16 lookaheads from 0 to 640\,ms
-with every other factor held fixed, and report five results. First,
+while separately reporting algorithmic and computational latency. We train a causal phone translator in a 16-point main sweep from 0 to 640\,ms, augmented with five targeted budgets around the diminishing-return region (21 in all),
+with every other factor held fixed, and report five principal empirical
+results. First,
 phone-translation PER decreases smoothly with lookahead at $-0.045$ phone error rate (PER) per
 doubling ($R^2=0.98$) with \emph{no locatable knee}: a piecewise fit is
 preferred under every axis treatment we tried, yet the breakpoint moves between
@@ -128,7 +129,8 @@ reporting lookahead sensitivity by phonetic manner class.
 Our contributions:
 \begin{enumerate}\itemsep1pt
 \item A latency--accuracy characterization of a causal phone-translation probe
-      for streaming FAC across 16 lookahead budgets, reporting an average
+      for streaming FAC across 21 lookahead budgets (a 16-point main sweep
+      plus five targeted additions), reporting an average
       exchange rate and a floor-relative saturation region rather than an
       unidentifiable knee (\S\ref{sec:rq1}).
 \item A negative result on a pre-registered phoneme-class hypothesis
@@ -255,8 +257,10 @@ Frozen causal WavLM-base-plus, CTC phone head, 1200 steps, batch 8, chunk
 40\,ms, 100-frame lookback, speaker-disjoint test split of 400 utterances.
 Two sweeps: a 7-lookahead $\times$ 2-target $\times$ 3-seed sweep (42 runs)
 and a 16-lookahead $\times$ 2-seed dense sweep, run on \emph{both} target arms
-(64 runs), all on an NVIDIA T4. Compute measurements use an Apple M4
-(10 logical cores: 4 performance, 6 efficiency; 16\,GB; macOS 25.5) and an
+(64 runs), later augmented on the conversion arm with five budgets (220, 260,
+300, 340, 360\,ms) to resolve the diminishing-return region, all on an NVIDIA
+T4. Compute measurements use an Apple M4
+(10 CPU cores: 4 performance, 6 efficiency; 16\,GB; macOS 25.5) and an
 ARM64 Linux host (aarch64, 4 logical cores, 3.8\,GB, Linux 6.8,
 scipy-openblas 0.3.29; the platform does not expose a CPU model string), CUDA-event or \texttt{perf\_counter\_ns} timed, 28--50 repetitions
 with three warm-up iterations discarded.
@@ -389,8 +393,14 @@ Conversion-arm PER falls monotonically from $0.4256$ at $L{=}0$ to $0.1561$ at
 $L{=}640$\,ms. Fitting $L\geq20$\,ms on $\log_2 L$ gives
 \begin{equation}
 \Delta\mathrm{PER} = -0.0452 \text{ per doubling},\quad R^2 = 0.983,
+\label{eq:rate}
 \end{equation}
-over 15 points.
+over the 15 positive-lookahead points of the main sweep. The five budgets added
+later to resolve the saturation region were sampled where the curve is
+flattest, so we report the fit with and without them rather than silently
+choosing one: including all 20 positive-lookahead conditions gives $-0.0453$
+per doubling at $R^2=0.985$. Targeted sampling did not move the exchange
+rate.
 
 \textbf{There is curvature, and it is not localisable.} BIC prefers a
 two-segment fit under all three axis treatments we tried
@@ -439,8 +449,8 @@ choice, and the floor is now measured with 12 degrees of freedom.
 \centering\small
 \caption{Conversion-arm PER against lookahead (mean of 2 seeds) and marginal
 return per added 20\,ms frame, in units of the measured $2\sigma{=}0.0029$
-floor (Eq.~\ref{eq:floor}). Below $1.0\times$ an additional frame is not
-measurably useful. The grid is 20\,ms-spaced to 360\,ms; the final two rows
+floor (Eq.~\ref{eq:floor}). Below $1.0\times$, the gain from an additional
+frame is smaller than the measured fixed-seed repeatability threshold. The grid is 20\,ms-spaced to 360\,ms; the final two rows
 average over wider intervals.}
 \label{tab:dense}
 \begin{tabular}{rrrr}
@@ -489,9 +499,12 @@ Every number above is measured over one frozen backbone, so the obvious
 question is whether the exchange rate describes speech or describes WavLM. We
 repeated the sweep on a second causalised encoder, wav2vec 2.0
 base~\cite{wav2vec2}, holding the corpus, split, head, optimiser, step budget,
-seed, chunk, lookback and grid fixed and changing only the checkpoint. Both
-encoders are causalised by the same two patches and both pass the same
-truncation proof.
+seed, chunk, lookback and grid fixed and changing only the checkpoint. The
+matched grid is $L\in\{0,20,40,80,160,320,640\}$\,ms, a subset of the main
+sweep; fitted over this reduced grid the WavLM slope is $-0.0446$ rather than
+the $-0.0452$ of Eq.~\ref{eq:rate}, which is why Table~\ref{tab:encoder}
+differs slightly from \S\ref{sec:rq1}. Both encoders are causalised by the same
+two patches and both pass the same truncation-based causality test.
 
 \textbf{The layer must be matched by function, not by index.} Tapping
 wav2vec 2.0 at layer 9 --- WavLM's phonetic layer --- produces a degenerate
@@ -535,7 +548,7 @@ wav2vec 2.0 base (layer 2) & 0.4359 & 0.4189 & $+3.9\%$  & $-0.0015$ \\
 \end{tabular}
 \end{table}
 
-\textbf{Direction replicates; magnitude does not.} At its own best layer
+\textbf{Direction replicates; magnitude does not.} At the selected layer 2,
 wav2vec 2.0 starts within $0.01$ PER of WavLM ($0.4359$ against $0.4256$) and
 then barely moves: $3.9\%$ relative gain against $63.3\%$, and $-0.0015$ PER
 per doubling against $-0.0446$. The log-linear fit that gives $R^2=0.989$ on
@@ -564,13 +577,16 @@ $L\in\{0,160,640\}$\,ms to 6000 steps. Every condition improves --- $0.4359
 --- but they improve together, and the shape is unchanged: the minimum stays at
 $L{=}160$\,ms and $L{=}640$ remains worse than it. The endpoint gain does not
 grow with training; it \emph{shrinks}, from $+3.9\%$ to $+1.8\%$, while WavLM
-at the same 6000 steps gains $+65.8\%$. Five times the budget widens the gap
+at the same 6000 steps gains $+65.8\%$ on test PER
+($0.4135\rightarrow0.1414$). Both encoder figures are test PER and so are
+comparable to each other; Table~\ref{tab:conv} reports \emph{validation}
+PER at checkpoints, on which the corresponding WavLM gain is $+63.8\%$. Five times the budget widens the gap
 rather than closing it.
 
 \textbf{This is not an artefact of tapping a shallow layer.} Layer 2 has had
-almost no contextual mixing, so the natural objection is that there was little
-context to withhold and that sensitivity would recover deeper in the stack. It
-does not. Relative gain from $L{=}0$ to $640$\,ms is $+3.9\%$ at layer 2,
+substantially less contextual mixing than deeper layers, so the natural
+objection is that there was less context to withhold and that sensitivity
+would recover deeper in the stack. We do not observe that recovery. Relative gain from $L{=}0$ to $640$\,ms is $+3.9\%$ at layer 2,
 $+5.4\%$ at 4, $+5.2\%$ at 6 and $-14.1\%$ at 8 --- flat across every layer
 where the encoder can still decode phones, then negative. We looked for the
 trade-off and did not find it.
@@ -580,8 +596,8 @@ order of magnitude in endpoint relative gain --- a statement that holds for
 both wav2vec 2.0 seeds ($+2.5\%$ and $+3.9\%$ against $+63.3\%$). \textbf{The exchange
 rate of $-0.045$ PER per doubling is a property of WavLM base+, and should be
 read as one encoder's operating curve rather than as a fact about how much
-future context English phones require.} The swap falsifies any
-backbone-independent quantitative law, and it also shows that the detailed
+future context English phones require.} The swap rules out treating the
+measured WavLM exchange rate as a backbone-independent law, and it also shows that the detailed
 shape need not carry over: WavLM's smooth diminishing-return curve has no
 counterpart in wav2vec 2.0's weak, non-monotonic one. We do not run the
 breakpoint and axis-perturbation analysis of \S\ref{sec:rq1} on a curve that
@@ -682,8 +698,7 @@ is represented by exactly one speaker} (ABA, LXC, SVBI, HJK, EBVS, PNV), so L1
 and talker are perfectly confounded: this table cannot separate a language
 effect from an individual one, and every ``by-L1'' row is equally readable as a
 single speaker's idiosyncrasy. We report it as a consistency check on the
-pooled result --- the reversals show that the pooled ordering is not
-consistent across the six held-out speakers --- and not as evidence
+pooled result --- and not as evidence
 about native language.
 
 \textbf{H2 is not supported.} The finding is not that lookahead fails to help
@@ -835,7 +850,8 @@ positions begin substantially harder and show a smaller relative reduction.
 \textbf{The interaction survives two controls.} Those positions are not a
 random subset: they differ in baseline difficulty, phone composition and
 distribution over speakers. Treating 42{,}255 phone tokens nested in six
-speakers as independent would manufacture significance, so we bootstrap over
+speakers as independent would substantially overstate precision by ignoring
+within-speaker dependence, so we bootstrap over
 \emph{speakers}: the slope difference is $-0.0127$ with a 95\% CI of
 $[-0.0211, -0.0069]$, excluding zero, and deviation positions are steeper in
 2000 of 2000 resamples. Leave-one-speaker-out agrees and is not asymptotic:
@@ -903,7 +919,8 @@ on a difference rather than a level turned out to matter
 second resisted three separate attempts, and we report that rather than
 substitute a number.
 
-\textbf{Jitter is negligible.} Two independent 30\,s duplex runs on the M4 at
+\textbf{On the M4 test platform, measured jitter is negligible relative to the
+other latency terms.} Two independent 30\,s duplex runs on the M4 at
 40\,ms blocks give required jitter buffers of $0.14$ and $0.08$\,ms, p99
 callback lateness ${\approx}0.06$\,ms, zero over- or underruns, and clock drift
 below $1.3\times10^{-4}$\%. On this platform the jitter safety margin
@@ -1011,7 +1028,7 @@ re-selection at $L{=}0$ returns the same layer.
 For the causal WavLM phone-translation probe, future context reduces PER at an
 approximately log-linear average rate of ${\approx}0.045$ per doubling, with no
 identifiable knee and measurable returns out to a saturation onset near
-${\approx}340$\,ms --- well beyond PHONOS's 40\,ms translator budget, relative
+$340$\,ms --- well beyond PHONOS's 40\,ms translator budget, relative
 to which a further 45.3\% reduction is available. That rate, however, is measured
 over one backbone: a second causalised encoder that matches WavLM at $L{=}0$
 recovers only $3.9\%$ of it from $640$\,ms of future context, and $1.8\%$ when
