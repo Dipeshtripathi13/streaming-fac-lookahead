@@ -39,3 +39,6 @@ paper/*.fdb_latexmk
 paper/*.log
 paper/*.out
 paper/*.xdv
+
+# TASLP anonymous build: regenerate with taslp/make_anonymous.sh
+taslp/anonymous/

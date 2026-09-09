@@ -1,0 +1,63 @@
+TASLP submission metadata
+=========================
+
+TITLE
+-----
+Future-Context Requirements for Streaming Accent Conversion: A Controlled
+Study Using Causal Phone Translation
+
+
+AUTHOR
+------
+Dipesh Tripathi
+University of South Dakota, Vermillion, SD, USA
+dipesh.tripathi@coyotes.usd.edu
+
+  Single author. You will be both corresponding and submitting author.
+  Have your ORCID ready; IEEE asks for it and will offer to create one.
+
+
+INDEX TERMS (as printed in the manuscript)
+------------------------------------------
+accent conversion, streaming speech, latency, lookahead, self-supervised
+models
+
+
+ABSTRACT
+--------
+See ../arxiv/abstract.txt for a plain-text version with LaTeX stripped, if
+the form does not accept markup. Otherwise copy from the manuscript.
+
+
+MANUSCRIPT TYPE
+---------------
+Regular paper.
+
+  TASLP also has shorter categories. This is a full-length study at 10 pages,
+  so a regular paper is the right class, but confirm the current category
+  names on the Information for Authors page.
+
+
+REPRODUCIBILITY
+---------------
+The IEEE SPS reproducibility policy asks authors to make code and data
+available. Point the form at:
+https://github.com/Dipeshtripathi13/streaming-fac-lookahead
+
+  Worth saying explicitly in the submission form, not only in the paper: the
+  repository holds the harness, per-condition hypothesis dumps, the analysis
+  scripts with their self-tests, and the causality audit.
+
+
+PREPRINT DISCLOSURE
+-------------------
+Declare the arXiv preprint if it is already posted. IEEE permits
+author-prepared preprints on arXiv and this does not count as prior
+publication, but the submission form asks and you should answer it.
+
+
+SUGGESTED REVIEWERS
+-------------------
+If the form asks, avoid anyone at Texas A&M PSI: Quamer, Tseng, Nasrallah and
+Gutierrez-Osuna are the authors of PHONOS, TVTSyn and DarkStream, which this
+paper measures against directly. That is a conflict, not a recommendation.
