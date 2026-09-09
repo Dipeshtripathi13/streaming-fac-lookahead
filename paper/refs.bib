@@ -34,6 +34,18 @@
 % overlooked. StreamVC's seven-author list and ICASSP 2024 venue re-confirmed.
 % ---------------------------------------------------------------------------
 
+% ---------------------------------------------------------------------------
+% IEEEtran.bst control entry. Its default CTLdash_repeated_names=yes replaces
+% a repeated author list with an em-dash rule, so consecutive papers by the
+% same group print as "------, ...". That is IEEE house style, but it assumes
+% a reader who knows the convention; this paper is also going to arXiv, where
+% the bibliography has to stand on its own. Names are therefore repeated in
+% full. Requires \bstctlcite{IEEEtranBSTCTL} early in the document.
+% ---------------------------------------------------------------------------
+@IEEEtranBSTCTL{IEEEtranBSTCTL,
+  CTLdash_repeated_names = "no"
+}
+
 % ===================== [V] verified against primary sources ===============
 
 % PROVENANCE: [V] Verified 7 Sep 2026 against the ISCA archive and arXiv
