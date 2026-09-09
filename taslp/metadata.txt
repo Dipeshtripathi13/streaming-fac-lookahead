@@ -79,3 +79,51 @@ three systems this paper measures itself against.
   compare against is not one, and marking it as such would be inaccurate.
   Preferring more independent reviewers is a different thing and needs no
   declaration.
+
+PORTAL FORM ANSWERS (recorded as submitted)
+-------------------------------------------
+
+SUBJECT CATEGORY (1 minimum, 3 maximum)
+  [x] SPEECH PROCESSING                        <- the core of the paper
+  [x] AUDIO AND ACOUSTIC SIGNAL PROCESSING     <- latency decomposition,
+                                                  per-chunk compute, causal
+                                                  encoders
+  [ ] HUMAN LANGUAGE TECHNOLOGY                <- optional third
+
+  These route the manuscript to reviewers, so pick the areas the ideal
+  reviewer works in rather than every area the paper touches. Speech
+  processing is unarguable. Audio and acoustic signal processing covers the
+  streaming, latency and encoder-causality half. Human language technology is
+  defensible, since the probe predicts phone sequences and the analysis is
+  phonetic, but HLT usually means NLP, and a reviewer from there is a weaker
+  match than one from either of the first two.
+
+EDICS (the widget says 1 to 5; the instructions say 3 to 10, so aim for 3-5)
+  Type these into the search box and take whichever real entries come back;
+  do not guess at codes:
+    voice conversion        the closest thing to accent conversion
+    speech synthesis        for the conversion framing
+    speech analysis         for the phonetic and manner-class work
+    representation / self-supervised   for the WavLM and wav2vec 2.0 work
+    speech recognition      only if the CTC phone-recognition framing fits an
+                            entry better than the above
+  Prefer entries under the speech branch over the AA-AUD ones shown by
+  default; this paper is not audio signal enhancement, source separation or
+  array processing.
+
+HAS THIS BEEN SUBMITTED PREVIOUSLY TO THIS JOURNAL?
+  No, it wasn't submitted previously.
+
+INFORMED CONSENT: did this research involve human subjects?
+  No, there were no human subjects.
+
+  The work is secondary analysis of L2-ARCTIC, a corpus that was already
+  public. No participant was recruited, contacted or recorded for this study,
+  and no listening test was run. That is what "no human subjects" means on
+  this form. The corpus's provenance is disclosed in the manuscript's
+  Compliance with Ethical Standards section, which is the right place for it,
+  so answering No here does not conceal anything.
+
+ANIMAL SUBJECTS
+  Not applicable. Choose the dropdown option meaning no animal subjects were
+  involved.
