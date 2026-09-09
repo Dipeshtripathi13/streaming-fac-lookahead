@@ -47,8 +47,11 @@ compute; all GPU results come from free-tier Google Colab. The harness,
 per-condition outputs and analysis scripts are public at
 https://github.com/Dipeshtripathi13/streaming-fac-lookahead.
 
-A preprint of this manuscript is available at arXiv:[ID]. It has not been
-published elsewhere and is not under consideration by another journal.
+A preprint of this work is available at arXiv:[ID]. That version is one page
+longer; the manuscript submitted here has the same results, with two
+supporting tables moved to the public repository and the abstract shortened.
+The work has not been published elsewhere and is not under consideration by
+another journal.
 
 Thank you for your consideration.
 

@@ -8,6 +8,7 @@ manuscript is *written*; this folder is what gets *sent*.
 |---|---|
 | `manuscript.pdf` | the paper, 10 pages |
 | `source/` | LaTeX source: `taslp.tex`, `taslp.bbl`, `refs.bib`, the figure |
+| `taslp_source.tar.gz` | the same source packaged, if the system wants an archive |
 | `cover_letter.md` | draft cover letter. Read before sending |
 | `metadata.txt` | title, author, index terms, and what to declare |
 | `make_anonymous.sh` | builds a blinded version, only if it is required |
@@ -109,9 +110,20 @@ not declaring it.
 `cover_letter.md` has a bracketed `arXiv:[ID]` to fill in, or a paragraph to
 cut if you go to TASLP first.
 
-The preprint is going up under **cs.CL** as primary, with eess.AS and cs.SD
+The preprint went up under **cs.CL** as primary, with eess.AS and cs.SD
 requested as cross-lists, because both of those require endorsements the
-account does not have. This has no bearing on the TASLP submission; arXiv classification and
+account does not have.
+
+**The two versions are no longer identical, and that is fine.** The arXiv
+preprint is the ten-page version. This submission is nine pages, cut to stay
+inside TASLP's free page limit: two supporting tables moved to the repository,
+the abstract was shortened, the t_buf narrative compressed and the
+bibliography abbreviated to IEEE style. No result differs between them. The
+cover letter says "a preprint of this manuscript is available", which is
+accurate; do not claim they are the same file. If you want them in sync, post
+the nine-page version to arXiv as a replacement, which keeps the same
+identifier. That is optional now and will happen anyway when you add the
+journal reference after acceptance. This has no bearing on the TASLP submission; arXiv classification and
 journal scope are unrelated.
 
 ---

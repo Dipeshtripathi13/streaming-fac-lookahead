@@ -42,36 +42,50 @@ rather than model weights.}}
 
 
 \begin{abstract}
-\noindent Streaming foreign accent conversion (FAC) systems choose a lookahead
-budget and report a single end-to-end latency, but to our knowledge no prior
-work densely sweeps that budget while reporting algorithmic and computational
-latency separately. Using a causal phone translator as a controlled probe, we
-sweep 21 lookahead budgets from 0 to 640\,ms with every other factor held
-fixed, and report five results. First, phone error rate falls smoothly at
-$-0.045$ PER per doubling ($R^2=0.98$) with no locatable knee: a piecewise fit
-is preferred under every axis treatment, yet the breakpoint moves between 40
-and 180\,ms and the narrowest bootstrap interval spans 2.6 octaves. We instead
-identify \emph{saturation onset} near 340\,ms against a repeatability floor
-measured from deliberate fixed-seed repeats, leaving 45.3\% relative PER
-reduction unclaimed at the 40\,ms budget used by PHONOS's translator. Second, a
-pre-specified hypothesis that vowels and approximants benefit more from future
-context than stops, fricatives, affricates and nasals is \emph{not supported}:
-bootstrapping over the six test speakers rather than over phone tokens, the
-between-group difference is $+0.040$ with a 95\% interval of
-$[-0.010, +0.101]$, and it still fails when errors are reweighted by a
-spectral-distortion proxy for acoustic cost. Third, canonical-phone prediction
-benefits more from future context than realized-phone transcription at matched
-capacity ($1.55\times$), and more still at canonical-deviation positions
-($1.32\times$). Fourth, repeating the sweep on a second causalised encoder
-changes the answer: wav2vec 2.0 starts within $0.011$ PER of WavLM at zero
-lookahead yet gains $3.9\%$ from $640$\,ms against WavLM's $63.3\%$, with a
-weak non-monotonic response ($R^2=0.10$ against $0.99$) reproduced at a second
-seed and unchanged at five times the training budget. Neither the measured
-exchange rate nor the detailed curve shape is a universal property of the task.
-Fifth, per-chunk compute depends only weakly on lookahead, moving at most
-$7.6\%$ across a $17\times$ change in algorithmic latency, subject to the
-throughput constraint $\tcmp<c$. We release the harness and the per-condition
-outputs.
+\noindent
+Streaming foreign accent conversion (FAC) systems choose a lookahead budget and
+report a single end-to-end latency, but to our knowledge prior streaming FAC work has not densely swept that budget
+while separately reporting algorithmic and computational latency. We train a causal phone translator in a 16-point main sweep from 0 to 640\,ms, augmented with five targeted budgets around the diminishing-return region (21 in all),
+with every other factor held fixed, and report five principal empirical
+results. First,
+phone-translation PER decreases smoothly with lookahead at $-0.045$ phone error rate (PER) per
+doubling ($R^2=0.98$) with \emph{no locatable knee}: a piecewise fit is
+preferred under every axis treatment we tried, yet the breakpoint moves between
+40 and 180\,ms and even the narrowest bootstrap interval spans 2.6 octaves.
+Instead of a knee we identify \emph{saturation onset} at ${\approx}340$\,ms:
+with the grid completed to 20\,ms spacing over 200--360\,ms, and against a
+fixed-seed repeatability floor measured from deliberate repeats
+($2\sigma=0.0029$), the $340\rightarrow360$\,ms increment is the first to buy
+less than that floor, and the average per-20\,ms gain stays below it
+thereafter. Propagating the floor's bootstrap interval moves the onset over
+300--480\,ms. At the 40\,ms lookahead used by PHONOS's translator, our probe
+retains a further 45.3\% relative PER reduction between 40 and 340\,ms.
+Second, a pre-specified hypothesis that vowels and approximants would benefit
+more from future context than stops, fricatives, affricates and nasals is
+\emph{not supported}: all seven manner classes improve by
+52--72\% relative, and the between-group difference is smaller than the
+dispersion among classes within the groups. Bootstrapping over the six test
+speakers rather than over phone tokens, that difference is $+0.040$ with a 95\%
+interval of $[-0.010, +0.101]$. It still fails when errors are reweighted by a synthesised spectral-distortion
+proxy for acoustic cost, so this is not an artefact of PER charging every error
+equally. Third, canonical-phone prediction benefits more from future context than
+realized-phone transcription at matched capacity ($-0.045$ against $-0.029$
+PER per doubling, $1.55\times$), and within the canonical-phone arm the benefit is
+$1.32\times$ larger in absolute PER slope at canonical-deviation positions
+(substitutions and deletions in the g2p--IPA alignment). Fourth, repeating the sweep on a second causalised encoder (wav2vec 2.0 base),
+tapped at its own selected phonetic layer, changes the answer: it starts within
+$0.011$ PER of WavLM at $L{=}0$ yet gains only $3.9\%$ relative from $640$\,ms
+of lookahead against WavLM's $63.3\%$, and where WavLM is smooth and
+log-linear ($R^2=0.99$) its response is weak and non-monotonic ($R^2=0.10$),
+bottoming out at $160$\,ms and rising again, a pattern reproduced at a
+second seed; at five times the training budget the $0/160/640$\,ms ordering is
+unchanged and its endpoint gain shrinks to $+1.8\%$ against WavLM's
+$+65.8\%$. Neither the measured exchange
+rate nor the detailed curve shape is a universal property of the task. Fifth, per-chunk compute depends only weakly on
+lookahead, moving at most $1.9\%$ on an Apple M4 and $7.6\%$ on an ARM64 Linux
+host across a $17\times$ change in algorithmic latency. That is a weak
+empirical dependence over the tested range,
+subject to the throughput constraint $\tcmp<c$. We release the harness and the per-condition outputs.
 \end{abstract}
 
 
@@ -213,9 +227,7 @@ does not monotonically reduce truncation sensitivity, because the remaining
 mechanisms interact; a partial causality fix is not a partial improvement.
 
 \begin{table}[t]
-\centering\footnotesize
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{0.93}
+\centering\small
 \caption{Truncation test on \texttt{wavlm-base-plus}. Relative $L_2$ change in
 earlier frames after deleting later audio.}
 \label{tab:causal}
@@ -327,9 +339,7 @@ Five representative budgets ($L\in\{0,40,160,240,640\}$\,ms) were trained for
 steps, giving a 12-point trace per condition (Table~\ref{tab:conv}).
 
 \begin{table}[t]
-\centering\footnotesize
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{0.93}
+\centering\small
 \caption{Convergence check: validation PER against optimization step, single
 seed. The ranking is preserved at all 12 checkpoints and the fitted exchange
 rate is stable from step 1000 onward.}
@@ -452,9 +462,7 @@ knee, though, the quantity depends on the floor rather than on an axis
 choice, and the floor is now measured with 12 degrees of freedom.
 
 \begin{table}[t]
-\centering\footnotesize
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{0.93}
+\centering\small
 \caption{Canonical-phone-arm PER against lookahead (mean of 2 seeds) and marginal
 return per added 20\,ms frame, in units of the measured $2\sigma{=}0.0029$
 floor (Eq.~\ref{eq:floor}). Below $1.0\times$, the gain from an additional
@@ -663,9 +671,7 @@ lookahead conditions (295{,}785 phone--condition observations), with each
 substitution or deletion charged to the class of the \emph{reference} phone:
 
 \begin{table}[t]
-\centering\footnotesize
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{0.93}
+\centering\small
 \caption{Relative error-rate reduction, $L{=}0\rightarrow640$\,ms. B =
 pre-specified as breaking first, S = as surviving. Intervals are
 percentile bootstrap over the six test speakers, not over phone
@@ -700,13 +706,16 @@ which the independent replicate is a talker rather than a phone. Resampling
 speakers rather than tokens (2000 draws, Table~\ref{tab:h2}) puts the
 between-group difference at $+0.040$ with a 95\% interval of
 $[-0.010, +0.101]$, which \textbf{includes zero}. Every individual class gain
-stays substantial, with the intervals in Table~\ref{tab:h2} between $0.40$ and
-$0.78$; what fails to separate from zero is the \emph{grouping}. Token-level intervals
+remains large and clearly non-zero, with the intervals in Table~\ref{tab:h2}
+sitting between $0.40$ and $0.78$, so every class shows a substantial positive
+gain;
+what fails to separate from zero is the \emph{grouping}. Token-level intervals
 would have been roughly an order of magnitude narrower and would have declared
 this difference significant, which is the error the clustering avoids. The same
 procedure applied to RQ3 (Sec.~\ref{sec:rq3}) resolves the larger interaction
-there, so the estimator is not uniformly uninformative at six speakers, though
-that alone does not establish power for an effect this small.
+there, showing that the estimator is not uniformly uninformative at six
+speakers, though that does not by itself establish power for an effect this
+small.
 A cluster bootstrap over six clusters leans on asymptotics that six clusters do
 not supply, so we add the non-asymptotic companion: recomputing the difference
 with each speaker removed in turn gives $+0.0217$ to $+0.0592$ (pooled
@@ -725,13 +734,13 @@ carries a distinct L1 label.
 The deeper limitation is that in the speaker-disjoint test split \emph{each L1
 is represented by exactly one speaker} (ABA, LXC, SVBI, HJK, EBVS, PNV), so L1
 and talker are perfectly confounded: this table cannot separate a language
-effect from an individual one, and every ``by-L1'' row is equally readable as one
-speaker's idiosyncrasy. We report it as a consistency check, not as evidence
-about native language.
+effect from an individual one, and every ``by-L1'' row is equally readable as a
+single speaker's idiosyncrasy. We report it as a consistency check on the
+pooled result, and not as evidence about native language.
 
-\textbf{H2 is not supported.} Not because lookahead fails to help vowels, since
-every class improves 52--72\% relative, but because the pre-specified manner
-grouping does not reliably order lookahead benefit.
+\textbf{H2 is not supported.} The finding is not that lookahead fails to help
+vowels, since every class improves 52--72\% relative. The finding is that the
+pre-specified manner grouping does not reliably order lookahead benefit.
 
 \textbf{Reweighting each error by a proxy for its acoustic cost does not rescue
 it.} PER charges every error exactly $1.0$, so the natural objection is that
@@ -760,14 +769,39 @@ validation fails: phones the sequence metric scores as incorrect carry
 $1.72\times$ the distortion of correct ones ($86.8$ versus $50.5$), and mean
 distortion falls monotonically with lookahead ($71.4$ to $46.9$, $-34\%$).
 
-The verdict is unchanged. Acoustic weighting does move
+\begin{table}[t]
+\centering\small
+\caption{H2 under acoustic weighting: relative reduction in per-phone
+distortion, $L{=}0\rightarrow640$\,ms, 40 utterances, 1451 reference phones per
+condition. B = pre-specified as breaking first, S = as surviving. The
+sequence-metric column is computed on the same utterances, so the two differ
+only in weighting.}
+\label{tab:h2audio}
+\begin{tabular}{llrrr}
+\toprule
+& class & acoustic & sequence & phones \\
+\midrule
+B & approximant  & 0.386 & 0.825 & 153 \\
+B & vowel (mono) & 0.379 & 0.712 & 448 \\
+S & nasal        & 0.376 & 0.784 & 128 \\
+S & fricative    & 0.372 & 0.745 & 272 \\
+B & vowel (diph) & 0.321 & 0.667 & 166 \\
+S & stop         & 0.305 & 0.663 & 240 \\
+S & affricate    & 0.257 & 0.526 & 44 \\
+\midrule
+\multicolumn{2}{l}{effect size (need $\geq1.0$)} & 0.756 & 0.607 & \\
+\multicolumn{2}{l}{ordering violations} & 2/12 & 4/12 & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The verdict is unchanged (Table~\ref{tab:h2audio}). Acoustic weighting does move
 in H2's favour, with effect size $0.607 \rightarrow 0.756$ and ordering
 violations $4/12 \rightarrow 2/12$ against the sequence metric on the same
 utterances, but not far enough to clear the pre-specified threshold of $1.0$, and the
 failure has the same shape as before: the ``survives'' group's internal spread
 ($0.120$) is $3.5\times$ the difference between the groups ($0.034$), and a
-nasal again out-gains a diphthong; the per-class figures are in the
-repository. So this particular equal-cost objection is not supported by the synthesized
+nasal again out-gains a diphthong. So this particular equal-cost objection is not supported by the synthesized
 distortion analysis; it does not exclude weightings this proxy cannot see,
 notably trajectory errors at correctly identified phones.
 
@@ -797,13 +831,12 @@ relative to the effect.
 
 \textbf{The dense grid replicates this, and sharpens it.} Running the full
 16-lookahead $\times$ 2-seed sweep on the transcription arm as well puts both
-arms on the same dense grid. The endpoint gains
+arms on the same dense grid (Table~\ref{tab:h3dense}). The endpoint gains
 reproduce the 7-point result almost exactly, at 63.3\% for canonical-phone
 prediction against
 43.5\% for transcription, against 63.2\% and 42.8\% before, in an
 independent set of training runs on a denser grid, though on the same corpus
-and test split; per-condition values for both arms are in the repository.
-The exchange rates separate cleanly:
+and test split. The exchange rates separate cleanly:
 \begin{center}
 canonical-phone $-0.0452$ vs transcription $-0.0292$ PER per doubling,
 \end{center}
@@ -883,6 +916,33 @@ added over 200--360\,ms to locate it were run on the canonical-phone arm only, s
 the transcription arm lacks the resolution the comparison would need. The
 transcription arm's own curve is just as log-linear, with a shallower slope.
 
+\begin{table}[t]
+\centering\small
+\caption{Both arms on the dense grid, mean of 2 seeds. The gap is the
+transcription arm's PER minus the canonical-phone arm's: near zero at $L{=}0$ and
+substantially wider at large lookahead; the full
+16-point curve widens in 13 of 15 adjacent steps rather than monotonically.}
+\label{tab:h3dense}
+\begin{tabular}{rrrr}
+\toprule
+$L$ (ms) & canonical & transcription & gap \\
+\midrule
+0   & 0.4256 & 0.4427 & $+$0.0171 \\
+20  & 0.3700 & 0.3896 & $+$0.0196 \\
+40  & 0.3275 & 0.3600 & $+$0.0325 \\
+80  & 0.2754 & 0.3271 & $+$0.0517 \\
+160 & 0.2206 & 0.2908 & $+$0.0702 \\
+240 & 0.1973 & 0.2755 & $+$0.0782 \\
+320 & 0.1823 & 0.2666 & $+$0.0843 \\
+640 & 0.1561 & 0.2501 & $+$0.0939 \\
+\midrule
+\multicolumn{2}{l}{exchange rate (PER/doubling)} & & \\
+\multicolumn{1}{r}{canonical} & $-0.0452$ & \multicolumn{2}{l}{$R^2=0.983$} \\
+\multicolumn{1}{r}{transcription} & $-0.0292$ & \multicolumn{2}{l}{$R^2=0.984$} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 A complementary within-run measure is the \emph{preference margin}, PER
 against the other arm's labels minus PER against its own. It grows
 monotonically in 3/3 seeds for the canonical-phone arm ($+0.032$ at $L{=}0$ to $+0.099$ at 640\,ms; 18/18
@@ -904,21 +964,35 @@ callback lateness ${\approx}0.06$\,ms, zero over- or underruns, and clock drift
 below $1.3\times10^{-4}$\%. On this platform the jitter safety margin
 contributes nothing meaningful to the budget.
 
-\textbf{The I/O term is unmeasured, and the reason is instructive.} Three
-attempts failed, each for a different reason, and we report that rather than
-substitute a number. An acoustic loopback was defeated by platform echo
-cancellation: all 20 repetitions fell below the correlation threshold, and
-captured level was \emph{invariant} to output amplitude, so a louder probe
-could not help. The driver-reported figure is not a substitute, being
-identically $201.69$\,ms in excess of the requested block at both 10 and
-20\,ms; a quantity invariant to a doubling of the block size is not measuring
-the block. A digital loopback through a virtual audio device returns a signal
-so weak that the detection threshold has to be lowered until repetitions pass,
-which yields p50 $206$\,ms against p90 $491$\,ms. We reject that as
-threshold-dependent rather than representative, and such a device would in any
-case measure its own buffering. Closing this term needs a wired loopback
-through real converters, or a platform without echo cancellation in the path;
-the full traces are in the repository.
+\textbf{The I/O term is unmeasured, and the reason is instructive.} An acoustic
+loopback (emit a chirp, record it, cross-correlate) failed on every
+attempt, with all 20 repetitions rejected at correlation $0.042$--$0.046$
+against a $0.20$ threshold. The diagnosis is not weak signal: captured level is
+\emph{invariant} to output amplitude (peak $0.00505$ at amplitude $0.50$ versus
+$0.00468$ at $0.95$), so nearly doubling the output changed the captured signal
+by nothing. That behaviour is consistent with platform echo cancellation, which scales
+with its own reference and therefore cannot be defeated by a louder probe.
+
+The driver-reported figure is not a substitute. Its excess over the requested
+block is \emph{identically} $201.69$\,ms at both 10 and 20\,ms blocks before
+roughly doubling at 40\,ms, which strongly suggests the reported quantity
+includes queueing rather than isolated converter delay: a quantity that is
+invariant to a doubling of the block size is not measuring the block.
+
+A digital loopback through a virtual audio device, where the signal never
+becomes sound and echo cancellation cannot reach it, also fails, for a
+different and more interesting reason. The path works mechanically, but the returned signal
+peaks near $0.014$; lowering the detection threshold until repetitions pass
+yields p50 $206$\,ms, p90 $491$\,ms, $\sigma=117$\,ms. A distribution whose p90
+is $2.4\times$ its p50, on a signal this weak and with this much threshold
+dependence, is not consistent with a stable measurement of converter latency.
+We therefore reject
+these measurements as threshold-dependent and not representative of converter
+latency: what the procedure records is that a detection threshold was lowered
+until the tool produced output.
+Such a device would also measure its own buffering rather than a converter.
+Closing this term needs a wired loopback through real converters, or a platform
+without echo cancellation in the path.
 
 \section{Measurement audits and failure modes}
 \label{sec:lessons}
@@ -995,29 +1069,31 @@ identifiable knee and measurable returns out to a saturation onset near
 $340$\,ms, well beyond PHONOS's 40\,ms translator budget, relative
 to which a further 45.3\% reduction is available. That rate, however, is measured
 over one backbone: a second causalised encoder with similar zero-lookahead PER
-shows only a $3.9\%$ relative endpoint PER reduction from $0$ to $640$\,ms
-against $63.3\%$ for WavLM, and $1.8\%$ when both are trained to 6000 steps
-(\S\ref{sec:encoder}). Neither the magnitude nor the detailed shape of the
-response transfers across the two encoders tested, so future-context budgets
-should be characterised for the deployed representation rather than inherited
-from another backbone. Increasing lookahead strongly changes algorithmic latency
+shows only a $3.9\%$ relative endpoint PER reduction from $0$ to $640$\,ms,
+against $63.3\%$ for WavLM; trained to 6000 steps the corresponding wav2vec
+reduction is $1.8\%$ (\S\ref{sec:encoder}). Neither the magnitude nor the detailed shape of the
+lookahead response transfers unchanged across the two encoders tested: WavLM
+exhibits a strong smooth diminishing-return curve, whereas wav2vec 2.0 shows a
+weak, non-monotonic one. Future-context budgets should therefore be
+characterised for the deployed representation rather than inherited from
+another backbone. Increasing lookahead strongly changes algorithmic latency
 while only weakly affecting measured per-chunk compute over the tested range,
 though throughput must still satisfy $\tcmp<c$
 (Eq.~\ref{eq:rtf}) to run at all.
 
 \section{Acknowledgements}
 
-This work received no external funding and used no institutional compute: GPU
-results are from free-tier Google Colab (Tesla T4), CPU results from consumer
-hardware. Thanks to the maintainers of L2-ARCTIC, WavLM, sherpa-onnx and
-Piper, whose public releases made a study of this scope possible.
+This work received no external funding and used no institutional compute: all
+GPU results are from free-tier Google Colab (Tesla T4) and all CPU results from
+consumer hardware. Thanks to the maintainers of L2-ARCTIC, WavLM, sherpa-onnx
+and Piper, whose public releases made a single-author study of this scope
+possible.
 
 \section{Compliance with ethical standards}
 
 This work used only the publicly released L2-ARCTIC corpus and involved no new
-participant recruitment, interaction or data collection. No listening study was
-run and no claim about perceived accentedness is made. The author declares no
-competing interests.
+participant recruitment, interaction or data collection. No listening study
+was run, and no claim about perceived accentedness or naturalness is made. The author declares no competing interests.
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
