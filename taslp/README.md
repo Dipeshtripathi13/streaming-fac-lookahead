@@ -9,7 +9,8 @@ manuscript is *written*; this folder is what gets *sent*.
 | `manuscript.pdf` | the paper, 10 pages |
 | `source/` | LaTeX source: `taslp.tex`, `taslp.bbl`, `refs.bib`, the figure |
 | `taslp_source.tar.gz` | the same source packaged, if the system wants an archive |
-| `cover_letter.md` | draft cover letter. Read before sending |
+| `cover_letter.pdf` | **the file to upload** to the Cover letter / Comments field |
+| `cover_letter.md` | same letter as text, if the portal offers a paste box |
 | `metadata.txt` | title, author, index terms, and what to declare |
 | `make_anonymous.sh` | **not needed.** SPS review is single-anonymised; kept only because this was unresolved earlier |
 | `anonymous/` | output of that script; not part of this submission |

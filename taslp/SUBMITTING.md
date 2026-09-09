@@ -118,10 +118,22 @@ would be inaccurate.
 
 ## Step 9: cover letter
 
-Paste `cover_letter.md`. It contains the letter and nothing else, so it needs
-no editing before use. `COVER_LETTER_NOTES.md` holds the two things worth
-checking first (the salutation, and swapping in the arXiv identifier if it has
-been announced); that file is for you and is not submitted.
+The portal has a **Cover letter / Comments** field: optional, one file, most
+document formats. It is editor-only and is shown neither to reviewers nor in
+the published version, which is exactly what a cover letter is for. Upload
+one.
+
+Upload **`cover_letter.pdf`**, not the `.md`. Markdown is not reliably
+accepted as a document format, and a PDF also fixes the layout. It is one
+page, 253 words, and contains the letter and nothing else.
+
+If the field offers a text box instead of, or as well as, an upload, pasting
+the text of `cover_letter.md` is equally fine.
+
+`COVER_LETTER_NOTES.md` holds the two things worth checking first: the
+salutation if the portal names a handling editor, and swapping in the arXiv
+identifier if it has been announced by then. That file is for you and is not
+submitted.
 
 ## Step 9b: the LLM policy, which applies to you
 
