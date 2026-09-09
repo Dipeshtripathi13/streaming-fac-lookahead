@@ -179,3 +179,33 @@ RESUBMISSION OF, OR RELATED TO, A PREVIOUSLY REJECTED OR WITHDRAWN MANUSCRIPT
   If the text box will not accept an empty answer, one sentence is enough:
   "This manuscript has not previously been submitted to, reviewed by, or
   withdrawn from any publication venue."
+
+PREPRINTS OF THE MANUSCRIPT (the "Yes"/"No" free-text box, 500 chars)
+  Paste this:
+
+    Yes. A preprint of this work has been submitted to arXiv and is awaiting
+    announcement; I will supply the identifier as soon as it is assigned. It
+    reports the same study, the same experiments and the same results as the
+    submitted manuscript. It differs only in presentation: it is one page
+    longer, two supporting tables were moved to the public code repository,
+    and the abstract was shortened to meet the journal's length requirement.
+
+  (433 characters.)
+
+  Why Yes rather than No, and why the differences are spelled out. The
+  question asks about preprints identical to the submission "except for minor
+  differences", and the two documents are no longer byte-identical: the arXiv
+  version is 10 pages with 8 tables and a 599-word abstract, the submission is
+  9 pages with 6 tables and a 187-word abstract. No result, number or
+  conclusion differs; the changes were made to meet the SPS abstract limit and
+  to leave page headroom.
+
+  Answering No would be wrong, since a preprint of this manuscript exists.
+  Saying Yes while describing the differences also keeps the paper out of the
+  form's second category, preprints that are "not identical" and are therefore
+  treated as prior art needing citation. Self-citing your own preprint of the
+  same study as prior art would be the wrong outcome, and describing the
+  differences up front is what avoids it.
+
+  If arXiv announces before you submit, replace the first sentence with:
+    Yes. A preprint of this work is available at arXiv:2609.XXXXX.
