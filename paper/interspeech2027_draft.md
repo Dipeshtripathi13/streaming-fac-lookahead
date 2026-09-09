@@ -1,5 +1,15 @@
 # Your "Causal" Encoder Is Not: Hidden Lookahead in Streaming Speech Models, and What Lookahead Actually Buys
 
+> **SUPERSEDED. Not the current paper.** This is an early draft written for
+> Interspeech 2027, kept for the record. Its `[P]` projected values and
+> `[TBD]` markers were never updated, and several of its numbers were later
+> corrected: the padding fix changed the curve, the noise floor was measured
+> rather than imported, and saturation moved from ~240 ms to ~340 ms.
+>
+> The current paper is `paper/taslp/taslp.pdf`, submitted to IEEE/ACM TASLP.
+> Where the two disagree, the paper is right.
+
+
 **Draft v0.1, 2 August 2026.** Target: Interspeech 2027 (4 pages + 2 references).
 Status markers used throughout: **[M]** measured, **[P]** projected, **[TBD]** pending.
 

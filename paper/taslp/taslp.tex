@@ -117,7 +117,7 @@ infinitely fast machine, because the model refuses to emit the frame ending at
 time $t_n$ until it has observed input through $t_n{+}L$. In frames that is
 $N_L=\lceil L/h\rceil$ of them at hop $h$, and \S\ref{sec:quant} returns to the
 consequences of the rounding. \tcmp{} is implementation- and hardware-dependent and can be
-reduced through optimization or faster hardware.
+reduced through optimisation or faster hardware.
 
 \textbf{Degradation is reported in aggregate.} Existing results are
 utterance-level MOS, WER or accentedness. We found no prior streaming FAC study
@@ -125,7 +125,7 @@ reporting lookahead sensitivity by phonetic manner class.
 
 Our contributions:
 \begin{enumerate}\itemsep1pt
-\item A latency--accuracy characterization of a causal phone-translation probe
+\item A latency--accuracy characterisation of a causal phone-translation probe
       for streaming FAC across 21 lookahead budgets (a 16-point main sweep
       plus five targeted additions), reporting an average
       exchange rate and a floor-relative saturation region rather than an
@@ -182,15 +182,15 @@ improvement over any of them.
 \label{sec:method-translator}
 
 Training a full FAC pipeline per lookahead is prohibitive. We instead isolate
-a phonetic-normalization component directly relevant to the research question;
+a phonetic-normalisation component directly relevant to the research question;
 future-context needs in acoustic generation and prosody may differ. L2-ARCTIC~\cite{l2arctic2018}
 provides, per utterance, both the canonical G2P/lexicon-derived phone sequence
-(\texttt{g2p}) and the annotated realized phone sequence (\texttt{ipa}). We operationalize the phonetic-normalization component of accent conversion as
+(\texttt{g2p}) and the annotated realized phone sequence (\texttt{ipa}). We operationalize the phonetic-normalisation component of accent conversion as
 \begin{center}
 \emph{non-native audio} $\rightarrow$ \emph{canonical phone sequence},
 \end{center}
 a CTC head over a frozen causal encoder. This provides a controlled supervised proxy for the
-phonetic-normalization stage, and swapping the target tensor from
+phonetic-normalisation stage, and swapping the target tensor from
 \texttt{g2p} to \texttt{ipa} yields a more tightly matched architectural
 control, differing in \emph{one tensor}, than an AC-versus-VC comparison,
 though the two targets still differ in label entropy, sequence length and
@@ -246,8 +246,8 @@ Lookahead is realized as $N_L=\lceil L/h \rceil$ frames at a frame hop
 $h=20$\,ms (equivalently, a 50\,Hz frame rate).
 A knee narrower than 20\,ms is not merely unmeasured but
 \emph{unrepresentable}, and sampling finer than $h$ silently creates duplicate
-conditions that reweight any fit. Lookahead is therefore quantized in 20\,ms increments: we sample every
-increment through 200\,ms and a subset of quantized budgets above it, and
+conditions that reweight any fit. Lookahead is therefore quantised in 20\,ms increments: we sample every
+increment through 200\,ms and a subset of quantised budgets above it, and
 assert zero collisions in $t_{\mathrm{alg}}$ across all conditions before
 fitting.
 
@@ -311,15 +311,15 @@ steady-state throughput constraint
 which lookahead leaves untouched but chunk size and hardware do not. Increasing $L$ adds little per-chunk compute over the tested range;
 being able to run at all is a separate constraint.
 
-\subsection{Is the curve an optimization-rate curve?}
+\subsection{Is the curve an optimisation-rate curve?}
 \label{sec:convergence}
 
 Every condition elsewhere is trained for a fixed 1200 steps, so what is
 measured directly is \emph{lookahead $\rightarrow$ performance after 1200
-optimization steps}. That equals \emph{lookahead $\rightarrow$ attainable
-performance} only if the conditions sit at comparable points in optimization.
+optimisation steps}. That equals \emph{lookahead $\rightarrow$ attainable
+performance} only if the conditions sit at comparable points in optimisation.
 If longer lookahead simply trained faster, part of the exchange rate would be
-an optimization-rate difference rather than a context effect. We test this
+an optimisation-rate difference rather than a context effect. We test this
 rather than list it as a caveat.
 
 Five representative budgets ($L\in\{0,40,160,240,640\}$\,ms) were trained for
@@ -330,7 +330,7 @@ steps, giving a 12-point trace per condition (Table~\ref{tab:conv}).
 \centering\footnotesize
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{0.93}
-\caption{Convergence check: validation PER against optimization step, single
+\caption{Convergence check: validation PER against optimisation step, single
 seed. The ranking is preserved at all 12 checkpoints and the fitted exchange
 rate is stable from step 1000 onward.}
 \label{tab:conv}
@@ -767,7 +767,7 @@ utterances, but not far enough to clear the pre-specified threshold of $1.0$, an
 failure has the same shape as before: the ``survives'' group's internal spread
 ($0.120$) is $3.5\times$ the difference between the groups ($0.034$), and a
 nasal again out-gains a diphthong; the per-class figures are in the
-repository. So this particular equal-cost objection is not supported by the synthesized
+repository. So this particular equal-cost objection is not supported by the synthesised
 distortion analysis; it does not exclude weightings this proxy cannot see,
 notably trajectory errors at correctly identified phones.
 
@@ -965,7 +965,7 @@ the repository.
 a phone-translation probe rather than an end-to-end FAC system: the
 latency--accuracy relation reported here need not transfer to synthesis,
 prosody, speaker similarity or perceived accentedness. We do not conduct a perceptual
-study because the phone-sequence outputs are not valid FAC stimuli: synthesized
+study because the phone-sequence outputs are not valid FAC stimuli: synthesised
 from bare phone strings, they lack the lexical, prosodic and acoustic structure
 required to judge naturalness or accentedness. This is a property of the
 stimuli rather than of the budget. Training is 1200 steps at fixed budget
