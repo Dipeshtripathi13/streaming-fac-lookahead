@@ -657,7 +657,7 @@ The part that was missing before: **power**. Planting a cliff of known size at
 | 0.08 PER | −2.93 **missed** | −6.41 detected |
 
 So this experiment excludes discontinuities above roughly **0.08 PER (≈18 %
-relative)** in the conversion arm and says nothing about smaller ones. Finding
+relative)** in the canonical-phone arm and says nothing about smaller ones. Finding
 7 and Finding 11's knee statements were absence of evidence; this is the first
 version with a bound attached.
 

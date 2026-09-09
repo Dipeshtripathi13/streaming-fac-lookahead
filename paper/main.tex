@@ -265,7 +265,7 @@ separately.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{../results/figures/fig_dense_no_knee.png}
-\caption{Dense sweep, conversion arm, 16 lookaheads $\times$ 2 seeds.
+\caption{Dense sweep, canonical-phone arm, 16 lookaheads $\times$ 2 seeds.
 \textbf{Left:} smooth curvature; the shaded band spans the breakpoint estimates
 produced by three defensible treatments of $L{=}0$, none identifiable.
 \textbf{Right:} marginal return per added 20\,ms frame against the measured
@@ -273,7 +273,7 @@ $2\sigma$ floor; red bars are below it.}
 \label{fig:dense}
 \end{figure}
 
-Conversion-arm PER falls monotonically from $0.4256$ at $L{=}0$ to $0.1561$ at
+Canonical-phone-arm PER falls monotonically from $0.4256$ at $L{=}0$ to $0.1561$ at
 $L{=}640$\,ms. Fitting $L\geq20$\,ms on $\log_2 L$ gives
 \begin{equation}
 \Delta\mathrm{PER} = -0.0452 \text{ per doubling},\quad R^2 = 0.983,
@@ -302,7 +302,7 @@ Unlike a knee, this quantity depends only on the floor, not on an axis choice.
 
 \begin{table}[t]
 \centering\small
-\caption{Conversion-arm PER against lookahead (mean of 2 seeds) and marginal
+\caption{Canonical-phone-arm PER against lookahead (mean of 2 seeds) and marginal
 return per added 20\,ms frame, in units of the measured $2\sigma{=}0.0044$
 floor. Below $1.0\times$ an additional frame is not measurably useful.}
 \label{tab:dense}
@@ -469,14 +469,14 @@ Two secondary points fall out. Both arms saturate at the same
 ${\approx}240$\,ms, and neither yields a locatable knee (breakpoints move to
 $[40, 240, 160]$\,ms across axis treatments for transcription, against
 $[40, 180, 180]$ for conversion), so \S\ref{sec:rq1}'s structural conclusion is
-not an artefact of the conversion arm. And the transcription arm's own curve is
+not an artefact of the canonical-phone arm. And the transcription arm's own curve is
 just as log-linear, so the shallower slope is a smaller effect of lookahead, not
 a noisier measurement of the same one.
 
 \begin{table}[t]
 \centering\small
 \caption{Both arms on the dense grid, mean of 2 seeds. The gap is the
-transcription arm's PER minus the conversion arm's: near zero at $L{=}0$ and
+transcription arm's PER minus the canonical-phone arm's: near zero at $L{=}0$ and
 widening monotonically with lookahead.}
 \label{tab:h3dense}
 \begin{tabular}{rrrr}

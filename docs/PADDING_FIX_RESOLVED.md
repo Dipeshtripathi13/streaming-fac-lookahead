@@ -163,7 +163,7 @@ floor, the shape spread 16.4×.
 
 1. Replace every absolute PER in the 3-seed table with the new values.
 2. Delete any discussion of the L=160→320 non-monotonicity. It was a bug.
-3. Restate RQ1: curvature exists in the conversion arm; the operating point is
+3. Restate RQ1: curvature exists in the canonical-phone arm; the operating point is
    unresolved at 7 points; the dense-L pilot decides it.
 4. Keep H3 as written; note explicitly that it is offset-invariant by
    construction.

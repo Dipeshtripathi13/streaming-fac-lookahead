@@ -8,7 +8,7 @@ noise, class distribution, sequence length and label entropy all move with it.
 So "conversion needs more lookahead" is not established by the arm comparison
 alone.
 
-This test removes the confound by staying INSIDE the conversion arm. Split the
+This test removes the confound by staying INSIDE the canonical-phone arm. Split the
 reference (g2p) positions by whether the speaker actually deviated there:
 
   accent-changing : the speaker produced something else (g2p[i] != ipa[i])

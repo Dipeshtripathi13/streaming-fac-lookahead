@@ -128,8 +128,10 @@ convention: output for a chunk is produced only once the whole $c$\,ms chunk
 and its $L$\,ms of future context have arrived. Conventions that emit
 frame-synchronously, or that charge only the lookahead, give a different
 constant; we state ours so the terms can be re-derived under another. \talg{} is inherent: it is the delay on an
-infinitely fast machine, because the model refuses to emit frame $n$ until it
-has seen frame $n{+}L$. \tcmp{} is implementation- and hardware-dependent and can be
+infinitely fast machine, because the model refuses to emit the frame ending at
+time $t_n$ until it has observed input through $t_n{+}L$. In frames that is
+$N_L=\lceil L/h\rceil$ of them at hop $h$, and \S\ref{sec:quant} returns to the
+consequences of the rounding. \tcmp{} is implementation- and hardware-dependent and can be
 reduced through optimization or faster hardware.
 
 \textbf{Degradation is reported in aggregate.} Existing results are
@@ -251,6 +253,7 @@ read as ``indistinguishable from causal at float32 precision'' rather than as
 a reproducible constant.
 
 \subsection{Lookahead is quantised}
+\label{sec:quant}
 
 Lookahead is realized as $N_L=\lceil L/h \rceil$ frames at a frame hop
 $h=20$\,ms (equivalently, a 50\,Hz frame rate).
@@ -400,7 +403,7 @@ $2\sigma$ floor; red bars are below it.}
 \label{fig:dense}
 \end{figure}
 
-Conversion-arm PER falls monotonically from $0.4256$ at $L{=}0$ to $0.1561$ at
+Canonical-phone-arm PER falls monotonically from $0.4256$ at $L{=}0$ to $0.1561$ at
 $L{=}640$\,ms. Fitting $L\geq20$\,ms on $\log_2 L$ gives
 \begin{equation}
 \Delta\mathrm{PER} = -0.0452 \text{ per doubling},\quad R^2 = 0.983,
@@ -461,7 +464,7 @@ choice, and the floor is now measured with 12 degrees of freedom.
 
 \begin{table}[t]
 \centering\small
-\caption{Conversion-arm PER against lookahead (mean of 2 seeds) and marginal
+\caption{Canonical-phone-arm PER against lookahead (mean of 2 seeds) and marginal
 return per added 20\,ms frame, in units of the measured $2\sigma{=}0.0029$
 floor (Eq.~\ref{eq:floor}). Below $1.0\times$, the gain from an additional
 frame is smaller than the measured fixed-seed repeatability threshold. The grid is 20\,ms-spaced to 360\,ms; the final two rows
@@ -610,10 +613,10 @@ trade-off and did not find it.
 
 Two encoders with similar zero-lookahead PER therefore differ by more than an
 order of magnitude in endpoint relative gain, a statement that holds for
-both wav2vec 2.0 seeds ($+2.5\%$ and $+3.9\%$ against $+63.3\%$). \textbf{The exchange
-rate of $-0.045$ PER per doubling is a property of WavLM base+, and should be
-read as one encoder's operating curve rather than as a fact about how much
-future context English phones require.} The swap rules out treating the
+both wav2vec 2.0 seeds ($+2.5\%$ and $+3.9\%$ against $+63.3\%$). \textbf{The measured $-0.045$ PER per doubling is specific to the WavLM
+base+ configuration tested here, and should be read as one encoder's operating
+curve rather than as a fact about how much future context English phones
+require.} The swap rules out treating the
 measured WavLM exchange rate as a backbone-independent law, and it also shows that the detailed
 shape need not carry over: WavLM's smooth diminishing-return curve has no
 counterpart in wav2vec 2.0's weak, non-monotonic one. We do not run the
@@ -640,8 +643,9 @@ committing machine and history can be rewritten, so the chronology is a claim
 about our repository rather than third-party attestation. What it does give a
 reader is the \emph{content} of the prediction, verbatim and inspectable,
 including the class assignment and the reasoning we offered for it at the
-time, in a form we could not have quietly rewritten to match the outcome
-without the rewrite itself being visible in the history. The prediction was
+time. The current public history is consistent with the prediction preceding
+the outputs it is tested on, but consistency is the most that can be claimed:
+this is not immutable third-party timestamping. The prediction was
 that vowels and approximants break first while stops, fricatives, affricates
 and nasals would survive short lookahead. The reasoning was that vocalic
 identity is carried by formant movement across a syllable nucleus that is tens
@@ -829,7 +833,8 @@ relative to the effect.
 \textbf{The dense grid replicates this, and sharpens it.} Running the full
 16-lookahead $\times$ 2-seed sweep on the transcription arm as well puts both
 arms on the same dense grid (Table~\ref{tab:h3dense}). The endpoint gains
-reproduce the 7-point result almost exactly, at 63.3\% for conversion against
+reproduce the 7-point result almost exactly, at 63.3\% for canonical-phone
+prediction against
 43.5\% for transcription, against 63.2\% and 42.8\% before, in an
 independent set of training runs on a denser grid, though on the same corpus
 and test split. The exchange rates separate cleanly:
@@ -905,7 +910,7 @@ annotation error.
 
 One secondary point falls out: neither arm yields a locatable knee
 (breakpoints move to $[40, 240, 160]$\,ms across axis treatments for
-transcription, against $[40, 180, 180]$ for conversion), so
+transcription, against $[40, 180, 180]$ for canonical-phone prediction), so
 \S\ref{sec:rq1}'s structural conclusion is not an artefact of the
 canonical-phone arm. We do not compare saturation onsets between the arms: the five budgets
 added over 200--360\,ms to locate it were run on the canonical-phone arm only, so
@@ -921,7 +926,7 @@ substantially wider at large lookahead; the full
 \label{tab:h3dense}
 \begin{tabular}{rrrr}
 \toprule
-$L$ (ms) & conversion & transcription & gap \\
+$L$ (ms) & canonical & transcription & gap \\
 \midrule
 0   & 0.4256 & 0.4427 & $+$0.0171 \\
 20  & 0.3700 & 0.3896 & $+$0.0196 \\
@@ -933,7 +938,7 @@ $L$ (ms) & conversion & transcription & gap \\
 640 & 0.1561 & 0.2501 & $+$0.0939 \\
 \midrule
 \multicolumn{2}{l}{exchange rate (PER/doubling)} & & \\
-\multicolumn{1}{r}{conversion} & $-0.0452$ & \multicolumn{2}{l}{$R^2=0.983$} \\
+\multicolumn{1}{r}{canonical} & $-0.0452$ & \multicolumn{2}{l}{$R^2=0.983$} \\
 \multicolumn{1}{r}{transcription} & $-0.0292$ & \multicolumn{2}{l}{$R^2=0.984$} \\
 \bottomrule
 \end{tabular}
@@ -941,7 +946,7 @@ $L$ (ms) & conversion & transcription & gap \\
 
 A complementary within-run measure is the \emph{preference margin}, PER
 against the other arm's labels minus PER against its own. It grows
-monotonically in 3/3 seeds for conversion ($+0.032$ at $L{=}0$ to $+0.099$ at 640\,ms; 18/18
+monotonically in 3/3 seeds for the canonical-phone arm ($+0.032$ at $L{=}0$ to $+0.099$ at 640\,ms; 18/18
 adjacent step $\times$ seed comparisons positive) while the transcription
 control is 0/3 monotone and drifts \emph{down} ($-0.0103$). Building the claim
 on a difference rather than a level turned out to matter

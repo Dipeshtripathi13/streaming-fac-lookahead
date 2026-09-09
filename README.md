@@ -171,7 +171,7 @@ model you trained.
    *(The 1.48× and +.036 → +.103 originally reported here predate the padding
    fix; see [`PADDING_FIX_RESOLVED.md`](docs/PADDING_FIX_RESOLVED.md).)*
 
-9. **The exchange rate is a property of the encoder, not of speech.** Repeating
+9. **The exchange rate does not transfer across encoders.** Repeating
    the whole sweep on causalised wav2vec 2.0 base, same corpus, split, head,
    optimiser, budget, seed and grid held fixed, gives
    **+3.9%** relative gain from 640 ms of lookahead against WavLM's **+63.3%**,

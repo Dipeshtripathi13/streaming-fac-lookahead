@@ -123,7 +123,7 @@ not test. Both positive and negative results are publishable. See §11.
 > the real test.
 >
 > **THE TRAINED SWEEP NOW ANSWERS IT (§7 F14, 42 conditions, padding-fixed):
-> curvature is real in the conversion arm, and its location is not
+> curvature is real in the canonical-phone arm, and its location is not
 > identifiable at 7 points.** BIC prefers two segments (native ΔBIC = −10.1,
 > produced −7.4) where the pre-fix data preferred log-linear (+5.3). So H1's
 > third branch, "no knee", is **withdrawn**: it was an artefact of the
@@ -697,7 +697,7 @@ Both are built, smoke-tested, and blocked only on a Hugging Face login,
    | `native` | `g2p` | accent **conversion**: decide what the speaker *should* have said |
    | `produced` | `ipa` | accent-faithful **transcription**: report the local gesture |
 
-   H3 predicts the conversion arm gains more from lookahead. Two arms differing
+   H3 predicts the canonical-phone arm gains more from lookahead. Two arms differing
    in a label tensor is a cleaner control than AC-vs-VC-only, and the gap
    between them *is* the accent-conversion signal, a model scoring well on
    `ipa` and badly on `g2p` has learned to transcribe, not convert.

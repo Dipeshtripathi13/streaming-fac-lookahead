@@ -409,7 +409,7 @@ def rederive_claims(own: Dict, cross: Dict) -> Dict[str, object]:
         out[f"knee_{arm}"] = knee_bic(xs, ys)
         out[f"knee_power_{arm}"] = knee_power(xs, ys, cliff=0.05, at_x=math.log2(81))
 
-    # H3: is the conversion arm's gain larger than the transcription arm's?
+    # H3: is the canonical-phone arm's gain larger than the transcription arm's?
     conv = [own["native"][s][-1] - own["native"][s][0] for s in SEEDS]
     trans = [own["produced"][s][-1] - own["produced"][s][0] for s in SEEDS]
     diff = [t_ - c for c, t_ in zip(conv, trans)]

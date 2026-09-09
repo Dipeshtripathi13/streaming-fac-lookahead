@@ -59,7 +59,7 @@ the spread within its own groups. It still fails when errors are reweighted by
 measured acoustic cost, so this is not an artefact of PER charging every error
 equally. Third, canonical-phone conversion benefits more from future context than
 accent-faithful transcription at matched capacity ($-0.045$ against $-0.029$
-PER per doubling, $1.55\times$), and within the conversion arm the benefit is
+PER per doubling, $1.55\times$), and within the canonical-phone arm the benefit is
 $1.32\times$ larger at positions where the speaker actually deviated from
 canonical. Fourth, per-chunk compute is flat in
 lookahead ($-0.3\%$ to $+1.9\%$ across a $17\times$ change in algorithmic
@@ -265,7 +265,7 @@ $L$ is close to free in compute; being able to run at all is not.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fig_dense_no_knee.png}
-\caption{Dense sweep, conversion arm, 16 lookaheads $\times$ 2 seeds.
+\caption{Dense sweep, canonical-phone arm, 16 lookaheads $\times$ 2 seeds.
 \textbf{Left:} smooth curvature; the shaded band spans the breakpoint estimates
 produced by three defensible treatments of $L{=}0$, none identifiable.
 \textbf{Right:} marginal return per added 20\,ms frame against the measured
@@ -273,7 +273,7 @@ $2\sigma$ floor; red bars are below it.}
 \label{fig:dense}
 \end{figure}
 
-Conversion-arm PER falls monotonically from $0.4256$ at $L{=}0$ to $0.1561$ at
+Canonical-phone-arm PER falls monotonically from $0.4256$ at $L{=}0$ to $0.1561$ at
 $L{=}640$\,ms. Fitting $L\geq20$\,ms on $\log_2 L$ gives
 \begin{equation}
 \Delta\mathrm{PER} = -0.0452 \text{ per doubling},\quad R^2 = 0.983,
@@ -307,7 +307,7 @@ floor rather than on an axis choice.
 
 \begin{table}[t]
 \centering\small
-\caption{Conversion-arm PER against lookahead (mean of 2 seeds) and marginal
+\caption{Canonical-phone-arm PER against lookahead (mean of 2 seeds) and marginal
 return per added 20\,ms frame, in units of the measured $2\sigma{=}0.0044$
 floor. Below $1.0\times$ an additional frame is not measurably useful.}
 \label{tab:dense}
@@ -443,7 +443,7 @@ lookaheads, every one by more than the $0.0044$ floor.
 
 The arms differ in their target tensor, which carries more than the task: label
 entropy, sequence length and annotation noise move with it. We therefore repeat
-the test \emph{inside} the conversion arm, where none of those can differ.
+the test \emph{inside} the canonical-phone arm, where none of those can differ.
 Splitting reference positions by whether the speaker actually deviated from
 canonical ($\mathrm{g2p}\neq\mathrm{ipa}$), the exchange rate is $-0.0520$ PER
 per doubling at accent-changing positions against $-0.0394$ at unchanged ones,
@@ -458,14 +458,14 @@ Two secondary points fall out. Both arms saturate at the same
 ${\approx}240$\,ms, and neither yields a locatable knee (breakpoints move to
 $[40, 240, 160]$\,ms across axis treatments for transcription, against
 $[40, 180, 180]$ for conversion), so \S\ref{sec:rq1}'s structural conclusion is
-not an artefact of the conversion arm. And the transcription arm's own curve is
+not an artefact of the canonical-phone arm. And the transcription arm's own curve is
 just as log-linear, so the shallower slope is a smaller effect of lookahead, not
 a noisier measurement of the same one.
 
 \begin{table}[t]
 \centering\small
 \caption{Both arms on the dense grid, mean of 2 seeds. The gap is the
-transcription arm's PER minus the conversion arm's: near zero at $L{=}0$ and
+transcription arm's PER minus the canonical-phone arm's: near zero at $L{=}0$ and
 widening monotonically with lookahead.}
 \label{tab:h3dense}
 \begin{tabular}{rrrr}

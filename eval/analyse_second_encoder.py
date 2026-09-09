@@ -1,7 +1,8 @@
 """Does the lookahead curve replicate on a second SSL encoder?
 
 A reviewer asked whether the headline exchange rate is a property of speech or
-a property of WavLM. The replication holds everything fixed -- corpus, split,
+specific to the WavLM configuration tested. The replication holds everything
+fixed -- corpus, split,
 head, optimiser, step budget, seed, chunk, lookback, grid -- and changes only
 `--encoder-name`, from `microsoft/wavlm-base-plus` to `facebook/wav2vec2-base`,
 both causalised by the same patches and both verified by the same truncation

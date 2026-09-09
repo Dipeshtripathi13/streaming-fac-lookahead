@@ -1,9 +1,9 @@
-# The exchange rate is a property of the encoder: not of speech
+# The exchange rate does not transfer across encoders
 
 **Status: answers the reviewer question "is this a fact about speech or about
 WavLM?".** Qualifies the headline of
 [`DENSE_SWEEP_RQ1_ANSWERED.md`](DENSE_SWEEP_RQ1_ANSWERED.md) and is written
-into the paper as §"The exchange rate is a property of the encoder".
+into the paper as §"The exchange rate does not transfer across encoders".
 
 Evidence: `results/raw/translator_w2v2_layer2.jsonl` (the replication),
 `translator_w2v2_layer9.jsonl` (the first, invalid attempt),
@@ -94,8 +94,9 @@ WavLM does. We looked for the trade-off and did not find it.
 
 ## What this costs the paper
 
-- **−0.045 PER per doubling**, the **≈340 ms** saturation point, and the cost
-  attributed to a 40 ms budget are properties of **WavLM base+**, not facts
+- **−0.045 PER per doubling**, the **≈340 ms** saturation onset, and the cost
+  attributed to a 40 ms budget are specific to the **WavLM base+ configuration
+  tested here**, not facts
   about how much future context English phones require. They must be
   re-measured on whatever backbone a system actually deploys.
 - **What survives the swap** is the qualitative shape: returns are positive,

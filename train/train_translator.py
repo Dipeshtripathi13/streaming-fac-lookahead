@@ -10,7 +10,7 @@ and RQ3 curves. Runs on Colab T4/L4, a rented 4090, or (slowly) an M4 CPU.
 What is being trained
 ---------------------
 A causal conversion stack + CTC head over a frozen, lookahead-masked WavLM.
-Target is the CANONICAL phone sequence (`g2p`) for the accent-conversion arm,
+Target is the CANONICAL phone sequence (`g2p`) for the canonical-phone arm,
 and the PRODUCED phone sequence (`ipa`) for the transcription control. See
 `src/sfac/translator.py` for why this is the right task for this dataset.
 
@@ -145,7 +145,7 @@ def load_corpus(n_max: Optional[int] = None, seed: int = 0, cache: Optional[str]
              for l1 in {i["l1"] for i in items}}.items())),
         "mean_dur_s": round(float(np.mean([len(i["wav"]) / 16_000 for i in items])), 2),
         # How different are the two targets? If g2p == ipa everywhere, the
-        # accent-conversion arm and the transcription control are the same task
+        # canonical-phone arm and the transcription control are the same task
         # and RQ3 is unanswerable. Check, do not assume.
         "mean_per_g2p_vs_ipa": round(float(np.mean(
             [per(i["g2p"], i["ipa"]) for i in items[:500]])), 4),
@@ -527,7 +527,7 @@ def main() -> None:
     print(f"corpus loaded in {time.time()-t0:.0f}s")
     if stats["mean_per_g2p_vs_ipa"] < 0.02:
         print("\nWARNING: g2p and ipa are nearly identical (mean PER "
-              f"{stats['mean_per_g2p_vs_ipa']:.4f}). The conversion arm and the "
+              f"{stats['mean_per_g2p_vs_ipa']:.4f}). The canonical-phone arm and the "
               "transcription control would be the same task and RQ3 would be "
               "unanswerable. Inspect the columns before trusting the sweep.")
 

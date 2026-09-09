@@ -303,7 +303,7 @@ T4**. The causality proof runs before training and aborts it on failure.
 
 **Most of this curve is not resolved, and that is the finding.** Blocking on
 seed, the correct analysis, since an unlucky seed raises PER at *every*
-lookahead, only the 0→20 ms step is significant at α=.05 in the conversion arm
+lookahead, only the 0→20 ms step is significant at α=.05 in the canonical-phone arm
 (*t*(2)=+11.1). The 160→320 ms step is **−0.0009 PER with 1 of 3 seeds
 improving**: the mid-range plateau visible in a single-seed run is noise. What
 *is* solid is the endpoint, −0.212 ± 0.018 PER, *t*(2)=+20.1, unanimous. **The
@@ -342,7 +342,7 @@ difference +0.079 ± 0.003, *t*(2)=+41.4. The margin is the stronger and more
 stable statement and is the one we lead with.
 
 **The obvious objection, controlled.** Any model that gets better at its own
-target must widen its margin, and the conversion arm does improve more in
+target must widen its margin, and the canonical-phone arm does improve more in
 absolute terms (0.212 vs 0.171 PER). We therefore compare the two arms **at
 matched own-target PER**. At *L*≥160 ms the conversion margin is **3.46×** the
 PER-matched transcription margin; at *L*=0 it is **0.88×**, i.e. slightly
@@ -357,7 +357,7 @@ bound and not a bottleneck, consistent with, but not proof of, the §5 reading.
 log-linear regime (ΔBIC = +5.27 conversion, +4.25 transcription; the best
 breakpoint is pinned at the grid edge, itself a signature of no interior knee).
 Crucially we now calibrate the test: **planting** a 0.08 PER cliff at 160 ms is
-*still missed* in the conversion arm (ΔBIC −2.93, short of the −6 threshold).
+*still missed* in the canonical-phone arm (ΔBIC −2.93, short of the −6 threshold).
 So this experiment excludes discontinuities larger than roughly **0.08 PER
 (≈18 % relative)** and says nothing about smaller ones. The earlier 7-point
 result carried no such bound and should not have been read as evidence of
