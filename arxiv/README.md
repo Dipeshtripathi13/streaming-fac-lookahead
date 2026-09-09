@@ -18,14 +18,13 @@ Regenerate the tarball at any time with `../paper/make_arxiv_package.sh`.
 
 ## Before you start
 
-**You need an arXiv account, and you may need endorsement.** arXiv requires
-endorsement before a user's first submission to a category. Registering with
-your `@coyotes.usd.edu` address gets you expedited consideration, and that is
-the path to take. If the system still asks for endorsement for `eess.AS`, it
-will tell you during submission and give you a code to send to someone who can
-endorse. A faculty member in your department who has posted to `eess.AS` or
-`cs.CL` in the last few years is the person to ask. This can add a few days,
-so register before the day you want to post.
+**Endorsement is per category, and it bit here.** arXiv requires endorsement
+before a user's first submission to a category. In practice this account was
+endorsed for `cs.CL` but not for `eess.AS` or `cs.SD`, so the preprint goes
+out under `cs.CL` with the other two requested as cross-lists. If you later
+want `eess.AS` as a primary for another paper, ask a faculty member who has
+posted there in the last few years; the system gives you a code to send them.
+That takes days, so start it well before you want to post.
 
 **Upload source, not PDF.** arXiv explicitly prefers LaTeX source and does not
 accept PDF generated from LaTeX. The tarball is already in the right shape.
