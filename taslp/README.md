@@ -135,6 +135,10 @@ journal scope are unrelated.
 
 ## The submission itself
 
+**See `SUBMITTING.md` for the end-to-end walkthrough.** The short version is
+below; that file covers the portal question, the charge questions and what to
+check before approving the generated PDF.
+
 1. Create or sign in to your account on whichever system the journal names.
 2. Start a new submission, category **regular paper**.
 3. Upload the manuscript. Identified or anonymised, per point 1 above.
