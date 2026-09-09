@@ -1,8 +1,14 @@
 # Cover letter
 
-Draft. Read it before sending; it makes claims on your behalf. Replace the
-bracketed arXiv ID once the preprint is live, or cut that paragraph if you
-submit to TASLP first.
+Draft. Read it before sending; it makes claims on your behalf.
+
+As written it says the preprint is awaiting announcement, which is true today.
+Once arXiv announces it you will get a public identifier of the form
+arXiv:2609.NNNNN. That is the number to quote, not the submission number
+(8054723), which is an internal tracking ID an editor cannot look up. When the
+public ID exists, replace the sentence with:
+
+  A preprint of this work is available at arXiv:2609.NNNNN.
 
 ---
 
@@ -47,10 +53,11 @@ compute; all GPU results come from free-tier Google Colab. The harness,
 per-condition outputs and analysis scripts are public at
 https://github.com/Dipeshtripathi13/streaming-fac-lookahead.
 
-A preprint of this work is available at arXiv:[ID]. That version is one page
-longer; the manuscript submitted here has the same results, with two
-supporting tables moved to the public repository and the abstract shortened.
-The work has not been published elsewhere and is not under consideration by
+A preprint of this work has been submitted to arXiv and is awaiting
+announcement; I will supply the identifier once it is assigned. That version
+is one page longer, with the same results: the manuscript submitted here moves
+two supporting tables to the public repository and shortens the abstract. The
+work has not been published elsewhere and is not under consideration by
 another journal.
 
 Thank you for your consideration.

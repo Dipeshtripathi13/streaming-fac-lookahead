@@ -107,15 +107,20 @@ rather not have the preprint visible during review, submit to TASLP first and
 post the preprint afterwards. Either order is allowed; the only mistake is
 not declaring it.
 
-`cover_letter.md` has a bracketed `arXiv:[ID]` to fill in, or a paragraph to
-cut if you go to TASLP first.
+**The preprint is submitted but not yet announced.** Submission ID 8054723 is
+an internal arXiv tracking number, not a citable identifier; the public one,
+of the form `arXiv:2609.NNNNN`, is assigned at announcement. Do not put the
+submission number in the cover letter, since an editor cannot resolve it. The
+letter currently says the preprint is awaiting announcement, which is accurate
+and needs no ID. If you would rather quote a real identifier, arXiv usually
+announces within one business day, so waiting costs little.
 
 The preprint went up under **cs.CL** as primary, with eess.AS and cs.SD
 requested as cross-lists, because both of those require endorsements the
 account does not have.
 
 **The two versions are no longer identical, and that is fine.** The arXiv
-preprint is the ten-page version. This submission is nine pages, cut to stay
+preprint, once announced, is the ten-page version. This submission is nine pages, cut to stay
 inside TASLP's free page limit: two supporting tables moved to the repository,
 the abstract was shortened, the t_buf narrative compressed and the
 bibliography abbreviated to IEEE style. No result differs between them. The
