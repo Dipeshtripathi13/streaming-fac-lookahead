@@ -35,9 +35,9 @@ So: decline the voluntary charges, decline open access, and keep the paper to
 ten published pages. The first two are checkboxes. The third is the one that
 can cost you real money, and it is mandatory and non-negotiable once incurred.
 
-**You have almost no margin.** The manuscript is exactly 10 pages and page 10
-is about 85% full, so roughly fifteen lines of slack stand between $0 and
-$220. Three things can eat that:
+**The manuscript is nine pages, giving one full page of headroom.** It was cut
+from ten deliberately, because ten left roughly fifteen lines between $0 and
+$220 and three things can eat that:
 
 - **Revision.** Responding to reviewers almost always adds text. Every round
   of this paper so far has grown it.
@@ -54,11 +54,14 @@ initial submission and 16 at revision. Those are review limits, not billing
 limits. Do not let the 13 tempt you into adding material, because the bill is
 computed on the *published* length.
 
-**If you want a safety margin, ask and I will cut a page.** The measurement-
-audit section compresses furthest without losing a result, and some of the
-RQ1 and RQ3 supporting detail could move to the repository. Cutting to nine
-pages costs nothing scientifically and buys a whole page of headroom for the
-revision round.
+**What the cut removed.** No result: all seventeen headline numbers are still
+stated, and the reference list is unchanged at 22. Two supporting tables moved
+to the repository, the dense H3 grid and the per-class acoustic weighting,
+both of whose contents the surrounding prose already states in full. The
+t_buf I/O narrative was compressed, the abstract went from 510 words to 318,
+a few sentences that said the same thing twice were tightened, and journal
+names in the bibliography were abbreviated to IEEE style, which was overdue
+anyway.
 
 ---
 

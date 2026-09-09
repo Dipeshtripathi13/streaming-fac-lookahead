@@ -38,8 +38,7 @@ W.~Quamer, M.-R. Tseng, G.~Nasrallah, and R.~Guti{\'e}rrez-Osuna, ``{TVTSyn}:
 
 \bibitem{darkstream2025}
 W.~Quamer and R.~Guti{\'e}rrez-Osuna, ``{DarkStream}: Real-time speech
-  anonymization with low latency,'' in \emph{IEEE Automatic Speech Recognition
-  and Understanding Workshop (ASRU)}, 2025, pp. 1--7.
+  anonymization with low latency,'' in \emph{Proc. IEEE ASRU}, 2025, pp. 1--7.
 
 \bibitem{nguyen2025streaming}
 T.-N. Nguyen, N.-Q. Pham, {\c{S}}.~Akti, and A.~Waibel, ``Streaming
@@ -48,9 +47,8 @@ T.-N. Nguyen, N.-Q. Pham, {\c{S}}.~Akti, and A.~Waibel, ``Streaming
 
 \bibitem{streamvc2024}
 Y.~Yang, Y.~Kartynnik, Y.~Li, J.~Tang, X.~Li, G.~Sung, and M.~Grundmann,
-  ``{StreamVC}: Real-time low-latency voice conversion,'' in \emph{IEEE
-  International Conference on Acoustics, Speech and Signal Processing
-  (ICASSP)}, 2024, pp. 11\,016--11\,020.
+  ``{StreamVC}: Real-time low-latency voice conversion,'' in \emph{Proc. IEEE
+  ICASSP}, 2024, pp. 11\,016--11\,020.
 
 \bibitem{acsurvey2026}
 Y.~Halychanskyi, J.~S. Guo, and V.~Kindratenko, ``Accent conversion: A
@@ -60,8 +58,7 @@ Y.~Halychanskyi, J.~S. Guo, and V.~Kindratenko, ``Accent conversion: A
 \bibitem{streamvoiceanon2026}
 N.~Kuzmin, S.~Liu, K.~A. Lee, and E.~S. Chng, ``Stream-voice-anon: Enhancing
   utility of real-time speaker anonymization via neural audio codec and
-  language models,'' in \emph{IEEE International Conference on Acoustics,
-  Speech and Signal Processing (ICASSP)}, 2026.
+  language models,'' in \emph{Proc. IEEE ICASSP}, 2026.
 
 \bibitem{streamvoiceanonplus2026}
 N.~Kuzmin, K.~A. Lee, and E.~S. Chng, ``{StreamVoiceAnon+}: Emotion-preserving
@@ -70,18 +67,18 @@ N.~Kuzmin, K.~A. Lee, and E.~S. Chng, ``{StreamVoiceAnon+}: Emotion-preserving
 
 \bibitem{e2eanon2024}
 W.~Quamer and R.~Guti{\'e}rrez-Osuna, ``End-to-end streaming model for
-  low-latency speech anonymization,'' in \emph{IEEE Spoken Language Technology
-  Workshop (SLT)}, 2024, pp. 727--734.
+  low-latency speech anonymization,'' in \emph{Proc. IEEE SLT}, 2024, pp.
+  727--734.
 
 \bibitem{zhao2021fac}
 G.~Zhao, S.~Ding, and R.~Guti{\'e}rrez-Osuna, ``Converting foreign accent
-  speech without a reference,'' \emph{IEEE/ACM Transactions on Audio, Speech,
-  and Language Processing}, vol.~29, pp. 2367--2381, 2021.
+  speech without a reference,'' \emph{IEEE/ACM Trans. Audio, Speech, Language
+  Process.}, vol.~29, pp. 2367--2381, 2021.
 
 \bibitem{accentron2022}
 S.~Ding, G.~Zhao, and R.~Guti{\'e}rrez-Osuna, ``Accentron: Foreign accent
   conversion to arbitrary non-native speakers using zero-shot learning,''
-  \emph{Computer Speech \& Language}, vol.~72, p. 101302, 2022.
+  \emph{Comput. Speech Lang.}, vol.~72, p. 101302, 2022.
 
 \bibitem{llvc2023}
 K.~Sadov, M.~Hutter, and A.~Near, ``Low-latency real-time voice conversion on
@@ -91,46 +88,44 @@ K.~Sadov, M.~Hutter, and A.~Near, ``Low-latency real-time voice conversion on
 S.~Chen, C.~Wang, Z.~Chen, Y.~Wu, S.~Liu, Z.~Chen, J.~Li, N.~Kanda,
   T.~Yoshioka, X.~Xiao, J.~Wu, L.~Zhou, S.~Ren, Y.~Qian, Y.~Qian, M.~Zeng,
   X.~Yu, and F.~Wei, ``{WavLM}: Large-scale self-supervised pre-training for
-  full stack speech processing,'' \emph{IEEE Journal of Selected Topics in
-  Signal Processing}, 2022.
+  full stack speech processing,'' \emph{IEEE J. Sel. Topics Signal Process.},
+  2022.
 
 \bibitem{wav2vec2}
 A.~Baevski, H.~Zhou, A.~Mohamed, and M.~Auli, ``wav2vec 2.0: A framework for
-  self-supervised learning of speech representations,'' in \emph{Advances in
-  Neural Information Processing Systems (NeurIPS)}, 2020.
+  self-supervised learning of speech representations,'' in \emph{Proc.
+  NeurIPS}, 2020.
 
 \bibitem{kassraftery1995}
-R.~E. Kass and A.~E. Raftery, ``Bayes factors,'' \emph{Journal of the American
-  Statistical Association}, vol.~90, no. 430, pp. 773--795, 1995.
+R.~E. Kass and A.~E. Raftery, ``Bayes factors,'' \emph{J. Amer. Statist.
+  Assoc.}, vol.~90, no. 430, pp. 773--795, 1995.
 
 \bibitem{petersonlehiste1960}
 G.~E. Peterson and I.~Lehiste, ``Duration of syllable nuclei in {E}nglish,''
-  \emph{The Journal of the Acoustical Society of America}, vol.~32, no.~6, pp.
-  693--703, 1960.
+  \emph{J. Acoust. Soc. Amer.}, vol.~32, no.~6, pp. 693--703, 1960.
 
 \bibitem{hillenbrand1995}
 J.~Hillenbrand, L.~A. Getty, M.~J. Clark, and K.~Wheeler, ``Acoustic
-  characteristics of {A}merican {E}nglish vowels,'' \emph{The Journal of the
-  Acoustical Society of America}, vol.~97, no.~5, pp. 3099--3111, 1995.
+  characteristics of {A}merican {E}nglish vowels,'' \emph{J. Acoust. Soc.
+  Amer.}, vol.~97, no.~5, pp. 3099--3111, 1995.
 
 \bibitem{nearey1986}
 T.~M. Nearey and P.~F. Assmann, ``Modeling the role of inherent spectral change
-  in vowel identification,'' \emph{The Journal of the Acoustical Society of
-  America}, vol.~80, no.~5, pp. 1297--1308, 1986.
+  in vowel identification,'' \emph{J. Acoust. Soc. Amer.}, vol.~80, no.~5, pp.
+  1297--1308, 1986.
 
 \bibitem{lehistepeterson1961}
 I.~Lehiste and G.~E. Peterson, ``Transitions, glides, and diphthongs,''
-  \emph{The Journal of the Acoustical Society of America}, vol.~33, no.~3, pp.
-  268--277, 1961.
+  \emph{J. Acoust. Soc. Amer.}, vol.~33, no.~3, pp. 268--277, 1961.
 
 \bibitem{delattre1955}
 P.~C. Delattre, A.~M. Liberman, and F.~S. Cooper, ``Acoustic loci and
-  transitional cues for consonants,'' \emph{The Journal of the Acoustical
-  Society of America}, vol.~27, no.~4, pp. 769--773, 1955.
+  transitional cues for consonants,'' \emph{J. Acoust. Soc. Amer.}, vol.~27,
+  no.~4, pp. 769--773, 1955.
 
 \bibitem{stevensblumstein1978}
 K.~N. Stevens and S.~E. Blumstein, ``Invariant cues for place of articulation
-  in stop consonants,'' \emph{The Journal of the Acoustical Society of
-  America}, vol.~64, no.~5, pp. 1358--1368, 1978.
+  in stop consonants,'' \emph{J. Acoust. Soc. Amer.}, vol.~64, no.~5, pp.
+  1358--1368, 1978.
 
 \end{thebibliography}
