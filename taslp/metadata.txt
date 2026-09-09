@@ -209,3 +209,35 @@ PREPRINTS OF THE MANUSCRIPT (the "Yes"/"No" free-text box, 500 chars)
 
   If arXiv announces before you submit, replace the first sentence with:
     Yes. A preprint of this work is available at arXiv:2609.XXXXX.
+
+SCOPE STATEMENT (150 words max; a weak answer here risks desk rejection
+for scope, so this one is not boilerplate)
+  The manuscript studies speech signal transformation for a streaming system and its latency-accuracy trade-off, which is squarely within the journal's remit of analysis, transformation and evaluation of speech signals and of the systems that process them. Foreign accent conversion is a speech transformation task; the object of study is how much future speech a causal system must buffer before it can emit, measured on real non-native speech. The machine-learning components are not the contribution in themselves: self-supervised encoders and a CTC head are the instrument, applied to a speech-processing problem, namely how lookahead trades against phonetic accuracy in streaming conversion. The manuscript also separates algorithmic from computational latency and measures per-chunk compute on consumer hardware, which speaks to the design and evaluation of streaming speech systems rather than to model architecture.
+
+  [131 words. The point it has to make is that the machine-learning
+  parts are the instrument, not the contribution, since the form warns that
+  technique-related topics must be applied to a problem within scope.]
+
+SIGNIFICANCE / IMPACT (500 characters)
+  Streaming accent conversion systems state a lookahead budget without evidence for it. This manuscript supplies the missing curve: what future context buys, where returns stop being measurable, and what a 40 ms budget forgoes. It also shows the curve does not transfer between encoders, so budgets must be measured for the deployed representation rather than inherited, and documents that masked self-supervised encoders are not causal by default, which affects any streaming result built on them.
+
+  [496 characters.]
+
+THREE MOST CLOSELY RELATED PAPERS
+1. T.-N. Nguyen, N.-Q. Pham, S. Akti and A. Waibel, "Streaming Non-Autoregressive Model for Accent Conversion and Pronunciation Improvement," Interspeech 2025, pp. 4163-4167. DOI: 10.21437/interspeech.2025-1403
+
+2. W. Quamer and R. Gutierrez-Osuna, "DarkStream: Real-Time Speech Anonymization with Low Latency," Proc. IEEE ASRU 2025, pp. 1-7. DOI: 10.1109/ASRU65441.2025.11434609
+
+3. W. Quamer, M.-R. Tseng, G. Nasrallah and R. Gutierrez-Osuna, "PHONOS: PHOnetic Neutralization for Online Streaming Applications," arXiv:2603.27001, 2026. (Preprint; no DOI beyond the arXiv identifier. Included because it is the system whose 40 ms lookahead budget this manuscript measures directly against.)
+
+  On including a preprint. The form asks for published literature, and PHONOS
+  is arXiv-only, but it is the single work this manuscript is most directly in
+  dialogue with: its 40 ms budget is the number the whole paper is measured
+  against. Omitting it to satisfy the word "published" would hide the closest
+  prior art from the editor, so it is listed third with its status stated.
+  The two published entries carry resolvable DOIs, both verified through
+  Crossref.
+
+  StreamVC (Proc. IEEE ICASSP 2024, pp. 11016-11020,
+  DOI 10.1109/ICASSP48485.2024.10446863) is the obvious fourth if a fully
+  published third entry is preferred to the preprint.
