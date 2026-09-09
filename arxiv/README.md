@@ -71,10 +71,11 @@ matches `taslp.pdf`. Check:
 
 **5b. Licence and category.** Take the **arXiv.org perpetual, non-exclusive
 license**; the form warns that the choice is irrevocable, and this is the one
-that does not complicate the IEEE copyright transfer later. For the category,
-read the line on that page saying which groups you are registered for. If it
-says only `cs`, `eess.AS` will not be in the dropdown; `metadata.txt` explains
-the two ways forward.
+that does not complicate the IEEE copyright transfer later. For the category, pick
+**Computer Science -> cs.SD (Sound)**. eess.AS needs an EESS endorsement this
+account does not have; request it as a cross-list on the following screen
+instead, along with cs.CL. See `metadata.txt` for why cs.SD is a correct
+primary here rather than a consolation.
 
 **6. Enter the metadata.** Copy from `metadata.txt`. Paste the abstract from
 `abstract.txt` rather than from the PDF; the PDF text has ligature and

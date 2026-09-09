@@ -18,32 +18,35 @@ Dipesh Tripathi
 
 PRIMARY CATEGORY
 ----------------
-eess.AS   (Electrical Engineering and Systems Science > Audio and Speech
-           Processing)
+cs.SD     (Computer Science > Sound)
 
-  CHECK YOUR REGISTRATION FIRST. The submission page prints which groups you
-  are registered for, e.g. "dipeshtripathi13 has registered as author to the
-  groups: cs". If EESS is not among them, the eess.AS option will not appear
-  in the primary-classification dropdown and you have two choices:
+  Use this. eess.AS would be the natural home for a TASLP-bound speech paper,
+  but it needs endorsement in the EESS archive, and cs.SD is not a fallback
+  for this paper: arXiv describes it as covering "all aspects of computing
+  with sound", explicitly including "sound signal processing" and "analysis
+  and synthesis". A latency-accuracy study of a causal speech encoder sits
+  inside that description.
 
-  (a) Follow the "registration form" link on that same page, add EESS, and
-      come back. eess.AS is where the speech community looks and is the right
-      primary for a TASLP-bound paper. Adding a group may require endorsement
-      for that archive, so do it before the day you want to post.
-
-  (b) Submit with cs.SD as primary now. This is not a misclassification:
-      cs.SD covers "sound signal processing" and "analysis and synthesis",
-      which is what this paper does. Cross-list to eess.AS so it still
-      reaches that audience.
-
-  arXiv's taxonomy does not declare cs.SD and eess.AS to be aliases, so the
-  primary you choose does determine which listing the paper lands in.
+  In the dropdown on the submission page: leave the left box on
+  "Computer Science" and pick "cs.SD" in the subject-class box.
 
 
 CROSS-LIST CATEGORIES
 ---------------------
-If primary is eess.AS:  cross-list cs.SD and cs.CL
-If primary is cs.SD:    cross-list eess.AS and cs.CL
+eess.AS   (Audio and Speech Processing)
+cs.CL     (Computation and Language)
+
+  Ask for both on the screen after the primary. Endorsement gates the primary
+  category; cross-lists are decided by the subject moderators instead, so
+  requesting eess.AS here is the way to reach that audience without waiting
+  for an EESS endorsement. The moderators may decline, which costs nothing.
+
+  cs.CL is the weaker of the two but is reasonable: the probe predicts phone
+  sequences with a CTC head and the analysis is phonetic throughout.
+
+  If you would rather have eess.AS as the primary, the alternative is to get
+  endorsed in EESS first and submit afterwards. That is a better listing but a
+  slower one, and nothing about the paper requires it.
 
 
 COMMENTS
