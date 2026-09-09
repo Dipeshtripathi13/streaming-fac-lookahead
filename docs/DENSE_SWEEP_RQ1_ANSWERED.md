@@ -42,7 +42,7 @@ none of them can localise it:
 | L=0 dropped (15 points) | −31.2 | 180 ms | [60, 320] ms | **no** |
 | L=0 at half a frame | −36.8 | 180 ms | [40, 320] ms | **no** |
 
-The bootstrap intervals span 3 octaves. **Sixteen points is not the fix**, which
+The bootstrap intervals span 2.4 to 3.0 octaves. **Sixteen points is not the fix**, which
 is the thing worth reporting: the earlier diagnosis that 7 points were
 underpowered was correct but incomplete. Denser sampling did not rescue a knee,
 because the curve is smoothly curved rather than piecewise. A breakpoint

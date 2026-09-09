@@ -47,6 +47,15 @@ print(f"  unresolved citations in rendered PDF: {n}")
 sys.exit(1 if n else 0)
 PYEOF
 rm -f "$OUT"/taslp.pdf "$OUT"/taslp.aux "$OUT"/taslp.log "$OUT"/taslp.blg
-tar -czf arxiv_taslp.tar.gz -C "$OUT" .
+# macOS tar writes an AppleDouble "._name" sidecar for every file carrying an
+# extended attribute, and files here pick up com.apple.provenance just by
+# being downloaded or copied. arXiv treats those as real source files and they
+# clutter the listing, so strip the attributes and tell tar not to add them.
+xattr -c "$OUT"/* 2>/dev/null || true
+COPYFILE_DISABLE=1 tar --no-xattrs --exclude '._*' --exclude '.DS_Store' \
+    -czf arxiv_taslp.tar.gz -C "$OUT" .
+if tar -tzf arxiv_taslp.tar.gz | grep -q '\._\|\.DS_Store'; then
+  echo "FAIL: macOS metadata leaked into the tarball"; tar -tzf arxiv_taslp.tar.gz; exit 1
+fi
 echo "wrote arxiv_taslp.tar.gz ($PAGES pages, $CITES references)"
 tar -tzf arxiv_taslp.tar.gz

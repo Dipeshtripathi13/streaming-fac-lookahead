@@ -152,7 +152,7 @@ not test. Both positive and negative results are publishable. See §11.
 > **There is curvature but no locatable knee, and a saturation point at
 > ~240 ms.** All three axis treatments prefer piecewise decisively (ΔBIC −22,
 > −31, −37) yet the breakpoint moves (40, 180, 180 ms) and every bootstrap
-> interval spans ~3 octaves. **Sixteen points did not rescue a knee**, which is
+> intervals span 2.4 to 3.0 octaves. **Sixteen points did not rescue a knee**, which is
 > the finding: the earlier "7 points are underpowered" diagnosis was right about
 > the power and wrong about the cause. The curve is smoothly curved, not
 > piecewise, and a breakpoint estimator asked for a breakpoint always returns
@@ -638,7 +638,7 @@ point is a genuinely distinct budget.
 
 **The knee is withdrawn.** ΔBIC prefers a two-segment fit under all three
 treatments of L=0 (−22.2, −31.2, −36.8) but the breakpoint lands at 40, 180 and
-180 ms respectively, and every bootstrap 90% interval spans ~3 octaves. None is
+180 ms respectively, and the bootstrap 90% intervals span 2.4 to 3.0 octaves. None is
 identifiable. Denser sampling was the obvious remedy and it did not work,
 because the curve is smoothly curved rather than piecewise.
 

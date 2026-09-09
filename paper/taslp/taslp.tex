@@ -52,7 +52,7 @@ results. First,
 phone-translation PER decreases smoothly with lookahead at $-0.045$ phone error rate (PER) per
 doubling ($R^2=0.98$) with \emph{no locatable knee}: a piecewise fit is
 preferred under every axis treatment we tried, yet the breakpoint moves between
-40 and 180\,ms and no bootstrap interval is narrower than three octaves.
+40 and 180\,ms and even the narrowest bootstrap interval spans 2.6 octaves.
 Instead of a knee we identify \emph{saturation onset} at ${\approx}340$\,ms:
 with the grid completed to 20\,ms spacing over 200--360\,ms, and against a
 fixed-seed repeatability floor measured from deliberate repeats
@@ -839,10 +839,10 @@ prediction against
 independent set of training runs on a denser grid, though on the same corpus
 and test split. The exchange rates separate cleanly:
 \begin{center}
-conversion $-0.0452$ vs transcription $-0.0292$ PER per doubling,
+canonical-phone $-0.0452$ vs transcription $-0.0292$ PER per doubling,
 \end{center}
-$R^2 = 0.983$ and $0.984$ respectively, so \textbf{conversion buys
-$\mathbf{1.55\times}$ as much per doubling of lookahead}.
+$R^2 = 0.983$ and $0.984$ respectively, so \textbf{canonical-phone prediction
+buys $\mathbf{1.55\times}$ as much per doubling of lookahead}.
 
 The effect is clearer in the between-arm gap than in the absolute levels. At
 $L{=}0$ the two arms have similar PER ($0.4256$ vs $0.4427$, a gap of
@@ -952,7 +952,7 @@ control is 0/3 monotone and drifts \emph{down} ($-0.0103$). Building the claim
 on a difference rather than a level turned out to matter
 (\S\ref{sec:lessons}).
 
-\subsection{\tbuf{}: jitter measured, I/O not}
+\subsection{\texorpdfstring{\tbuf{}}{t\_buf}: jitter measured, I/O not}
 
 \tbuf{} splits into a jitter term and an I/O term. The first is measured; the
 second resisted three separate attempts, and we report that rather than

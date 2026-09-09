@@ -47,7 +47,7 @@ with every other factor held fixed, and report four results. First, quality
 improves smoothly with lookahead at $-0.045$ phone error rate (PER) per
 doubling ($R^2=0.98$) with \emph{no locatable knee}: a piecewise fit is
 preferred under every axis treatment we tried, yet the breakpoint moves between
-40 and 180\,ms and no bootstrap interval is narrower than three octaves.
+40 and 180\,ms and even the narrowest bootstrap interval spans 2.4 octaves.
 Instead of a knee we report a \emph{saturation point} at ${\approx}240$\,ms,
 beyond which each additional 20\,ms frame buys less than the measured
 $2\sigma$ noise floor. A 40\,ms budget, the value used by the current
@@ -285,7 +285,7 @@ two-segment fit under all three axis treatments we tried
 ($\Delta\mathrm{BIC}=-22.2$, $-31.2$, $-36.8$), which by the usual
 thresholds~\cite{kassraftery1995} is strong evidence. But the breakpoint lands
 at 40, 180 and 180\,ms respectively, and every bootstrap 90\% interval spans
-about three octaves. Sixteen points did not rescue a knee. The reason is
+2.4 to 3.0 octaves. Sixteen points did not rescue a knee. The reason is
 mechanical and worth stating: on a $\log_2(L{+}1)$ axis the $L{=}0
 \rightarrow 20$\,ms gap is 4.39 units while every other gap is ${\approx}1.0$,
 so a piecewise fit places a breakpoint just past that gap whatever the data
