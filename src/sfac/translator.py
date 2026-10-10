@@ -78,6 +78,16 @@ class TranslatorConfig:
 
     # ---- held constant across the sweep ----
     target: Target = Target.NATIVE
+    # Where the lookahead mask is applied.
+    #   "end_to_end": the encoder is strictly frame-causal and only the first
+    #                 probe block looks ahead, so the model's total future
+    #                 context is exactly chunk + lookahead.
+    #   "per_layer":  the mask is applied in every encoder layer and every
+    #                 probe block. Right context then COMPOUNDS with depth and
+    #                 lookahead_ms understates the future the model sees
+    #                 (eval/effective_lookahead.py). Kept only to reproduce
+    #                 the first arXiv version.
+    lookahead_scope: str = "end_to_end"
     chunk_ms: float = 40.0
     lookback_ms: Optional[float] = 2000.0
     frame_ms: float = 20.0
@@ -102,6 +112,8 @@ class TranslatorConfig:
     grad_clip: float = 1.0
 
     def __post_init__(self):
+        if self.lookahead_scope not in ("end_to_end", "per_layer"):
+            raise ValueError(f"unknown lookahead_scope={self.lookahead_scope!r}")
         if self.chunk_ms % self.frame_ms:
             raise ValueError(
                 f"chunk_ms={self.chunk_ms} must be a multiple of frame_ms="
@@ -113,6 +125,28 @@ class TranslatorConfig:
         return StreamGeometry(chunk_ms=self.chunk_ms, lookahead_ms=self.lookahead_ms,
                               frame_ms=self.frame_ms, lookback_ms=self.lookback_ms,
                               sample_rate=self.sample_rate)
+
+    @property
+    def encoder_geometry(self) -> StreamGeometry:
+        """Mask geometry for the frozen encoder.
+
+        Under "end_to_end" this is frame-causal (one-frame chunks, zero
+        lookahead) and therefore identical for every lookahead in a sweep: an
+        encoder frame must not see the rest of its chunk, or an odd number of
+        lookahead frames would be rounded up to the next chunk boundary.
+        """
+        if self.lookahead_scope == "per_layer":
+            return self.geometry
+        return StreamGeometry(chunk_ms=self.frame_ms, lookahead_ms=0.0,
+                              frame_ms=self.frame_ms, lookback_ms=self.lookback_ms,
+                              sample_rate=self.sample_rate)
+
+    def block_lookahead_frames(self, block: int) -> int:
+        """Lookahead of probe block `block`; later blocks stay chunk-causal
+        under "end_to_end" so the first block's lookahead does not compound."""
+        if self.lookahead_scope == "per_layer" or block == 0:
+            return self.geometry.lookahead_frames
+        return 0
 
     def fingerprint(self) -> Dict[str, object]:
         d = asdict(self)
@@ -293,26 +327,27 @@ def build_translator(cfg: TranslatorConfig, vocab: PhoneVocab):
             self.blocks = nn.ModuleList([MaskedBlock(c) for _ in range(c.n_layers)])
             self.norm = nn.LayerNorm(c.d_model)
             self.head = nn.Linear(c.d_model, V)
-            self._mask_cache: Dict[int, "torch.Tensor"] = {}
+            self._mask_cache: Dict[Tuple[int, int], "torch.Tensor"] = {}
 
-        def attn_mask(self, T: int, device, dtype):
+        def attn_mask(self, T: int, device, dtype, lookahead_frames: int):
             """Float mask for nn.MultiheadAttention: 0 = attend, -inf = block."""
-            m = self._mask_cache.get(T)
+            m = self._mask_cache.get((T, lookahead_frames))
             if m is None:
                 g = self.cfg.geometry
                 bm = chunked_lookahead_mask(
                     T, chunk_frames=g.chunk_frames,
-                    lookahead_frames=g.lookahead_frames,
+                    lookahead_frames=lookahead_frames,
                     lookback_frames=g.lookback_frames)
                 m = torch.from_numpy(np.where(bm, 0.0, float("-inf")).astype(np.float32))
-                self._mask_cache[T] = m
+                self._mask_cache[(T, lookahead_frames)] = m
             return m.to(device=device, dtype=dtype)
 
         def forward(self, feats, key_padding_mask=None):
             T = feats.shape[1]
-            am = self.attn_mask(T, feats.device, feats.dtype)
             x = feats
-            for b in self.blocks:
+            for k, b in enumerate(self.blocks):
+                am = self.attn_mask(T, feats.device, feats.dtype,
+                                    self.cfg.block_lookahead_frames(k))
                 x = b(x, am, key_padding_mask)
             return self.head(self.norm(x))          # (B, T, V) logits
 

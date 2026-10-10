@@ -185,7 +185,7 @@ class Frontend:
         for i, n in enumerate(lens):
             am[i, :n] = 1
         am = am.to(self.device)
-        geom = self.cfg.geometry
+        geom = self.cfg.encoder_geometry
         with torch.no_grad(), self.MaskInjector(self.model, geom):
             out = self.model(x, attention_mask=am, output_hidden_states=True)
         h = out.hidden_states[self.cfg.encoder_layer]
@@ -457,6 +457,10 @@ def main() -> None:
                          "without them those need a full re-run.")
     ap.add_argument("--hyp-dir", default=None)
     ap.add_argument("--out", default="results/raw/translator_sweep")
+    ap.add_argument("--resume", action="store_true",
+                    help="skip any run whose tag is already in <out>.jsonl and "
+                         "carry its recorded result into the summary. For "
+                         "sessions that get reclaimed mid-sweep.")
     ap.add_argument("--smoke", action="store_true",
                     help="60 steps, 3 lookaheads, 120 utts -- proves the pipeline runs")
     # store_true with default=True could never be switched off. The proof is a
@@ -476,6 +480,14 @@ def main() -> None:
                          "(pos_conv kernel, feat_extract_norm) are per-checkpoint "
                          "properties and a different backbone can fail where "
                          "WavLM passes.")
+    ap.add_argument("--lookahead-scope", default="end_to_end",
+                    choices=["end_to_end", "per_layer"],
+                    help="end_to_end: strictly causal encoder, lookahead in the "
+                         "first probe block only, so total future context is "
+                         "exactly chunk + lookahead. per_layer: mask every "
+                         "layer; right context compounds with depth and the "
+                         "label understates it. per_layer reproduces the first "
+                         "arXiv version and nothing else should use it.")
     ap.add_argument("--encoder-layer", type=int, default=9,
                     help="Hidden-state index to tap. 9 is the usual phonetic "
                          "layer for base-size models.")
@@ -514,6 +526,19 @@ def main() -> None:
                      "would be corrupted by an amount that grows with "
                      "lookahead. Fix before sweeping.")
 
+        # The truncation proof runs at L = 0, where nothing can compound, so it
+        # says nothing about whether a lookahead LABEL is the future context
+        # the model really gets. Measure that for every budget in the sweep.
+        if a.lookahead_scope == "end_to_end" and not a.unfreeze:
+            from effective_lookahead import reach_selftest
+            rs = reach_selftest(a.encoder_name, a.encoder_layer, a.lookaheads,
+                                chunk_ms=a.chunk_ms, lookback_ms=a.lookback_ms)
+            print(json.dumps(rs, indent=2))
+            if not rs["ok"]:
+                sys.exit("ABORT: measured future context does not equal "
+                         "chunk + lookahead for at least one budget. The "
+                         "lookahead labels would be wrong. Fix first.")
+
         if st["without_fix"]["causal"]:
             sys.exit(f"ABORT: {a.encoder_name} passes the truncation proof "
                      "UNPATCHED, which means the proof is not exercising the "
@@ -538,25 +563,44 @@ def main() -> None:
         chunk_ms=a.chunk_ms, lookback_ms=a.lookback_ms,
         batch_size=a.batch_size, train_steps=a.steps,
         freeze_encoder=not a.unfreeze,
-        encoder_name=a.encoder_name, encoder_layer=a.encoder_layer)
+        encoder_name=a.encoder_name, encoder_layer=a.encoder_layer,
+        lookahead_scope=a.lookahead_scope)
     for t in a.targets:
         assert_only_L_varies([c for c in cfgs if c.target.value == t])
     print(f"\n{len(cfgs)} conditions x {a.steps} steps\n")
 
     results = []
+    done: Dict[str, dict] = {}
+    if a.resume and os.path.exists(a.out + ".jsonl"):
+        with open(a.out + ".jsonl") as jf:
+            for line in jf:
+                if line.strip():
+                    rec = json.loads(line)
+                    done[rec["tag"]] = rec
+        print(f"resume: {len(done)} runs already in {a.out}.jsonl")
     total = len(cfgs) * len(a.seeds)
     k = 0
+    # Under end_to_end the frozen encoder never sees the lookahead, so its
+    # features are identical for every budget and both targets: cache them
+    # once for the whole sweep instead of once per condition.
+    sweep_cache = a.lookahead_scope == "end_to_end" and not a.unfreeze
+    shared = None
     for i, cfg in enumerate(cfgs, 1):
         # Cache the frozen-encoder features ONCE per condition and reuse them
         # for every seed. The encoder does not depend on the seed, so this is
         # exact -- and it is what makes 3 seeds cost ~1.2x a single seed rather
         # than 3x.
-        shared = None
+        if not sweep_cache:
+            shared = None
         for sd in a.seeds:
             k += 1
             c = TranslatorConfig(**{**cfg.fingerprint(), "lookahead_ms":
                                     cfg.lookahead_ms, "target": cfg.target,
                                     "seed": sd})
+            if c.tag() in done:
+                print(f"[{k}/{total}] {c.tag()} already done, skipping")
+                results.append(done[c.tag()])
+                continue
             print(f"[{k}/{total}] {c.tag()} seed={sd}  {c.geometry.describe()}")
             r, shared = train_one(c, items, vocab, device, a.steps,
                                   a.ckpt_dir, eval_every=a.eval_every,
@@ -565,6 +609,7 @@ def main() -> None:
                                   hyp_dir=a.hyp_dir or (
                                       os.path.dirname(a.out) or "."))
             r["seed"] = sd
+            r["lookahead_scope"] = c.lookahead_scope
             results.append(r)
 
             # Append this condition's result before starting the next one.

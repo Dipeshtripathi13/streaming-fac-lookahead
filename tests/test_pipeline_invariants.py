@@ -116,8 +116,49 @@ def test_torch_model_masks_are_L_dependent_only():
     print("ok  torch: identical weights, wider mask")
 
 
+def test_probe_lookahead_does_not_compound():
+    """The probe's future context must equal its label, not grow with depth.
+
+    Change the input from frame F on and find the first output frame that
+    moves. With the lookahead in the first block only, that frame is the one
+    the mask predicts. With it in every block, the reach is several times the
+    label, which is the error the first arXiv version carried.
+    """
+    try:
+        import torch
+    except Exception as e:
+        print(f"skip probe lookahead test ({type(e).__name__}: {str(e)[:60]})")
+        return
+    from sfac.translator import TranslatorConfig, PhoneVocab, build_translator
+    vocab = PhoneVocab([f"p{i}" for i in range(36)])
+    T, F = 300, 200
+    g = torch.Generator().manual_seed(0)
+    x = torch.randn(1, T, 768, generator=g)
+    y = x.clone()
+    y[:, F:] = torch.randn(1, T - F, 768, generator=g)
+
+    def first_moved(scope, L):
+        cfg = TranslatorConfig(lookahead_ms=L, lookahead_scope=scope)
+        m, _ = build_translator(cfg, vocab)
+        m.eval()
+        with torch.no_grad():
+            d = (m(x) - m(y))[0].abs().amax(-1)
+        return int(torch.nonzero(d > 1e-5)[0]), cfg.geometry
+
+    for L in (0, 20, 40, 60, 160, 340):
+        first, geo = first_moved("end_to_end", L)
+        C, NL = geo.chunk_frames, geo.lookahead_frames
+        want = next(i for i in range(F + 1) if (i // C + 1) * C - 1 + NL >= F)
+        assert first == want, f"L={L}: first moved frame {first}, mask says {want}"
+    e2e, _ = first_moved("end_to_end", 40)
+    per, _ = first_moved("per_layer", 40)
+    assert per < e2e, "per_layer should reach further ahead than its label"
+    print(f"ok  probe lookahead exact end-to-end; per_layer at L=40 ms reaches "
+          f"{(F - per) * 20} ms against {(F - e2e) * 20} ms")
+
+
 if __name__ == "__main__":
-    fns = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
+    fns =[v for k, v in sorted(globals().items()) if k.startswith("test_")]
     for fn in fns:
         fn()
     print(f"\n{len(fns)} tests passed")
