@@ -1,0 +1,121 @@
+{
+  "encoder": "microsoft/wavlm-base-plus",
+  "layer": 9,
+  "tolerance": 0.0001,
+  "end_to_end": [
+    {
+      "lookahead_ms": 0,
+      "expected_future_ms": 20.0,
+      "measured_future_ms": 20.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 20,
+      "expected_future_ms": 40.0,
+      "measured_future_ms": 40.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 40,
+      "expected_future_ms": 60.0,
+      "measured_future_ms": 60.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 60,
+      "expected_future_ms": 80.0,
+      "measured_future_ms": 80.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 80,
+      "expected_future_ms": 100.0,
+      "measured_future_ms": 100.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 160,
+      "expected_future_ms": 180.0,
+      "measured_future_ms": 180.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 320,
+      "expected_future_ms": 340.0,
+      "measured_future_ms": 340.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 640,
+      "expected_future_ms": 660.0,
+      "measured_future_ms": 660.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    }
+  ],
+  "per_layer": [
+    {
+      "lookahead_ms": 0,
+      "expected_future_ms": 20.0,
+      "measured_future_ms": 20.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 20,
+      "expected_future_ms": 40.0,
+      "measured_future_ms": 200.0,
+      "exact": false,
+      "max_rel_change_before": 9.580140613252297e-05
+    },
+    {
+      "lookahead_ms": 40,
+      "expected_future_ms": 60.0,
+      "measured_future_ms": 220.0,
+      "exact": false,
+      "max_rel_change_before": 7.63766875024885e-05
+    },
+    {
+      "lookahead_ms": 60,
+      "expected_future_ms": 80.0,
+      "measured_future_ms": 360.0,
+      "exact": false,
+      "max_rel_change_before": 9.690865408629179e-05
+    },
+    {
+      "lookahead_ms": 80,
+      "expected_future_ms": 100.0,
+      "measured_future_ms": 460.0,
+      "exact": false,
+      "max_rel_change_before": 4.320458901929669e-05
+    },
+    {
+      "lookahead_ms": 160,
+      "expected_future_ms": 180.0,
+      "measured_future_ms": 780.0,
+      "exact": false,
+      "max_rel_change_before": 7.92436912888661e-05
+    },
+    {
+      "lookahead_ms": 320,
+      "expected_future_ms": 340.0,
+      "measured_future_ms": 1440.0,
+      "exact": false,
+      "max_rel_change_before": 7.753945101285353e-05
+    },
+    {
+      "lookahead_ms": 640,
+      "expected_future_ms": 660.0,
+      "measured_future_ms": 2760.0,
+      "exact": false,
+      "max_rel_change_before": 9.862407023319975e-05
+    }
+  ]
+}

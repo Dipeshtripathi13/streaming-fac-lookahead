@@ -1,0 +1,267 @@
+{
+  "corpus": {
+    "n_items": 3599,
+    "n_train": 1800,
+    "n_val": 899,
+    "n_test": 900,
+    "val_speakers": [
+      "ASI",
+      "BWC",
+      "HKK",
+      "MBMPS",
+      "TLV",
+      "YBAA"
+    ],
+    "test_speakers": [
+      "ABA",
+      "EBVS",
+      "HJK",
+      "LXC",
+      "PNV",
+      "SVBI"
+    ],
+    "vocab_size": 37,
+    "per_l1": {
+      "Arabic": 599,
+      "Chinese": 600,
+      "Hindi": 600,
+      "Korean": 600,
+      "Spanish": 600,
+      "Vietnamese": 600
+    },
+    "mean_dur_s": 3.66,
+    "mean_per_g2p_vs_ipa": 0.1748
+  },
+  "device": "cuda",
+  "steps": 1200,
+  "chunk_ms": 40.0,
+  "results": [
+    {
+      "tag": "L40_native_s1337",
+      "lookahead_ms": 40.0,
+      "target": "native",
+      "chunk_ms": 40.0,
+      "t_algorithmic_ms": 80.0,
+      "t_algorithmic_honest_ms": 85.0,
+      "test_per": 0.4390336869055951,
+      "test_per_cross": 0.4740659730053212,
+      "n_test": 400,
+      "params": 24552741,
+      "steps": 1200,
+      "wall_s": 186.3,
+      "history": [
+        {
+          "step": 1000,
+          "loss": 0.9192466735839844,
+          "per": 0.4535187787730668,
+          "per_cross": 0.4710197070968816,
+          "n": 200
+        },
+        {
+          "step": 1200,
+          "loss": 0.7802702188491821,
+          "per": 0.4407551247276686,
+          "per_cross": 0.4584129092405116,
+          "n": 200
+        }
+      ],
+      "seed": 1337,
+      "lookahead_scope": "end_to_end"
+    },
+    {
+      "tag": "L160_native_s1337",
+      "lookahead_ms": 160.0,
+      "target": "native",
+      "chunk_ms": 40.0,
+      "t_algorithmic_ms": 200.0,
+      "t_algorithmic_honest_ms": 205.0,
+      "test_per": 0.43515761112459417,
+      "test_per_cross": 0.4697127554988985,
+      "n_test": 400,
+      "params": 24552741,
+      "steps": 1200,
+      "wall_s": 185.5,
+      "history": [
+        {
+          "step": 1000,
+          "loss": 0.7350766062736511,
+          "per": 0.44364608910810716,
+          "per_cross": 0.46925558790841704,
+          "n": 200
+        },
+        {
+          "step": 1200,
+          "loss": 0.7566152811050415,
+          "per": 0.43469458559200946,
+          "per_cross": 0.45648530148023136,
+          "n": 200
+        }
+      ],
+      "seed": 1337,
+      "lookahead_scope": "end_to_end"
+    },
+    {
+      "tag": "L240_native_s1337",
+      "lookahead_ms": 240.0,
+      "target": "native",
+      "chunk_ms": 40.0,
+      "t_algorithmic_ms": 280.0,
+      "t_algorithmic_honest_ms": 285.0,
+      "test_per": 0.432337518178307,
+      "test_per_cross": 0.467421662335607,
+      "n_test": 400,
+      "params": 24552741,
+      "steps": 1200,
+      "wall_s": 186.3,
+      "history": [
+        {
+          "step": 1000,
+          "loss": 0.7409788370132446,
+          "per": 0.44627222031913566,
+          "per_cross": 0.46917197669289634,
+          "n": 200
+        },
+        {
+          "step": 1200,
+          "loss": 0.6996445655822754,
+          "per": 0.4335507676179627,
+          "per_cross": 0.46401568211370475,
+          "n": 200
+        }
+      ],
+      "seed": 1337,
+      "lookahead_scope": "end_to_end"
+    },
+    {
+      "tag": "L320_native_s1337",
+      "lookahead_ms": 320.0,
+      "target": "native",
+      "chunk_ms": 40.0,
+      "t_algorithmic_ms": 360.0,
+      "t_algorithmic_honest_ms": 365.0,
+      "test_per": 0.429758994232122,
+      "test_per_cross": 0.46755227301850305,
+      "n_test": 400,
+      "params": 24552741,
+      "steps": 1200,
+      "wall_s": 186.0,
+      "history": [
+        {
+          "step": 1000,
+          "loss": 0.7626805305480957,
+          "per": 0.438460519531302,
+          "per_cross": 0.46548188334607254,
+          "n": 200
+        },
+        {
+          "step": 1200,
+          "loss": 0.6852453947067261,
+          "per": 0.4224670479851752,
+          "per_cross": 0.4505533341583772,
+          "n": 200
+        }
+      ],
+      "seed": 1337,
+      "lookahead_scope": "end_to_end"
+    }
+  ],
+  "per_condition_native": [
+    {
+      "lookahead_ms": 40.0,
+      "n_seeds": 1,
+      "per_mean": 0.4390336869055951,
+      "per_sd": 0.0,
+      "per_min": 0.4390336869055951,
+      "per_max": 0.4390336869055951,
+      "per_all": [
+        0.4390336869055951
+      ],
+      "cross_mean": 0.4740659730053212,
+      "preference_mean": 0.03503228609972614
+    },
+    {
+      "lookahead_ms": 160.0,
+      "n_seeds": 1,
+      "per_mean": 0.43515761112459417,
+      "per_sd": 0.0,
+      "per_min": 0.43515761112459417,
+      "per_max": 0.43515761112459417,
+      "per_all": [
+        0.43515761112459417
+      ],
+      "cross_mean": 0.4697127554988985,
+      "preference_mean": 0.03455514437430435
+    },
+    {
+      "lookahead_ms": 240.0,
+      "n_seeds": 1,
+      "per_mean": 0.432337518178307,
+      "per_sd": 0.0,
+      "per_min": 0.432337518178307,
+      "per_max": 0.432337518178307,
+      "per_all": [
+        0.432337518178307
+      ],
+      "cross_mean": 0.467421662335607,
+      "preference_mean": 0.03508414415729999
+    },
+    {
+      "lookahead_ms": 320.0,
+      "n_seeds": 1,
+      "per_mean": 0.429758994232122,
+      "per_sd": 0.0,
+      "per_min": 0.429758994232122,
+      "per_max": 0.429758994232122,
+      "per_all": [
+        0.429758994232122
+      ],
+      "cross_mean": 0.46755227301850305,
+      "preference_mean": 0.03779327878638106
+    }
+  ],
+  "curve_native": {
+    "lookaheads_ms": [
+      40.0,
+      160.0,
+      240.0,
+      320.0
+    ],
+    "test_per": [
+      0.4390336869055951,
+      0.43515761112459417,
+      0.432337518178307,
+      0.429758994232122
+    ],
+    "test_per_sd": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "n_seeds": 1,
+    "pooled_sd": 0.0,
+    "knee": {
+      "knee_ms": NaN,
+      "has_knee": false,
+      "delta_bic_piecewise_minus_loglinear": Infinity,
+      "breakpoint_if_piecewise_ms": NaN,
+      "r2_loglinear": 0.96858,
+      "r2_linear": 0.99971,
+      "slope_per_doubling": -0.00518,
+      "gain_per_doubling_profile": [
+        {
+          "from_ms": 160.0,
+          "to_ms": 320.0,
+          "delta": 0.0054
+        }
+      ],
+      "n_duplicate_conditions": 0,
+      "n_points": 4,
+      "underpowered_for_bic": true,
+      "chord_argmax_ms": 160.0,
+      "monotone": true,
+      "interpretation": "UNDERPOWERED: only 4 points; BIC cannot detect a knee below ~10 points, so a 'no knee' verdict here is absence of evidence, not evidence of absence. No knee: log-linear in lookahead (dBIC=+inf favours one segment). Every doubling buys ~0.0052. No natural operating point; the budget is a product decision."
+    },
+    "relative_gain_0_to_max": 0.021125241524957084
+  }
+}

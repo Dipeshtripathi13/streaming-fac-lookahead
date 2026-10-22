@@ -1,0 +1,121 @@
+{
+  "encoder": "facebook/wav2vec2-base",
+  "layer": 2,
+  "tolerance": 0.0001,
+  "end_to_end": [
+    {
+      "lookahead_ms": 0,
+      "expected_future_ms": 20.0,
+      "measured_future_ms": 20.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 20,
+      "expected_future_ms": 40.0,
+      "measured_future_ms": 40.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 40,
+      "expected_future_ms": 60.0,
+      "measured_future_ms": 60.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 60,
+      "expected_future_ms": 80.0,
+      "measured_future_ms": 80.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 80,
+      "expected_future_ms": 100.0,
+      "measured_future_ms": 100.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 160,
+      "expected_future_ms": 180.0,
+      "measured_future_ms": 180.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 320,
+      "expected_future_ms": 340.0,
+      "measured_future_ms": 340.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 640,
+      "expected_future_ms": 660.0,
+      "measured_future_ms": 660.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    }
+  ],
+  "per_layer": [
+    {
+      "lookahead_ms": 0,
+      "expected_future_ms": 20.0,
+      "measured_future_ms": 20.0,
+      "exact": true,
+      "max_rel_change_before": 0.0
+    },
+    {
+      "lookahead_ms": 20,
+      "expected_future_ms": 40.0,
+      "measured_future_ms": 80.0,
+      "exact": false,
+      "max_rel_change_before": 8.620098014944233e-06
+    },
+    {
+      "lookahead_ms": 40,
+      "expected_future_ms": 60.0,
+      "measured_future_ms": 100.0,
+      "exact": false,
+      "max_rel_change_before": 2.435975693515502e-05
+    },
+    {
+      "lookahead_ms": 60,
+      "expected_future_ms": 80.0,
+      "measured_future_ms": 160.0,
+      "exact": false,
+      "max_rel_change_before": 2.6977975721820258e-05
+    },
+    {
+      "lookahead_ms": 80,
+      "expected_future_ms": 100.0,
+      "measured_future_ms": 180.0,
+      "exact": false,
+      "max_rel_change_before": 7.587598520331085e-05
+    },
+    {
+      "lookahead_ms": 160,
+      "expected_future_ms": 180.0,
+      "measured_future_ms": 420.0,
+      "exact": false,
+      "max_rel_change_before": 8.069758769124746e-05
+    },
+    {
+      "lookahead_ms": 320,
+      "expected_future_ms": 340.0,
+      "measured_future_ms": 940.0,
+      "exact": false,
+      "max_rel_change_before": 9.714569750940427e-05
+    },
+    {
+      "lookahead_ms": 640,
+      "expected_future_ms": 660.0,
+      "measured_future_ms": 2180.0,
+      "exact": false,
+      "max_rel_change_before": 9.144098294200376e-05
+    }
+  ]
+}

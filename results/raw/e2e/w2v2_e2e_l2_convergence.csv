@@ -1,0 +1,4 @@
+tag,lookahead_ms,target,chunk_ms,t_algorithmic_ms,t_algorithmic_honest_ms,test_per,test_per_cross,n_test,params,steps,wall_s,seed,lookahead_scope
+L0_native_s1337,0.0,native,40.0,40.0,45.0,0.3796898053429603,0.41955788721583415,400,24552741,6000,921.0,1337,end_to_end
+L160_native_s1337,160.0,native,40.0,200.0,205.0,0.3592516341959198,0.4071982625993363,400,24552741,6000,919.6,1337,end_to_end
+L640_native_s1337,640.0,native,40.0,680.0,685.0,0.3953320948174259,0.433129135896191,400,24552741,6000,916.2,1337,end_to_end

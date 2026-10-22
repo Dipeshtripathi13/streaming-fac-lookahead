@@ -1,0 +1,2 @@
+tag,lookahead_ms,target,chunk_ms,t_algorithmic_ms,t_algorithmic_honest_ms,test_per,test_per_cross,n_test,params,steps,wall_s,seed,lookahead_scope
+L0_native_s1337,0.0,native,40.0,40.0,45.0,0.6986946997283369,0.7035739308991339,400,24552741,1200,186.0,1337,end_to_end

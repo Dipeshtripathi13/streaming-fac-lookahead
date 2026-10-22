@@ -1,0 +1,87 @@
+{
+  "corpus": {
+    "n_items": 3599,
+    "n_train": 1800,
+    "n_val": 899,
+    "n_test": 900,
+    "val_speakers": [
+      "ASI",
+      "BWC",
+      "HKK",
+      "MBMPS",
+      "TLV",
+      "YBAA"
+    ],
+    "test_speakers": [
+      "ABA",
+      "EBVS",
+      "HJK",
+      "LXC",
+      "PNV",
+      "SVBI"
+    ],
+    "vocab_size": 37,
+    "per_l1": {
+      "Arabic": 599,
+      "Chinese": 600,
+      "Hindi": 600,
+      "Korean": 600,
+      "Spanish": 600,
+      "Vietnamese": 600
+    },
+    "mean_dur_s": 3.66,
+    "mean_per_g2p_vs_ipa": 0.1748
+  },
+  "device": "cuda",
+  "steps": 1200,
+  "chunk_ms": 40.0,
+  "results": [
+    {
+      "tag": "L0_native_s1337",
+      "lookahead_ms": 0.0,
+      "target": "native",
+      "chunk_ms": 40.0,
+      "t_algorithmic_ms": 40.0,
+      "t_algorithmic_honest_ms": 45.0,
+      "test_per": 0.775027293865789,
+      "test_per_cross": 0.7754469910927851,
+      "n_test": 400,
+      "params": 24552741,
+      "steps": 1200,
+      "wall_s": 185.6,
+      "history": [
+        {
+          "step": 1000,
+          "loss": 2.3311617374420166,
+          "per": 0.7825949135225722,
+          "per_cross": 0.7832362609393908,
+          "n": 200
+        },
+        {
+          "step": 1200,
+          "loss": 2.1949920654296875,
+          "per": 0.7763732610644635,
+          "per_cross": 0.7781726190387284,
+          "n": 200
+        }
+      ],
+      "seed": 1337,
+      "lookahead_scope": "end_to_end"
+    }
+  ],
+  "per_condition_native": [
+    {
+      "lookahead_ms": 0.0,
+      "n_seeds": 1,
+      "per_mean": 0.775027293865789,
+      "per_sd": 0.0,
+      "per_min": 0.775027293865789,
+      "per_max": 0.775027293865789,
+      "per_all": [
+        0.775027293865789
+      ],
+      "cross_mean": 0.7754469910927851,
+      "preference_mean": 0.00041969722699619627
+    }
+  ]
+}

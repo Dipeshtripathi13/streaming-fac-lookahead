@@ -1,0 +1,1 @@
+{"tag": "L0_native_s1337", "lookahead_ms": 0.0, "target": "native", "chunk_ms": 40.0, "t_algorithmic_ms": 40.0, "t_algorithmic_honest_ms": 45.0, "test_per": 0.5643464938547922, "test_per_cross": 0.57732267519333, "n_test": 400, "params": 24552741, "steps": 1200, "wall_s": 185.9, "seed": 1337, "lookahead_scope": "end_to_end"}
