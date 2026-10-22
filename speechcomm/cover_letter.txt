@@ -1,0 +1,21 @@
+Dipesh Tripathi
+University of South Dakota
+414 E Clark St, Vermillion, SD 57069, USA
+dipesh.tripathi@coyotes.usd.edu
+
+To the Editors-in-Chief, Speech Communication
+
+Dear Editors,
+
+Please consider the enclosed manuscript, "Per-layer lookahead masks leak future context: re-measuring the future-context requirement of streaming accent conversion," for publication in Speech Communication as an original full-length research article.
+
+Streaming speech systems, including recent streaming accent conversion systems, are built around a lookahead budget, and studies of the latency-quality trade-off report accuracy as a function of that budget. The manuscript shows that two common constructions make the budget a model is labelled with differ from the future context it actually uses. Masking self-attention does not make wav2vec 2.0 or WavLM base causal, and a lookahead mask applied in every layer compounds with depth: in a frozen-WavLM probe, a nominal 40 ms budget draws on at least 220 ms of future audio. We give a perturbation test that measures effective future context and two masking schemes that make it equal the nominal budget exactly. Re-measuring a phonetic-normalisation probe for accent conversion with exact budgets reduces the apparent benefit of 640 ms of lookahead from 63% to between 3.7% and 12.5% relative phone error rate, and removes two secondary effects that the per-layer measurement suggested.
+
+We believe the work suits Speech Communication because it concerns the methodology of evaluating streaming speech processing, an area the journal covers under models for automatic speech communication and development and evaluation tools, and because its central recommendation, that lookahead results be reported with a measured effective context, applies across streaming recognition, conversion and synthesis.
+
+All code, tests, configurations and per-condition results are publicly available, as described in the data availability statement. The manuscript is not under consideration elsewhere, and its single author approves its submission. The use of generative AI tools is declared in the manuscript.
+
+Thank you for your consideration.
+
+Sincerely,
+Dipesh Tripathi

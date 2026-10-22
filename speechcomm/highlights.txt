@@ -1,0 +1,7 @@
+Highlights
+
+• Per-layer lookahead masks compound with depth and leak future context
+• A nominal 40 ms budget used at least 220 ms of future audio in a WavLM probe
+• A perturbation test measures the effective future context of a streaming model
+• Two masking schemes make the effective context equal the nominal budget
+• With exact budgets the lookahead benefit drops from 63% to 3.7-12.5% (PER)

@@ -1,0 +1,160 @@
+\begin{thebibliography}{17}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\href}[2]{#2}
+\providecommand{\path}[1]{#1}
+\providecommand{\DOIprefix}{doi:}
+\providecommand{\ArXivprefix}{arXiv:}
+\providecommand{\URLprefix}{URL: }
+\providecommand{\Pubmedprefix}{pmid:}
+\providecommand{\doi}[1]{\href{http://dx.doi.org/#1}{\path{#1}}}
+\providecommand{\Pubmed}[1]{\href{pmid:#1}{\path{#1}}}
+\providecommand{\bibinfo}[2]{#2}
+\ifx\xfnm\relax \def\xfnm[#1]{\unskip,\space#1}\fi
+%Type = Inproceedings
+\bibitem[{Baevski et~al.(2020)Baevski, Zhou, Mohamed and Auli}]{wav2vec2}
+\bibinfo{author}{Baevski, A.}, \bibinfo{author}{Zhou, H.},
+  \bibinfo{author}{Mohamed, A.}, \bibinfo{author}{Auli, M.},
+  \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{wav2vec 2.0: A framework for self-supervised learning
+  of speech representations}, in: \bibinfo{booktitle}{Proc. NeurIPS}.
+%Type = Article
+\bibitem[{Chen et~al.(2022)Chen, Wang, Chen, Wu, Liu, Chen, Li, Kanda,
+  Yoshioka, Xiao, Wu, Zhou, Ren, Qian, Qian, Zeng, Yu and Wei}]{wavlm2022}
+\bibinfo{author}{Chen, S.}, \bibinfo{author}{Wang, C.}, \bibinfo{author}{Chen,
+  Z.}, \bibinfo{author}{Wu, Y.}, \bibinfo{author}{Liu, S.},
+  \bibinfo{author}{Chen, Z.}, \bibinfo{author}{Li, J.}, \bibinfo{author}{Kanda,
+  N.}, \bibinfo{author}{Yoshioka, T.}, \bibinfo{author}{Xiao, X.},
+  \bibinfo{author}{Wu, J.}, \bibinfo{author}{Zhou, L.}, \bibinfo{author}{Ren,
+  S.}, \bibinfo{author}{Qian, Y.}, \bibinfo{author}{Qian, Y.},
+  \bibinfo{author}{Zeng, M.}, \bibinfo{author}{Yu, X.}, \bibinfo{author}{Wei,
+  F.}, \bibinfo{year}{2022}.
+\newblock \bibinfo{title}{{WavLM}: Large-scale self-supervised pre-training for
+  full stack speech processing}.
+\newblock \bibinfo{journal}{IEEE J. Sel. Topics Signal Process.}
+  \DOIprefix\doi{10.1109/JSTSP.2022.3188113}.
+%Type = Article
+\bibitem[{Ding et~al.(2022)Ding, Zhao and Guti{\'e}rrez-Osuna}]{accentron2022}
+\bibinfo{author}{Ding, S.}, \bibinfo{author}{Zhao, G.},
+  \bibinfo{author}{Guti{\'e}rrez-Osuna, R.}, \bibinfo{year}{2022}.
+\newblock \bibinfo{title}{Accentron: Foreign accent conversion to arbitrary
+  non-native speakers using zero-shot learning}.
+\newblock \bibinfo{journal}{Comput. Speech Lang.} \bibinfo{volume}{72},
+  \bibinfo{pages}{101302}.
+%Type = Article
+\bibitem[{Halychanskyi et~al.(2026)Halychanskyi, Guo and
+  Kindratenko}]{acsurvey2026}
+\bibinfo{author}{Halychanskyi, Y.}, \bibinfo{author}{Guo, J.S.},
+  \bibinfo{author}{Kindratenko, V.}, \bibinfo{year}{2026}.
+\newblock \bibinfo{title}{Accent conversion: A problem-driven survey of
+  sociolinguistic and technical constraints}.
+\newblock \bibinfo{journal}{arXiv preprint arXiv:2604.27281} .
+%Type = Article
+\bibitem[{Kass and Raftery(1995)}]{kassraftery1995}
+\bibinfo{author}{Kass, R.E.}, \bibinfo{author}{Raftery, A.E.},
+  \bibinfo{year}{1995}.
+\newblock \bibinfo{title}{Bayes factors}.
+\newblock \bibinfo{journal}{J. Amer. Statist. Assoc.} \bibinfo{volume}{90},
+  \bibinfo{pages}{773--795}.
+%Type = Article
+\bibitem[{Kuzmin et~al.(2026a)Kuzmin, Lee and Chng}]{streamvoiceanonplus2026}
+\bibinfo{author}{Kuzmin, N.}, \bibinfo{author}{Lee, K.A.},
+  \bibinfo{author}{Chng, E.S.}, \bibinfo{year}{2026}a.
+\newblock \bibinfo{title}{{StreamVoiceAnon+}: Emotion-preserving streaming
+  speaker anonymization via frame-level acoustic distillation}.
+\newblock \bibinfo{journal}{arXiv preprint arXiv:2603.06079} .
+%Type = Inproceedings
+\bibitem[{Kuzmin et~al.(2026b)Kuzmin, Liu, Lee and Chng}]{streamvoiceanon2026}
+\bibinfo{author}{Kuzmin, N.}, \bibinfo{author}{Liu, S.}, \bibinfo{author}{Lee,
+  K.A.}, \bibinfo{author}{Chng, E.S.}, \bibinfo{year}{2026}b.
+\newblock \bibinfo{title}{Stream-voice-anon: Enhancing utility of real-time
+  speaker anonymization via neural audio codec and language models}, in:
+  \bibinfo{booktitle}{Proc. IEEE ICASSP}.
+%Type = Inproceedings
+\bibitem[{Nguyen et~al.(2025)Nguyen, Pham, Akti and
+  Waibel}]{nguyen2025streaming}
+\bibinfo{author}{Nguyen, T.N.}, \bibinfo{author}{Pham, N.Q.},
+  \bibinfo{author}{Akti, {\c{S}}.}, \bibinfo{author}{Waibel, A.},
+  \bibinfo{year}{2025}.
+\newblock \bibinfo{title}{Streaming non-autoregressive model for accent
+  conversion and pronunciation improvement}, in:
+  \bibinfo{booktitle}{Interspeech}, pp. \bibinfo{pages}{4163--4167}.
+%Type = Inproceedings
+\bibitem[{Quamer and Guti{\'e}rrez-Osuna(2024)}]{e2eanon2024}
+\bibinfo{author}{Quamer, W.}, \bibinfo{author}{Guti{\'e}rrez-Osuna, R.},
+  \bibinfo{year}{2024}.
+\newblock \bibinfo{title}{End-to-end streaming model for low-latency speech
+  anonymization}, in: \bibinfo{booktitle}{Proc. IEEE SLT}, pp.
+  \bibinfo{pages}{727--734}.
+\newblock \DOIprefix\doi{10.1109/SLT61566.2024.10832303}.
+%Type = Inproceedings
+\bibitem[{Quamer and Guti{\'e}rrez-Osuna(2025)}]{darkstream2025}
+\bibinfo{author}{Quamer, W.}, \bibinfo{author}{Guti{\'e}rrez-Osuna, R.},
+  \bibinfo{year}{2025}.
+\newblock \bibinfo{title}{{DarkStream}: Real-time speech anonymization with low
+  latency}, in: \bibinfo{booktitle}{Proc. IEEE ASRU}, pp.
+  \bibinfo{pages}{1--7}.
+\newblock \DOIprefix\doi{10.1109/ASRU65441.2025.11434609}.
+%Type = Article
+\bibitem[{Quamer et~al.(2026a)Quamer, Tseng, Nasrallah and
+  Guti{\'e}rrez-Osuna}]{phonos2026}
+\bibinfo{author}{Quamer, W.}, \bibinfo{author}{Tseng, M.R.},
+  \bibinfo{author}{Nasrallah, G.}, \bibinfo{author}{Guti{\'e}rrez-Osuna, R.},
+  \bibinfo{year}{2026}a.
+\newblock \bibinfo{title}{{PHONOS}: {PHO}netic neutralization for online
+  streaming applications}.
+\newblock \bibinfo{journal}{arXiv preprint arXiv:2603.27001} .
+%Type = Article
+\bibitem[{Quamer et~al.(2026b)Quamer, Tseng, Nasrallah and
+  Guti{\'e}rrez-Osuna}]{tvtsyn2026}
+\bibinfo{author}{Quamer, W.}, \bibinfo{author}{Tseng, M.R.},
+  \bibinfo{author}{Nasrallah, G.}, \bibinfo{author}{Guti{\'e}rrez-Osuna, R.},
+  \bibinfo{year}{2026}b.
+\newblock \bibinfo{title}{{TVTSyn}: Content-synchronous time-varying timbre for
+  streaming voice conversion and anonymization}.
+\newblock \bibinfo{journal}{arXiv preprint arXiv:2602.09389} .
+%Type = Article
+\bibitem[{Sadov et~al.(2023)Sadov, Hutter and Near}]{llvc2023}
+\bibinfo{author}{Sadov, K.}, \bibinfo{author}{Hutter, M.},
+  \bibinfo{author}{Near, A.}, \bibinfo{year}{2023}.
+\newblock \bibinfo{title}{Low-latency real-time voice conversion on {CPU}}.
+\newblock \bibinfo{journal}{arXiv preprint arXiv:2311.00873} .
+%Type = Inproceedings
+\bibitem[{Yang et~al.(2024)Yang, Kartynnik, Li, Tang, Li, Sung and
+  Grundmann}]{streamvc2024}
+\bibinfo{author}{Yang, Y.}, \bibinfo{author}{Kartynnik, Y.},
+  \bibinfo{author}{Li, Y.}, \bibinfo{author}{Tang, J.}, \bibinfo{author}{Li,
+  X.}, \bibinfo{author}{Sung, G.}, \bibinfo{author}{Grundmann, M.},
+  \bibinfo{year}{2024}.
+\newblock \bibinfo{title}{{StreamVC}: Real-time low-latency voice conversion},
+  in: \bibinfo{booktitle}{Proc. IEEE ICASSP}, pp.
+  \bibinfo{pages}{11016--11020}.
+\newblock \DOIprefix\doi{10.1109/ICASSP48485.2024.10446863}.
+%Type = Inproceedings
+\bibitem[{Zhang et~al.(2020)Zhang, Lu, Sak, Tripathi, McDermott, Koo and
+  Kumar}]{zhang2020transformertransducer}
+\bibinfo{author}{Zhang, Q.}, \bibinfo{author}{Lu, H.}, \bibinfo{author}{Sak,
+  H.}, \bibinfo{author}{Tripathi, A.}, \bibinfo{author}{McDermott, E.},
+  \bibinfo{author}{Koo, S.}, \bibinfo{author}{Kumar, S.}, \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{Transformer transducer: A streamable speech
+  recognition model with transformer encoders and {RNN-T} loss}, in:
+  \bibinfo{booktitle}{Proc. IEEE ICASSP}.
+%Type = Article
+\bibitem[{Zhao et~al.(2021)Zhao, Ding and Guti{\'e}rrez-Osuna}]{zhao2021fac}
+\bibinfo{author}{Zhao, G.}, \bibinfo{author}{Ding, S.},
+  \bibinfo{author}{Guti{\'e}rrez-Osuna, R.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{Converting foreign accent speech without a
+  reference}.
+\newblock \bibinfo{journal}{IEEE/ACM Trans. Audio, Speech, Language Process.}
+  \bibinfo{volume}{29}, \bibinfo{pages}{2367--2381}.
+%Type = Inproceedings
+\bibitem[{Zhao et~al.(2018)Zhao, Sonsaat, Silpachai, Lucic,
+  Chukharev-Hudilainen, Levis and Guti{\'e}rrez-Osuna}]{l2arctic2018}
+\bibinfo{author}{Zhao, G.}, \bibinfo{author}{Sonsaat, S.},
+  \bibinfo{author}{Silpachai, A.}, \bibinfo{author}{Lucic, I.},
+  \bibinfo{author}{Chukharev-Hudilainen, E.}, \bibinfo{author}{Levis, J.},
+  \bibinfo{author}{Guti{\'e}rrez-Osuna, R.}, \bibinfo{year}{2018}.
+\newblock \bibinfo{title}{{L2-ARCTIC}: A non-native {E}nglish speech corpus},
+  in: \bibinfo{booktitle}{Interspeech}, pp. \bibinfo{pages}{2783--2787}.
+
+\end{thebibliography}

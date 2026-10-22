@@ -1,0 +1,685 @@
+% ---------------------------------------------------------------------------
+% Speech Communication submission (Elsevier, elsarticle). Built from
+% ../paper/v2/paper.tex; keep the two in sync by hand.
+% Build: tectonic manuscript.tex  (needs refs.bib and fig_schemes.pdf here)
+% ---------------------------------------------------------------------------
+\documentclass[preprint,12pt,authoryear]{elsarticle}
+\usepackage{amsmath,amssymb,graphicx,booktabs,url}
+\usepackage[T1]{fontenc}
+\usepackage[hidelinks,breaklinks=true]{hyperref}
+\biboptions{authoryear}
+\setlength{\emergencystretch}{3em}
+
+\newcommand{\talg}{\ensuremath{t_{\mathrm{alg}}}}
+\newcommand{\tcmp}{\ensuremath{t_{\mathrm{cmp}}}}
+\newcommand{\tbuf}{\ensuremath{t_{\mathrm{buf}}}}
+
+\journal{Speech Communication}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Per-layer lookahead masks leak future context: re-measuring the
+future-context requirement of streaming accent conversion}
+
+\author{Dipesh Tripathi\corref{cor1}}
+\ead{dipesh.tripathi@coyotes.usd.edu}
+\cortext[cor1]{Corresponding author.}
+\affiliation{organization={University of South Dakota},
+            addressline={414 E Clark St},
+            city={Vermillion},
+            state={SD},
+            postcode={57069},
+            country={USA}}
+
+\begin{abstract}
+Streaming foreign accent conversion systems are designed around a lookahead
+budget, and latency--quality studies report accuracy as a function of it. Such results are valid only if the
+model's output depends on no more future input than the budget states. We
+show that two common constructions violate this. First, masking
+self-attention does not make wav2vec~2.0 or WavLM base causal: a positional
+convolution admits 1.28\,s of future input and a feature-encoder
+normalisation admits the whole utterance. Second, a lookahead mask applied in
+every layer compounds with depth: in a 13-layer model built on a frozen WavLM
+encoder, a nominal 40\,ms budget yields at least 220\,ms of effective future
+context, and a nominal 640\,ms at least 2.8\,s. We give a perturbation test
+that measures effective future context and two masking schemes for which it
+equals the nominal budget exactly. Re-measuring a phonetic-normalisation
+probe for accent conversion under these schemes changes the conclusion. Under per-layer masking, phone error rate falls by 63\% from 0
+to 640\,ms of nominal lookahead. With exact budgets the reduction is 12.5\%
+when the lookahead enters the first encoder layer and 3.7\% when it enters
+only after the encoder, where nearly all of the gain is obtained within
+80\,ms. Two secondary findings of the per-layer analysis, a stronger
+lookahead response for canonical than for realized phone targets and a large
+difference between encoders, do not survive exact budgets. We conclude that
+lookahead results should be reported with a measured effective context.
+\end{abstract}
+
+\begin{keyword}
+accent conversion \sep streaming speech processing \sep lookahead \sep
+latency \sep self-supervised models \sep reproducibility
+\end{keyword}
+
+\end{frontmatter}
+
+\section{Introduction}
+
+Streaming foreign accent conversion (FAC) has been demonstrated at low
+latency. PHONOS \citep{phonos2026} operates with at most 40\,ms of lookahead
+and reports an 81\% reduction in non-native accent confidence, and related
+systems for streaming conversion and anonymisation operate under similar
+budgets \citep{tvtsyn2026, darkstream2025}. The lookahead budget is therefore a
+primary design parameter of such systems, and a natural question is how much
+accuracy each additional millisecond of future context buys.
+
+Answering that question requires that the budget a model is labelled with is
+the future context it actually uses. Two properties of current practice make
+this assumption fragile. Self-supervised speech encoders contain components
+outside self-attention that read future input, so masking attention alone does
+not make them causal. And a lookahead mask applied identically in every layer
+of a deep network extends the receptive field by the budget once per layer.
+The latter is known in streaming speech recognition, where the look-ahead
+latency of per-layer right context is recognised to aggregate over the layers
+of the stack \citep{zhang2020transformertransducer}. It is easily overlooked,
+however, when a frozen pretrained encoder is masked to emulate a streaming
+condition, because the nominal budget then describes the mask rather than the
+model.
+
+This paper began as a characterisation of the lookahead--accuracy trade-off
+for streaming FAC using a phone-translation probe, and an earlier version
+reported a steep, log-linear benefit of lookahead under per-layer masking. A
+measurement of the probe's effective future context showed that the masks
+compounded and that the nominal budgets understated the context used by a
+factor of three to five at short budgets and more at long ones. The present paper reports that finding, the tools
+that detect and remove it, and the corrected measurement.
+
+The contributions are as follows.
+\begin{enumerate}\itemsep1pt
+\item We identify two components of wav2vec~2.0 and WavLM base that leak future
+      input under attention masking, give patches for both, and verify them by
+      a truncation test (\S\ref{sec:causal}).
+\item We show that per-layer lookahead masks compound in a frozen-encoder
+      probe and quantify the inflation, using a perturbation test that
+      measures the effective future context of a complete model
+      (\S\ref{sec:mask}, \S\ref{sec:reach}).
+\item We define two masking schemes whose effective context equals the
+      nominal budget exactly, one placing the lookahead after the encoder and
+      one in the first encoder layer, and verify both with the same test.
+\item We re-measure the lookahead response of the probe under all three
+      schemes with matched training, and show that the per-layer result
+      overstates the benefit of lookahead by a factor of five to seventeen
+      and that two secondary findings derived from it do not hold under exact
+      budgets (\S\ref{sec:schemes}--\S\ref{sec:encoder}).
+\end{enumerate}
+
+\section{Related work}
+
+\citet{nguyen2025streaming} present a streaming
+non-autoregressive accent conversion system built on an Emformer encoder, and
+PHONOS \citep{phonos2026} targets substantially lower latency with bounded
+future context. PHONOS, TVTSyn \citep{tvtsyn2026} and
+DarkStream \citep{darkstream2025} originate from one group and combine
+conversion with speaker anonymisation. TVTSyn reports both CPU and GPU latency
+at a 60\,ms chunk, and DarkStream ablates its look-ahead over
+$\{0, 140, 280\}$\,ms, selecting 140\,ms because the further 140\,ms improves
+anonymisation accuracy by less than one percentage point.
+StreamVC \citep{streamvc2024} reports mobile operation without device details.
+A survey \citep{acsurvey2026} frames the problem space; streaming
+anonymisation \citep{streamvoiceanon2026, streamvoiceanonplus2026, e2eanon2024}
+shares the latency constraint, and offline FAC \citep{zhao2021fac,
+accentron2022} and low-latency voice conversion \citep{llvc2023} bracket the
+design space.
+
+In streaming speech recognition, \citet{zhang2020transformertransducer} note that applying the same
+right-context mask in every Transformer layer makes the look-ahead latency
+aggregate over the layers. Our contribution is not that observation but its
+measurement and consequences in a setting where it is easy to miss: a frozen
+self-supervised encoder masked to emulate streaming, used as a probe of how
+much future context a conversion task requires. None of the FAC systems above
+is evaluated here, and no claim is made about their effective context.
+
+\section{Method}
+\label{sec:method}
+
+\subsection{Task and latency model}
+\label{sec:formulation}
+
+Let $\mathbf{x}$ be a 16\,kHz waveform from a non-native speaker, encoded into
+frames $\mathbf{z}_{1:T}$ at hop $h=20$\,ms. L2-ARCTIC \citep{l2arctic2018}
+annotates each utterance with a canonical phone sequence
+$\mathbf{y}^{\mathrm{can}}$ derived from the lexicon and a realized sequence
+$\mathbf{y}^{\mathrm{real}}$ transcribed from what the speaker produced. We
+operationalize the phonetic-normalisation component of accent conversion as
+the prediction of $\mathbf{y}^{\mathrm{can}}$ from accented audio,
+\begin{equation}
+f_\theta:\ \mathbf{x} \longmapsto \mathbf{y}^{\mathrm{can}}.
+\label{eq:task}
+\end{equation}
+This is a controlled proxy for one stage of FAC; the future-context
+requirements of acoustic generation and prosody may differ.
+
+A streaming system consumes audio in chunks of $c=Ch$ and may delay its
+output by a lookahead of $L$, realized as $N_L=\lceil L/h\rceil$ frames. Under
+a block-emission convention its end-to-end delay is
+\begin{equation}
+t_{\mathrm{e2e}} = \underbrace{c + L}_{\talg} + \tcmp + \tbuf ,
+\label{eq:decomp}
+\end{equation}
+where \tcmp{} is per-chunk computation and \tbuf{} is input/output and jitter
+buffering. Eq.~\ref{eq:decomp} holds only if the output for a chunk depends on
+no input beyond $L$ after the end of the chunk. Verifying that condition is
+the subject of the following subsections.
+
+\subsection{Lookahead masking schemes}
+\label{sec:mask}
+
+With zero-based frame indices, chunk length $C$, lookahead $N_L$ and lookback
+$N_B$ frames, the chunked lookahead mask permits query frame $i$ to attend to
+key frame $j$ if and only if
+\begin{equation}
+i - N_B \;\le\; j \;\le\; (\lfloor i/C \rfloor + 1)\,C - 1 + N_L .
+\label{eq:mask}
+\end{equation}
+The upper limit is the last frame of the chunk containing $i$, extended by
+$N_L$ frames. The mask is added to the pre-softmax attention logits; in WavLM
+it is added to the gated relative position bias, which leaves the model's own
+padding mask in effect. All experiments use $C=2$ ($c=40$\,ms) and $N_B=100$
+(2\,s). We compare three ways of applying it to a model consisting of a
+frozen encoder tapped at layer $\ell$ followed by a four-block probe.
+
+\textbf{Per-layer.} Eq.~\ref{eq:mask} with lookahead $N_L$ is applied in every
+encoder layer and every probe block. The bounds compose: a frame at layer $k$
+attends to frames of layer $k{-}1$ that have themselves attended $N_L$ frames
+ahead, so after $K$ masked layers the output at frame $i$ can depend on input
+as far as approximately $i + K(N_L + C - 1)$. For $N_L=0$ the bound does not
+grow, since every attended frame lies in the same or an earlier chunk. For
+$N_L>0$ it grows linearly with depth.
+
+\textbf{End-to-end.} The encoder is masked frame-causally (Eq.~\ref{eq:mask}
+with $C=1$ and $N_L=0$), the first probe block uses the full $N_L$, and the
+remaining blocks use $N_L=0$. An encoder frame then depends on no input
+beyond itself, the first block extends each frame's context to the end of its
+chunk plus $N_L$ frames, and later blocks, which attend only within the
+current and earlier chunks, cannot extend it further. The effective future
+context is exactly $(C-1+N_L)h$.
+
+\textbf{Encoder-first.} The first encoder layer uses the full $N_L$ and every
+later encoder layer and probe block uses $N_L=0$. By the same argument the
+effective future context is again exactly $(C-1+N_L)h$, but the pretrained
+encoder now builds its representation with the future in view.
+
+The two exact schemes differ in a second respect that matters at $L=0$: in
+the end-to-end scheme encoder frames are frame-causal, whereas in the
+encoder-first and per-layer schemes they may also attend to the remainder of
+their own chunk.
+
+\subsection{Measuring effective future context}
+\label{sec:reachtest}
+
+Let $F$ denote the complete model, encoder and probe. We replace every sample
+after a time $\tau$ by independent noise and locate the earliest output frame
+whose relative change, $\lVert F(\mathbf{x})_t - F(\mathbf{x}')_t\rVert /
+\lVert F(\mathbf{x})_t\rVert$, exceeds $10^{-4}$; floating-point noise in this
+computation is of order $10^{-5}$. The interval between that frame and the
+first input frame affected by the perturbation is the effective future
+context. Because a frame's context depends on its position within the chunk,
+the test is repeated for each alignment of $\tau$ within a chunk and the
+largest value is retained. The probe is randomly initialised, since the
+property under test is structural. Values obtained this way are lower bounds,
+because the influence of sufficiently distant frames can fall below the
+threshold. The test is run for every budget before each training sweep, and
+the sweep is aborted if an exact scheme fails it.
+
+\subsection{Making the encoder causal}
+\label{sec:causal}
+
+Masking self-attention in wav2vec~2.0 or WavLM base \citep{wavlm2022, wav2vec2}
+does not produce a causal encoder, because two components outside the
+attention layers also read future input.
+
+\textbf{Positional convolution.} The convolutional positional embedding is a
+grouped convolution with kernel size $K_p=128$ and symmetric padding, so the
+embedding added to frame $t$ is computed from frames $t-64$ to $t+63$, 1.28\,s
+of future context. We replace the symmetric padding with $K_p-1$ frames of
+left padding,
+\begin{equation}
+\mathbf{p}_t = \sum_{k=0}^{K_p-1} \mathbf{W}_k\, \mathbf{z}_{t-(K_p-1)+k},
+\label{eq:posconv}
+\end{equation}
+retaining the pretrained kernel $\mathbf{W}$.
+
+\textbf{Feature-encoder normalisation.} In the base checkpoints the first
+layer of the convolutional feature encoder is followed by a group
+normalisation with one group per channel, whose statistics are computed over
+the entire utterance. We replace it with a cumulative normalisation,
+\begin{equation}
+\begin{aligned}
+\mu_t &= \frac{1}{t}\sum_{s=1}^{t} x_s,\qquad
+\sigma_t^2 = \frac{1}{t}\sum_{s=1}^{t} x_s^2 - \mu_t^2,\\
+y_t &= \gamma\,\frac{x_t-\mu_t}{\sqrt{\sigma_t^2+\epsilon}} + \beta,
+\end{aligned}
+\label{eq:cumnorm}
+\end{equation}
+applied per channel with the pretrained affine parameters $\gamma$ and
+$\beta$. The large checkpoints use layer normalisation at this position and do
+not require the second patch. Both patches alter the function computed by the
+pretrained encoder, which is then used frozen; every condition uses the same
+patched encoder, so comparisons across lookahead are unaffected.
+
+\textbf{Verification by truncation.} A causal encoder must satisfy
+$F(\mathbf{x})_t = F(\mathbf{x}_{1:\tau})_t$ for every frame $t$ ending before
+sample $\tau$. With $N_L=0$, a 4\,s input truncated at 2\,s and the last
+$m=8$ frames excluded to cover the front end's receptive field, we compute the
+relative $L_2$ change $\delta$ in the remaining frames and require
+$\delta<10^{-4}$. Table~\ref{tab:causal} reports the four combinations of the
+two patches. Neither patch suffices alone, and applying the cumulative
+normalisation without the causal positional convolution increases $\delta$.
+The value for the fully patched encoder lies at single-precision accumulation
+level and varies with the library release ($4.58\times10^{-6}$ here,
+$6.14\times10^{-6}$ with an earlier release).
+
+\begin{table}[t]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.93}
+\caption{Truncation test on \texttt{wavlm-base-plus} at $N_L=0$: relative
+$L_2$ change $\delta$ in earlier frames after later audio is deleted.}
+\label{tab:causal}
+\begin{tabular}{lrc}
+\toprule
+configuration & $\delta$ & causal? \\
+\midrule
+attention mask only        & $1.14\times10^{-2}$ & no \\
+\quad + causal positional conv & $6.00\times10^{-3}$ & no \\
+\quad + cumulative normalisation & $2.60\times10^{-2}$ & no \\
+\textbf{both patches}      & $\mathbf{4.58\times10^{-6}}$ & \textbf{yes} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The truncation test establishes causality at $N_L=0$ only. It cannot detect
+the compounding of \S\ref{sec:mask}, which appears only for $N_L>0$; that is
+the role of the test in \S\ref{sec:reachtest}.
+
+\subsection{Probe and matched control}
+\label{sec:probe}
+
+The probe operates on the hidden states of encoder layer $\ell$ ($\ell=9$ for
+WavLM base+, $\ell=2$ for wav2vec~2.0 base; \S\ref{sec:encoder}). It consists
+of four pre-norm blocks of width 768, each applying eight-head self-attention,
+a depthwise convolution of kernel size 31 with left-only padding followed by a
+pointwise convolution, and a feed-forward layer of width 2048 with GELU
+activation, all with residual connections and dropout 0.1. A final layer
+normalisation and a linear layer produce posteriors over 37 symbols (36 phones
+after stress marks are removed, and the CTC blank). The probe has 24.6\,M
+parameters, is trained with the connectionist temporal classification
+objective, and is decoded greedily. Padded positions are zeroed after every
+sub-layer.
+
+Replacing $\mathbf{y}^{\mathrm{can}}$ in Eq.~\ref{eq:task} with
+$\mathbf{y}^{\mathrm{real}}$ yields a realized-phone transcription model that
+shares architecture, capacity, vocabulary, data order, seed and step count
+with the canonical-phone model and differs only in its target tensor.
+
+\subsection{Reported quantities}
+\label{sec:quantities}
+
+PER is the Levenshtein distance between hypothesis and reference divided by
+the reference length, averaged over test utterances. The \emph{exchange rate}
+is the slope of the least-squares fit
+$\mathrm{PER}(L)=\alpha+\beta\log_2 L$ over $L\ge20$\,ms, in PER per doubling.
+The \emph{repeatability floor} $2\sigma$ is twice the standard deviation of
+test PER over complete reruns of a condition at identical seed and
+configuration; differences below it are treated as unresolved. The
+\emph{preference margin} of a model is its PER against the other target minus
+its PER against its own.
+
+\section{Experimental setup}
+\label{sec:setup}
+
+\textbf{Data.} We use the \texttt{KoelLabs/L2Arctic} release of
+L2-ARCTIC \citep{l2arctic2018}, 3599 phoneme-annotated utterances from 24
+speakers of six native languages, excluding utterances shorter than 0.8\,s or
+longer than 10\,s. The data are divided into speaker-disjoint sets stratified
+by native language: one speaker per language for validation, one for testing,
+and the remaining speakers for training. Test PER is computed on a fixed
+subset of 400 test utterances.
+
+\textbf{Training.} The encoder is frozen. The probe is trained for 1200 steps
+with batch size 8, AdamW (weight decay 0.01), a one-cycle schedule with peak
+learning rate $3\times10^{-4}$ and gradient clipping at 1.0. The order of
+training utterances is identical across conditions. All training ran on an
+NVIDIA T4.
+
+\textbf{Sweeps.} Under the per-layer scheme: a dense sweep of 21 budgets from
+0 to 640\,ms with two seeds on the canonical-phone arm, 16 of those budgets on
+the realized-phone arm, and a seven-budget wav2vec~2.0 sweep. Under the
+end-to-end scheme we repeat each of these and add a seven-budget,
+two-target, three-seed sweep, a repeatability experiment and a convergence
+check to 6000 steps. Under the encoder-first scheme we run seven budgets
+$\{0,20,40,80,160,320,640\}$\,ms with two seeds for WavLM and one for
+wav2vec~2.0. Every sweep verifies that no two conditions share the same
+effective budget.
+
+\textbf{Repeatability floor.} Repeating four budgets
+($L\in\{40,160,240,320\}$\,ms) four times each at identical seed and
+configuration gives $\sigma=0.00146$ ($2\sigma=0.0029$) under the per-layer
+scheme and $\sigma=0.00251$ ($2\sigma=0.0050$) under the end-to-end scheme,
+each with 12 degrees of freedom. We use the floor of the scheme being
+analysed.
+
+\textbf{Compute.} Per-chunk compute was measured on an Apple M4 (four
+performance and six efficiency cores, 16\,GB) and an ARM64 Linux host (four
+cores, 3.8\,GB), with 28 to 50 timed repetitions after three warm-up
+iterations.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Effective context of per-layer masks}
+\label{sec:reach}
+
+Table~\ref{tab:reach} reports the effective future context of the complete
+WavLM model, nine encoder layers and four probe blocks, under the three
+schemes. Both exact schemes match the nominal value at every budget tested.
+Under the per-layer scheme the effective context is at least 200\,ms at a
+nominal 20\,ms, 220\,ms at 40\,ms, 780\,ms at 160\,ms and 2.82\,s at
+640\,ms. The theoretical bound of \S\ref{sec:mask}, $13(N_L+1)$ frames, is
+520\,ms at a nominal 20\,ms.
+
+\begin{table}[t]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.93}
+\caption{Effective future context (ms) of the complete model, WavLM base+
+tapped at layer 9 with a four-block probe, $c=40$\,ms. The nominal value is
+the remainder of the chunk plus $L$. Per-layer values are lower bounds at a
+$10^{-4}$ threshold.}
+\label{tab:reach}
+\begin{tabular}{rrrrr}
+\toprule
+$L$ (ms) & nominal & per-layer & end-to-end & encoder-first \\
+\midrule
+0   & 20  & 20          & 20  & 20 \\
+20  & 40  & $\geq$200   & 40  & 40 \\
+40  & 60  & $\geq$220   & 60  & 60 \\
+60  & 80  & $\geq$360   & 80  & 80 \\
+160 & 180 & $\geq$780   & 180 & 180 \\
+640 & 660 & $\geq$2820  & 660 & 660 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Lookahead response under the three schemes}
+\label{sec:schemes}
+
+Fig.~\ref{fig:schemes} and Table~\ref{tab:schemes} show test PER of the
+canonical-phone probe against nominal lookahead. Under the per-layer scheme
+PER falls from $0.4256$ to $0.1561$, a relative reduction of 63.3\%, at an
+exchange rate of $-0.0453$ PER per doubling ($R^2=0.985$). Under the
+encoder-first scheme it falls from $0.4238$ to $0.3707$, a reduction of
+12.5\% at $-0.0072$ per doubling. Under the end-to-end scheme it falls from
+$0.4517$ to a minimum of $0.4273$ at 320\,ms (5.4\%) and ends at $0.4352$
+(3.7\%), at $-0.0033$ per doubling ($R^2=0.60$). Relative to exact budgets,
+the per-layer analysis therefore overstates the endpoint benefit of lookahead
+by a factor of five against the encoder-first scheme and seventeen against
+the end-to-end scheme.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig_schemes.pdf}
+\caption{Test PER of the canonical-phone probe (WavLM base+, mean of two
+seeds) against nominal lookahead under the three masking schemes. Only the
+two exact schemes have an effective future context equal to the nominal
+value (Table~\ref{tab:reach}).}
+\label{fig:schemes}
+\end{figure}
+
+\begin{table}[t]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.93}
+\caption{Test PER (canonical-phone arm, WavLM base+, mean of two seeds) under
+the three schemes, with the exchange rate (PER per doubling, $L\geq20$\,ms)
+and the relative reduction from 0 to 640\,ms.}
+\label{tab:schemes}
+\begin{tabular}{rrrr}
+\toprule
+$L$ (ms) & per-layer & encoder-first & end-to-end \\
+\midrule
+0   & 0.4256 & 0.4238 & 0.4517 \\
+20  & 0.3700 & 0.4082 & 0.4486 \\
+40  & 0.3275 & 0.3979 & 0.4446 \\
+80  & 0.2754 & 0.3883 & 0.4335 \\
+160 & 0.2206 & 0.3854 & 0.4301 \\
+320 & 0.1823 & 0.3776 & 0.4273 \\
+640 & 0.1561 & 0.3707 & 0.4352 \\
+\midrule
+exchange rate & $-0.0453$ & $-0.0072$ & $-0.0033$ \\
+reduction 0--640 & 63.3\% & 12.5\% & 3.7\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{End-to-end scheme in detail.} The dense sweep samples every 20\,ms to
+360\,ms. No individual 20\,ms step exceeds the floor of $0.0050$ (the largest,
+40$\rightarrow$60\,ms, is $1.2\times$ the floor), but the cumulative reduction
+from 0 to 80\,ms is $0.0182$ PER, $3.6\times$ the floor and 4.0\% relative.
+Beyond 80\,ms the curve stays within about one floor of its 80\,ms value and
+rises slightly between 360 and 640\,ms. A three-seed sweep on seven budgets
+confirms the shape: the relative reduction from 0 to 640\,ms is 2.8\%, 4.4\%
+and 4.8\% across seeds.
+
+\textbf{Convergence.} All conditions are trained for 1200 steps. To test
+whether the shallow response reflects under-training, five budgets were
+trained to 6000 steps under the end-to-end scheme. Test PER was $0.4183$,
+$0.4078$, $0.3941$, $0.3892$ and $0.4053$ at 0, 40, 160, 240 and 640\,ms.
+Longer training increases the benefit to 7.0\% at 240\,ms, but the response
+remains shallow and 640\,ms is again worse than 240\,ms.
+
+\textbf{Encoder-first scheme in detail.} The two seeds give endpoint
+reductions of 14.2\% and 10.8\% and agree in shape, but differ by up to
+$0.024$ PER at individual budgets (160\,ms), about five times the end-to-end
+floor. The monotone decrease and the endpoint are well supported;
+differences between adjacent budgets above 80\,ms are not resolved.
+
+\subsection{Where the context enters}
+\label{sec:where}
+
+Two comparisons indicate that the location of future context matters as well
+as its amount. First, at $L=0$ the only difference between the encoder-first
+and end-to-end schemes is that encoder frames may attend to the remainder of
+their 40\,ms chunk, one additional 20\,ms frame for half of them. This alone
+reduces PER from $0.4517$ to $0.4238$, a 6.2\% reduction, which exceeds the
+entire benefit of 640\,ms of lookahead under the end-to-end scheme. Second,
+the encoder-first scheme continues to improve at 640\,ms, whereas the
+end-to-end scheme is flat beyond 80\,ms.
+
+Amount nevertheless dominates the per-layer result. The per-layer model at a
+nominal 20\,ms, with at most 520\,ms of effective context, reaches $0.3700$;
+the encoder-first model with a full 660\,ms reaches $0.3707$. The steep
+per-layer curve thus reflects effective contexts of several hundred
+milliseconds to several seconds distributed through all thirteen layers,
+which neither exact scheme provides at these budgets.
+
+\subsection{Canonical against realized targets}
+\label{sec:rq3}
+
+Under the per-layer scheme, the canonical-phone arm gained $1.55\times$ as much
+per doubling of lookahead as the realized-phone arm ($-0.0452$ against
+$-0.0292$), the PER gap between the arms widened from $0.017$ at $L=0$ to
+$0.094$ at 640\,ms, and the canonical arm's preference margin grew
+monotonically in three of three seeds. The earlier version took this as
+evidence that conversion requires more future context than accent-faithful
+transcription.
+
+Under the end-to-end scheme the effect is not resolved. On the dense sweep the
+relative reduction from 0 to 640\,ms is 3.7\% for the canonical arm and 2.4\%
+for the realized arm, with best reductions of 5.4\% and 3.9\%. On the
+three-seed sweep the per-seed reductions are 2.8, 4.4 and 4.8\% for the
+canonical arm against 1.9, 3.5 and 7.8\% for the realized arm, so the arms
+overlap. The canonical arm's preference margin changes from $0.029$ at
+$L=0$ to $0.033$ at 640\,ms and the realized arm's from $0.040$ to $0.036$;
+both changes are within the floor. We therefore withdraw the claim. Whether
+it holds under the encoder-first scheme, which was not run on the realized
+arm, remains open.
+
+\subsection{A second encoder}
+\label{sec:encoder}
+
+The wav2vec~2.0 base layer is selected by phone decodability at $L=0$ under
+the end-to-end scheme: PER is $0.438$, $0.465$, $0.564$, $0.699$ and $0.775$
+at layers 2, 4, 6, 8 and 9, so layer 2 is used. Under the per-layer scheme
+this encoder appeared to respond very differently from WavLM, with a 3.9\%
+endpoint reduction against 63.3\%. Under that scheme, however, the two taps
+sit behind nine and two masked encoder layers respectively, so at equal
+nominal budgets they received very different effective context.
+
+Under exact budgets the two encoders behave alike. In the end-to-end scheme,
+wav2vec~2.0 reaches its best PER at 80\,ms, a 4.0\% reduction from $0.4357$ to
+$0.4183$, and then degrades to $0.4544$ at 640\,ms; a second seed and a
+6000-step run show the same rise beyond 160\,ms. In the encoder-first scheme
+it is flat, with a best reduction of 1.6\% (single seed). The large
+difference between encoders reported for the per-layer scheme was therefore
+mostly a difference in effective context.
+
+\subsection{Compute}
+\label{sec:compute}
+
+Across $L\in[0,640]$\,ms at a 40\,ms chunk, median per-chunk compute of the
+WavLM model varied by $-0.3\%$ to $+1.9\%$ on the M4 and by 0 to $+7.6\%$ on
+the ARM64 host, while the nominal algorithmic term varied seventeenfold. The
+throughput condition $\mathrm{RTF}=\tcmp/c<1$ is not met at this chunk size
+on the M4 ($\tcmp\approx43$--44\,ms), independently of $L$. These
+measurements were taken under the per-layer scheme; the exact schemes apply a
+nonzero lookahead in fewer layers and are not expected to cost more.
+
+\section{Measurement audits}
+\label{sec:lessons}
+
+\textbf{Compounding lookahead.} The central error of the earlier analysis is
+described above. It passed a truncation test, because that test ran at
+$N_L=0$, where nothing compounds, and it produced a smooth and reproducible
+curve ($R^2=0.985$, replicated across seeds and a denser grid).
+Reproducibility of a curve says nothing about whether its abscissa is
+correct. The guard we now apply is to measure effective context at every
+budget before training.
+
+\textbf{A padding error changed the shape of the curve.} An earlier version
+of the probe passed a zero-padded tensor to a depthwise convolution and
+feed-forward layer that ignore the padding mask. The resulting error grew
+with lookahead, from $-0.014$ PER at $L=0$ to $-0.086$ at 320\,ms, so it was
+not a constant offset. All results here postdate the correction.
+
+\textbf{A forced breakpoint estimator returns a breakpoint.} A two-segment fit
+selected by $\Delta$BIC \citep{kassraftery1995} and a
+maximum-distance-to-chord estimator both reported confident knees on the
+per-layer curve, at 40 and 160\,ms, although the curve is log-linear. On
+synthetic data that is log-linear for $L\ge20$\,ms with $L=0$ off the
+extrapolation, including $L=0$ yields $\Delta\mathrm{BIC}=-39$ and a knee at
+40\,ms, and excluding it yields $+5$. Identifiability must be tested by
+perturbing the axis.
+
+\textbf{Silent symbol mismatch.} A phoneme-class map keyed on ARPAbet, applied
+to IPA output, sent 57\% of reference tokens to an ``other'' class and still
+produced per-class results. A pre-specified manner-class analysis of the
+per-layer data, conducted after this was corrected, did not support the
+hypothesis that vowels and approximants benefit more from lookahead than
+obstruents. We do not repeat it under exact budgets, where the total benefit
+is only a few times the floor.
+
+\section{Limitations}
+\label{sec:limitations}
+
+\textbf{Phone-level probe.} All quality results are phone error rates of a
+phone-translation probe over a frozen encoder, not perceived accentedness of
+converted speech, and the requirements of synthesis and prosody may differ.
+
+\textbf{Frozen encoder and scheme coverage.} The patched encoder is used
+without adaptation. A fine-tuned encoder, or one trained for streaming, may
+exploit future context differently. The two exact schemes are two of many
+non-compounding designs; a budget distributed across layers, or a dedicated
+right-context block, was not tested.
+
+\textbf{Statistical resolution.} Most sweeps use two seeds and the
+encoder-first wav2vec~2.0 sweep one. The repeatability floor is global, while
+the per-condition spread varies, and the encoder-first seeds disagree by up to
+five times the floor at individual budgets.
+
+\textbf{Effective-context bounds.} Per-layer effective contexts are lower
+bounds at a fixed threshold; \S\ref{sec:where} uses the theoretical upper
+bound where the measured value is not sufficient.
+
+\textbf{Second encoder.} The layer selected for wav2vec~2.0 is shallow,
+leaving a single encoder layer above the encoder-first lookahead.
+
+\section{Conclusion}
+
+A lookahead budget describes a streaming model only if the model's output
+depends on no more future input than the budget states. In a frozen-encoder
+probe for streaming accent conversion, two conditions for this fail by
+default: masking attention leaves the encoder non-causal, and a per-layer
+lookahead mask compounds with depth, so that a nominal 40\,ms corresponded to
+at least 220\,ms and a nominal 640\,ms to at least 2.8\,s. Both are detected by
+simple input-perturbation tests and both have direct remedies. With exact
+budgets, the probe's error rate falls by 12.5\% over 640\,ms when the
+lookahead enters the first encoder layer and by 3.7\% when it enters after the
+encoder, with most of the latter obtained within 80\,ms, against 63\% under
+per-layer masking. Two secondary conclusions drawn from the per-layer
+analysis, a target asymmetry and an encoder dependence, do not survive.
+Studies of the latency--quality trade-off in streaming speech processing
+should report a measured effective context alongside the nominal budget.
+
+\section*{CRediT authorship contribution statement}
+
+\textbf{Dipesh Tripathi:} Conceptualization, Methodology, Software,
+Investigation, Formal analysis, Data curation, Visualization, Writing --
+original draft, Writing -- review \& editing.
+
+\section*{Declaration of competing interest}
+
+The author declares no known competing financial interests or personal
+relationships that could have appeared to influence the work
+reported in this paper.
+
+\section*{Funding}
+
+This research did not receive any specific grant from funding agencies in the
+public, commercial, or not-for-profit sectors.
+
+\section*{Data availability}
+
+The code, the causality and effective-context tests, the sweep
+configurations, the analysis scripts and the per-condition results for every
+experiment are available at
+\url{https://github.com/Dipeshtripathi13/streaming-fac-lookahead}. The speech
+data is the L2-ARCTIC corpus \citep{l2arctic2018}, used through the
+\texttt{KoelLabs/L2Arctic} release under a CC-BY-NC-4.0 licence; it is not
+redistributed. Given that licence, trained model weights are not released;
+the released configurations reproduce them.
+
+\section*{Ethics statement}
+
+This work used only the publicly released L2-ARCTIC corpus and involved no
+new participant recruitment or data collection. No listening study was run
+and no claim about perceived accentedness is made.
+
+\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
+
+During the preparation of this work the author used Claude (Anthropic) to
+assist with writing and debugging code, scripting analyses, and drafting and
+editing the manuscript text. After using this tool, the author reviewed and
+edited the content as needed and takes full responsibility for the content of
+the published article.
+
+\section*{Acknowledgements}
+
+GPU results were obtained on Google Colab (Tesla T4) and CPU results on
+consumer hardware. Thanks to the maintainers of L2-ARCTIC and WavLM, whose
+public releases made a study of this scope possible.
+
+\bibliographystyle{elsarticle-harv}
+\bibliography{refs}
+
+\end{document}
