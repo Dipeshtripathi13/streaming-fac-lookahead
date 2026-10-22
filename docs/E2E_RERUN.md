@@ -93,3 +93,46 @@ context than the threshold-based bound shows. The test that separates them is
 an encoder-side lookahead that does not compound: exact lookahead in the first
 encoder layer only, all later layers chunk-causal. That needs a code change
 and one more Colab sweep.
+
+## 7. Encoder-side lookahead (`encoder_first`, 22 Oct 2026)
+
+Exact lookahead in encoder layer 0 only; every later encoder layer and every
+probe block chunk-causal. Verified exact for every budget on Colab before
+training. Data: `results/raw/e2e/translator_encfirst.csv`,
+`w2v2_encfirst_l2.csv`.
+
+WavLM base+, canonical-phone arm, 2 seeds:
+
+| L (ms) | per-layer | end-to-end | encoder-first |
+|---:|---:|---:|---:|
+| 0 | 0.4256 | 0.4517 | 0.4238 |
+| 20 | 0.3700 | 0.4486 | 0.4082 |
+| 40 | 0.3275 | 0.4446 | 0.3979 |
+| 80 | 0.2754 | 0.4335 | 0.3883 |
+| 160 | 0.2206 | 0.4301 | 0.3854 |
+| 320 | 0.1823 | 0.4273 | 0.3776 |
+| 640 | 0.1561 | 0.4352 | 0.3707 |
+| gain 0 -> 640 | 63.3% | 3.7% | **12.5%** |
+| slope / doubling | -0.0446 | -0.0035 | -0.0072 |
+
+wav2vec 2.0 base, layer 2, 1 seed: 0.4295 at 0 ms, 0.4226 at 320 ms, 0.4288 at
+640 ms; best gain 1.6%, effectively flat.
+
+Reading:
+
+1. Context inside the encoder is worth more than the same context at the head
+   (12.5% against 3.7% at 640 ms, and the encoder-first curve is still falling
+   at 640 ms rather than flat).
+2. It does not come close to the per-layer result. Per-layer at a labelled
+   20 ms (at most ~520 ms of real future) reaches 0.370; encoder-first with a
+   full 660 ms reaches 0.371. The 63% of the first version was mainly the
+   amount of leaked context, not where it entered.
+3. A small in-encoder context matters disproportionately: at L = 0 the only
+   difference between end-to-end (0.4517) and encoder-first (0.4238) is that
+   encoder frames may see the rest of their 40 ms chunk, one extra 20 ms frame
+   for half of them, and that alone is worth 6%.
+4. The encoder-first seeds disagree by up to 0.024 PER (160 ms), about 5x the
+   repeatability floor, so per-budget differences above 80 ms are not well
+   resolved with two seeds.
+5. The wav2vec 2.0 tap at layer 2 has only two encoder layers above the
+   lookahead layer, and it gains nothing.
