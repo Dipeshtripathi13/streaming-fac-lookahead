@@ -44,7 +44,8 @@ def _first_moved(cfg: TranslatorConfig, encoder, wav_a, wav_b):
     probe.eval()
 
     def run(w):
-        with torch.no_grad(), MaskInjector(encoder, cfg.encoder_geometry):
+        with torch.no_grad(), MaskInjector(encoder, cfg.encoder_geometry,
+                                           first_layer_only=cfg.encoder_first_layer_only):
             h = encoder(torch.from_numpy(w)[None],
                         output_hidden_states=True).hidden_states[cfg.encoder_layer]
             return probe(h)[0]
@@ -106,12 +107,13 @@ def measure(encoder_name: str, encoder_layer: int, lookaheads: Sequence[float],
 
 def reach_selftest(encoder_name: str, encoder_layer: int,
                    lookaheads: Sequence[float], chunk_ms: float = 40.0,
-                   lookback_ms: float = 2000.0) -> Dict[str, object]:
+                   lookback_ms: float = 2000.0,
+                   scope: str = "end_to_end") -> Dict[str, object]:
     """Gate for a sweep: every budget's measured future context must equal the
     one its label promises."""
-    rows = measure(encoder_name, encoder_layer, lookaheads, "end_to_end",
+    rows = measure(encoder_name, encoder_layer, lookaheads, scope,
                    chunk_ms=chunk_ms, lookback_ms=lookback_ms)
-    return {"scope": "end_to_end", "encoder": encoder_name,
+    return {"scope": scope, "encoder": encoder_name,
             "layer": encoder_layer, "tolerance": TOL, "rows": rows,
             "ok": all(r["exact"] for r in rows)}
 
@@ -126,7 +128,7 @@ def main() -> None:
     a = ap.parse_args()
 
     report = {"encoder": a.encoder_name, "layer": a.encoder_layer, "tolerance": TOL}
-    for scope in ("end_to_end", "per_layer"):
+    for scope in ("end_to_end", "encoder_first", "per_layer"):
         rows = measure(a.encoder_name, a.encoder_layer, a.lookaheads, scope)
         report[scope] = rows
         print(f"\n{scope}  ({a.encoder_name}, layer {a.encoder_layer}, chunk 40 ms)")

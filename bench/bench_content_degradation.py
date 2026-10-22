@@ -213,10 +213,15 @@ class MaskInjector:
     We fall back to that if `torch_multi_head_self_attention` is absent.
     """
 
-    def __init__(self, model, geom: Optional[StreamGeometry]):
+    def __init__(self, model, geom: Optional[StreamGeometry],
+                 first_layer_only: bool = False):
+        """first_layer_only: apply geom's lookahead in encoder layer 0 only
+        and keep every later layer chunk-causal (lookahead 0), so the
+        lookahead cannot compound with depth."""
         import torch
         self.model = model
         self.geom = geom
+        self.first_layer_only = first_layer_only
         self._cache: Dict[Tuple[int, str], "torch.Tensor"] = {}
         self._orig = []
         if geom is None:
@@ -225,47 +230,53 @@ class MaskInjector:
         layers = list(model.encoder.layers)
         if hasattr(layers[0].attention, "torch_multi_head_self_attention"):
             self.strategy = "position_bias"
-            for layer in layers:
+            for k, layer in enumerate(layers):
                 att = layer.attention
                 self._orig.append((att, "torch_multi_head_self_attention",
                                    att.torch_multi_head_self_attention))
                 att.torch_multi_head_self_attention = self._wrap_mha(
-                    att.torch_multi_head_self_attention)
+                    att.torch_multi_head_self_attention, self._layer_la(k))
         else:
             self.strategy = "layer_attention_mask"
-            for layer in layers:
+            for k, layer in enumerate(layers):
                 self._orig.append((layer, "forward", layer.forward))
-                layer.forward = self._wrap_layer(layer.forward)
+                layer.forward = self._wrap_layer(layer.forward, self._layer_la(k))
 
-    def _mask2d(self, T: int, dtype, device):
+    def _layer_la(self, k: int) -> int:
+        if self.first_layer_only and k > 0:
+            return 0
+        return self.geom.lookahead_frames
+
+    def _mask2d(self, T: int, dtype, device, lookahead_frames: Optional[int] = None):
         """(T, T) additive mask. Broadcasts over the (B*H, T, T) position bias."""
         import torch
-        key = (T, f"{device}{dtype}")
+        la = self.geom.lookahead_frames if lookahead_frames is None else lookahead_frames
+        key = (T, f"{device}{dtype}", la)
         m = self._cache.get(key)
         if m is None:
             bm = chunked_lookahead_mask(
                 T,
                 chunk_frames=self.geom.chunk_frames,
-                lookahead_frames=self.geom.lookahead_frames,
+                lookahead_frames=la,
                 lookback_frames=self.geom.lookback_frames,
             )
             m = torch.from_numpy(np.where(bm, 0.0, NEG)).to(dtype=dtype, device=device)
             self._cache[key] = m
         return m
 
-    def _wrap_mha(self, orig):
+    def _wrap_mha(self, orig, la: int):
         # transformers <=5.15 called this with a positional `output_attentions`;
         # 5.16 dropped it. Take the trailing arguments as *a and pass them
         # straight through, so one wrapper serves both signatures -- a pinned
         # version would otherwise silently decide whether the mask is applied.
         def mha(hidden_states, attention_mask, gated_position_bias, *a, **kw):
             m = self._mask2d(hidden_states.shape[1], gated_position_bias.dtype,
-                             gated_position_bias.device)
+                             gated_position_bias.device, la)
             return orig(hidden_states, attention_mask,
                         gated_position_bias + m, *a, **kw)
         return mha
 
-    def _wrap_layer(self, orig):
+    def _wrap_layer(self, orig, la: int):
         """Non-WavLM path: add the lookahead mask to the layer's own mask.
 
         This must ADD, not replace. `Wav2Vec2Encoder.forward` builds a padding
@@ -287,7 +298,7 @@ class MaskInjector:
 
         def fwd(hidden_states, attention_mask=None, *a, **kw):
             m = self._mask2d(hidden_states.shape[1], hidden_states.dtype,
-                             hidden_states.device)[None, None]
+                             hidden_states.device, la)[None, None]
             if attention_mask is None:
                 combined = m
             elif attention_mask.dtype == torch.bool:

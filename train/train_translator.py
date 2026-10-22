@@ -186,7 +186,8 @@ class Frontend:
             am[i, :n] = 1
         am = am.to(self.device)
         geom = self.cfg.encoder_geometry
-        with torch.no_grad(), self.MaskInjector(self.model, geom):
+        with torch.no_grad(), self.MaskInjector(
+                self.model, geom, first_layer_only=self.cfg.encoder_first_layer_only):
             out = self.model(x, attention_mask=am, output_hidden_states=True)
         h = out.hidden_states[self.cfg.encoder_layer]
         T = h.shape[1]
@@ -481,13 +482,15 @@ def main() -> None:
                          "properties and a different backbone can fail where "
                          "WavLM passes.")
     ap.add_argument("--lookahead-scope", default="end_to_end",
-                    choices=["end_to_end", "per_layer"],
+                    choices=["end_to_end", "per_layer", "encoder_first"],
                     help="end_to_end: strictly causal encoder, lookahead in the "
                          "first probe block only, so total future context is "
                          "exactly chunk + lookahead. per_layer: mask every "
                          "layer; right context compounds with depth and the "
                          "label understates it. per_layer reproduces the first "
-                         "arXiv version and nothing else should use it.")
+                         "arXiv version and nothing else should use it. "
+                         "encoder_first: exact lookahead in encoder layer 0 "
+                         "only, everything after it chunk-causal.")
     ap.add_argument("--encoder-layer", type=int, default=9,
                     help="Hidden-state index to tap. 9 is the usual phonetic "
                          "layer for base-size models.")
@@ -529,10 +532,11 @@ def main() -> None:
         # The truncation proof runs at L = 0, where nothing can compound, so it
         # says nothing about whether a lookahead LABEL is the future context
         # the model really gets. Measure that for every budget in the sweep.
-        if a.lookahead_scope == "end_to_end" and not a.unfreeze:
+        if a.lookahead_scope in ("end_to_end", "encoder_first") and not a.unfreeze:
             from effective_lookahead import reach_selftest
             rs = reach_selftest(a.encoder_name, a.encoder_layer, a.lookaheads,
-                                chunk_ms=a.chunk_ms, lookback_ms=a.lookback_ms)
+                                chunk_ms=a.chunk_ms, lookback_ms=a.lookback_ms,
+                                scope=a.lookahead_scope)
             print(json.dumps(rs, indent=2))
             if not rs["ok"]:
                 sys.exit("ABORT: measured future context does not equal "

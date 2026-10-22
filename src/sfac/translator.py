@@ -87,6 +87,10 @@ class TranslatorConfig:
     #                 lookahead_ms understates the future the model sees
     #                 (eval/effective_lookahead.py). Kept only to reproduce
     #                 the first arXiv version.
+    #   "encoder_first": the lookahead sits in the FIRST ENCODER layer only;
+    #                 later encoder layers and every probe block are
+    #                 chunk-causal. Also exact, but lets the pretrained encoder
+    #                 build its representation with the future in view.
     lookahead_scope: str = "end_to_end"
     chunk_ms: float = 40.0
     lookback_ms: Optional[float] = 2000.0
@@ -112,7 +116,7 @@ class TranslatorConfig:
     grad_clip: float = 1.0
 
     def __post_init__(self):
-        if self.lookahead_scope not in ("end_to_end", "per_layer"):
+        if self.lookahead_scope not in ("end_to_end", "per_layer", "encoder_first"):
             raise ValueError(f"unknown lookahead_scope={self.lookahead_scope!r}")
         if self.chunk_ms % self.frame_ms:
             raise ValueError(
@@ -135,7 +139,7 @@ class TranslatorConfig:
         encoder frame must not see the rest of its chunk, or an odd number of
         lookahead frames would be rounded up to the next chunk boundary.
         """
-        if self.lookahead_scope == "per_layer":
+        if self.lookahead_scope in ("per_layer", "encoder_first"):
             return self.geometry
         return StreamGeometry(chunk_ms=self.frame_ms, lookahead_ms=0.0,
                               frame_ms=self.frame_ms, lookback_ms=self.lookback_ms,
@@ -144,9 +148,14 @@ class TranslatorConfig:
     def block_lookahead_frames(self, block: int) -> int:
         """Lookahead of probe block `block`; later blocks stay chunk-causal
         under "end_to_end" so the first block's lookahead does not compound."""
-        if self.lookahead_scope == "per_layer" or block == 0:
+        if self.lookahead_scope == "per_layer" or (
+                self.lookahead_scope == "end_to_end" and block == 0):
             return self.geometry.lookahead_frames
         return 0
+
+    @property
+    def encoder_first_layer_only(self) -> bool:
+        return self.lookahead_scope == "encoder_first"
 
     def fingerprint(self) -> Dict[str, object]:
         d = asdict(self)

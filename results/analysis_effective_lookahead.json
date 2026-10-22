@@ -32,39 +32,62 @@
       "max_rel_change_before": 1.0196010407526046e-05
     },
     {
-      "lookahead_ms": 80.0,
-      "expected_future_ms": 100.0,
-      "measured_future_ms": 100.0,
-      "exact": true,
-      "max_rel_change_before": 1.0796506103361025e-05
-    },
-    {
       "lookahead_ms": 160.0,
       "expected_future_ms": 180.0,
       "measured_future_ms": 180.0,
       "exact": true,
-      "max_rel_change_before": 1.927012635860592e-05
-    },
-    {
-      "lookahead_ms": 220.0,
-      "expected_future_ms": 240.0,
-      "measured_future_ms": 240.0,
-      "exact": true,
-      "max_rel_change_before": 1.1911754882021341e-05
-    },
-    {
-      "lookahead_ms": 340.0,
-      "expected_future_ms": 360.0,
-      "measured_future_ms": 360.0,
-      "exact": true,
-      "max_rel_change_before": 9.147679520538077e-06
+      "max_rel_change_before": 1.0641991138982121e-05
     },
     {
       "lookahead_ms": 640.0,
       "expected_future_ms": 660.0,
       "measured_future_ms": 660.0,
       "exact": true,
-      "max_rel_change_before": 1.1487483789096586e-05
+      "max_rel_change_before": 2.036943806160707e-05
+    }
+  ],
+  "encoder_first": [
+    {
+      "lookahead_ms": 0.0,
+      "expected_future_ms": 20.0,
+      "measured_future_ms": 20.0,
+      "exact": true,
+      "max_rel_change_before": 1.6660398614476435e-05
+    },
+    {
+      "lookahead_ms": 20.0,
+      "expected_future_ms": 40.0,
+      "measured_future_ms": 40.0,
+      "exact": true,
+      "max_rel_change_before": 1.3077553376206197e-05
+    },
+    {
+      "lookahead_ms": 40.0,
+      "expected_future_ms": 60.0,
+      "measured_future_ms": 60.0,
+      "exact": true,
+      "max_rel_change_before": 1.5329980669775978e-05
+    },
+    {
+      "lookahead_ms": 60.0,
+      "expected_future_ms": 80.0,
+      "measured_future_ms": 80.0,
+      "exact": true,
+      "max_rel_change_before": 1.0015301995736081e-05
+    },
+    {
+      "lookahead_ms": 160.0,
+      "expected_future_ms": 180.0,
+      "measured_future_ms": 180.0,
+      "exact": true,
+      "max_rel_change_before": 1.4440244740399066e-05
+    },
+    {
+      "lookahead_ms": 640.0,
+      "expected_future_ms": 660.0,
+      "measured_future_ms": 660.0,
+      "exact": true,
+      "max_rel_change_before": 7.986976015672553e-06
     }
   ],
   "per_layer": [
@@ -97,39 +120,18 @@
       "max_rel_change_before": 9.680745279183611e-05
     },
     {
-      "lookahead_ms": 80.0,
-      "expected_future_ms": 100.0,
-      "measured_future_ms": 460.0,
-      "exact": false,
-      "max_rel_change_before": 4.6658533392474055e-05
-    },
-    {
       "lookahead_ms": 160.0,
       "expected_future_ms": 180.0,
       "measured_future_ms": 780.0,
       "exact": false,
-      "max_rel_change_before": 7.998462388059124e-05
-    },
-    {
-      "lookahead_ms": 220.0,
-      "expected_future_ms": 240.0,
-      "measured_future_ms": 1040.0,
-      "exact": false,
-      "max_rel_change_before": 8.748649997869506e-05
-    },
-    {
-      "lookahead_ms": 340.0,
-      "expected_future_ms": 360.0,
-      "measured_future_ms": 1500.0,
-      "exact": false,
-      "max_rel_change_before": 9.345778380520642e-05
+      "max_rel_change_before": 8.862531831255183e-05
     },
     {
       "lookahead_ms": 640.0,
       "expected_future_ms": 660.0,
       "measured_future_ms": 2820.0,
       "exact": false,
-      "max_rel_change_before": 9.477615094510838e-05
+      "max_rel_change_before": 9.394623339176178e-05
     }
   ]
 }
